@@ -1,0 +1,1 @@
+Zdrojové kódy k semestrálnym prácam z predmetu Algoritmy a údajové štruktúry 2 (AUS2) na FRI UNIZA.
