@@ -76,10 +76,14 @@
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
                         <TextBlock Text="Nodes count:" />
                         <TextBlock x:Name="_txt_NodesCount" Grid.Column="2" TextAlignment="Right" />
+
+                        <TextBlock Text="Tree depth:" Grid.Row="1" />
+                        <TextBlock x:Name="_txt_TreeDepth" Grid.Column="2" Grid.Row="1" TextAlignment="Right" />
                     </Grid>
                 </GroupBox>
             </StackPanel>

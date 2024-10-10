@@ -71,6 +71,7 @@ namespace FRI.AUS2.StuctureTester
         private void _updateStatistics()
         {
             _txt_NodesCount.Text = _exampleStructure.NodesCount.ToString();
+            _txt_TreeDepth.Text = _exampleStructure.Depth.ToString();
         }
 
         private void _btn_ViewerRerender_Click(object sender, RoutedEventArgs e)
