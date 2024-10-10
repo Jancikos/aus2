@@ -21,23 +21,27 @@ namespace FRI.AUS2.StuctureTester
     {
         private KdTree<KdExampleData> _exampleStructure;
 
+        // viewer
+        private bool _isViewerExpanded = true;
+        private int _viewerExpandedLevel;
+
         public MainWindow()
         {
             InitializeComponent();
 
             _exampleStructure = new KdTree<KdExampleData>();
 
-            _exampleStructure.Insert(new KdExampleData() { X = 0, Y = 0, Data = 1 });
+            _exampleStructure.Insert(new KdExampleData() { X = 10, Y = 0, Data = 1 });
 
             _exampleStructure.Insert(new KdExampleData() { X = 0, Y = 1, Data = 2 });
-            _exampleStructure.Insert(new KdExampleData() { X = 1, Y = 1, Data = 3 });
+            _exampleStructure.Insert(new KdExampleData() { X = 1, Y = 5, Data = 3 });
             _exampleStructure.Insert(new KdExampleData() { X = 2, Y = 3, Data = 4 });
             _exampleStructure.Insert(new KdExampleData() { X = 3, Y = 5, Data = 5 });
             _exampleStructure.Insert(new KdExampleData() { X = 5, Y = 8, Data = 6 });
             _exampleStructure.Insert(new KdExampleData() { X = 8, Y = 13, Data = 7 });
             _exampleStructure.Insert(new KdExampleData() { X = 13, Y = 21, Data = 8 });
             _updateStatistics();
-            _rerenderTree();
+            _viewerRerenderTree();
         }
 
         private void _mnitem_Test_Click(object sender, RoutedEventArgs e)
@@ -61,7 +65,7 @@ namespace FRI.AUS2.StuctureTester
 
             _exampleStructure.Insert(newExampleData);
             _updateStatistics();
-            _rerenderTree();
+            _viewerRerenderTree();
         }
 
         private void _updateStatistics()
@@ -69,19 +73,21 @@ namespace FRI.AUS2.StuctureTester
             _txt_NodesCount.Text = _exampleStructure.NodesCount.ToString();
         }
 
-        private void _btn_Render_Click(object sender, RoutedEventArgs e)
+        private void _btn_ViewerRerender_Click(object sender, RoutedEventArgs e)
         {
-            _rerenderTree();
+            _viewerRerenderTree();
         }
 
-        private void _rerenderTree()
+        private void _viewerRerenderTree()
         {
-            _treeView_Structure.Items.Clear();
+            _treeView_Tree.Items.Clear();
 
             if (_exampleStructure.RootNode is not null)
             {
-                _treeView_Structure.Items.Add(_createTreeViewItem(_exampleStructure.RootNode));
+                _treeView_Tree.Items.Add(_createTreeViewItem(_exampleStructure.RootNode));
             }
+
+            _viewerExpandedLevel = _exampleStructure.Depth - 1;
         }
 
         private TreeViewItem _createTreeViewItem(KdTreeNode<KdExampleData> node)
@@ -89,7 +95,8 @@ namespace FRI.AUS2.StuctureTester
             var item = new TreeViewItem()
             {
                 Header = node.Data.ToString(),
-                IsExpanded = true
+                IsExpanded = true,
+                Foreground = node.Level % 2 == 0 ? Brushes.Red : Brushes.Blue // otrasna zlozitost
             };
 
             if (node.LeftChild is not null)
@@ -104,31 +111,95 @@ namespace FRI.AUS2.StuctureTester
 
             return item;
         }
-    }
 
-    internal class KdExampleData : IKdTreeData
-    {
-        public int X { get; set; }
-        public int Y { get; set; }
-
-        public int Data { get; set; }
-
-        public int Compare(int level, IKdTreeData other)
+        private void _btn_ViewerToggleCollapse_Click(object sender, RoutedEventArgs e)
         {
-            switch (level % 2)
+            _viewerToggleExpanded(_treeView_Tree);
+        }
+
+        private void _viewerToggleExpanded(TreeView treeView)
+        {
+            _isViewerExpanded = !_isViewerExpanded;
+            _viewerExpandedLevel = _isViewerExpanded
+                ? _exampleStructure.Depth - 1
+                : 0;
+
+            _viewerExpandToLevel(treeView, _viewerExpandedLevel);
+        }
+
+        private void _viewerExpandToLevel(TreeView treeView, int maxLevel)
+        {
+            int currentLevel = 0;
+
+            var actaulLevelQueue = new Queue<TreeViewItem>();
+            var nextLevelQueue = new Queue<TreeViewItem>();
+
+            actaulLevelQueue.Enqueue((TreeViewItem)treeView.Items[0]);
+
+            while (actaulLevelQueue.Count > 0)
             {
-                case 0:
-                    return X.CompareTo(((KdExampleData)other).X);
-                case 1:
-                    return Y.CompareTo(((KdExampleData)other).Y);
-                default:
-                    throw new InvalidOperationException("Invalid level.");
+                var item = actaulLevelQueue.Dequeue();
+
+                if (currentLevel < maxLevel)
+                {
+                    item.IsExpanded = true;
+                }
+                else
+                {
+                    item.IsExpanded = false;
+                }
+
+                item.Items.Cast<TreeViewItem>().ToList().ForEach(nextLevelQueue.Enqueue);
+
+                if (actaulLevelQueue.Count == 0)
+                {
+                    actaulLevelQueue = nextLevelQueue;
+                    nextLevelQueue = new Queue<TreeViewItem>();
+                    currentLevel++;
+                }
             }
         }
 
-        public override string ToString()
+        private void _btn_ViewerExpandLevel_Click(object sender, RoutedEventArgs e)
         {
-            return $"[{X}, {Y}]: {Data}";
+            _viewerExpandToLevel(_treeView_Tree, ++_viewerExpandedLevel);
+        }
+
+        private void _btn_ViewerCollapseLevel_Click(object sender, RoutedEventArgs e)
+        {
+            if (_viewerExpandedLevel > 0)
+            {
+                _viewerExpandedLevel--;
+            }
+
+            _viewerExpandToLevel(_treeView_Tree, _viewerExpandedLevel);
+        }
+
+
+        internal class KdExampleData : IKdTreeData
+        {
+            public int X { get; set; }
+            public int Y { get; set; }
+
+            public int Data { get; set; }
+
+            public int Compare(int level, IKdTreeData other)
+            {
+                switch (level % 2)
+                {
+                    case 0:
+                        return X.CompareTo(((KdExampleData)other).X);
+                    case 1:
+                        return Y.CompareTo(((KdExampleData)other).Y);
+                    default:
+                        throw new InvalidOperationException("Invalid level.");
+                }
+            }
+
+            public override string ToString()
+            {
+                return $"[{X}, {Y}]: {Data}";
+            }
         }
     }
 }
