@@ -30,18 +30,28 @@ namespace FRI.AUS2.StuctureTester
             InitializeComponent();
 
             _exampleStructure = new KdTree<KdExampleData>();
+            _initTreeNodes();
 
-            _exampleStructure.Insert(new KdExampleData() { X = 10, Y = 0, Data = 1 });
-
-            _exampleStructure.Insert(new KdExampleData() { X = 0, Y = 1, Data = 2 });
-            _exampleStructure.Insert(new KdExampleData() { X = 1, Y = 5, Data = 3 });
-            _exampleStructure.Insert(new KdExampleData() { X = 2, Y = 3, Data = 4 });
-            _exampleStructure.Insert(new KdExampleData() { X = 3, Y = 5, Data = 5 });
-            _exampleStructure.Insert(new KdExampleData() { X = 5, Y = 8, Data = 6 });
-            _exampleStructure.Insert(new KdExampleData() { X = 8, Y = 13, Data = 7 });
-            _exampleStructure.Insert(new KdExampleData() { X = 13, Y = 21, Data = 8 });
             _updateStatistics();
             _viewerRerenderTree();
+        }
+
+        private void _initTreeNodes()
+        {
+            int i = 0;
+
+            // root
+            _exampleStructure.Insert(new KdExampleData() { X = 10, Y = 10, Data = ++i });
+
+            // level 1
+            _exampleStructure.Insert(new KdExampleData() { X = 15, Y = 10, Data = ++i });
+            _exampleStructure.Insert(new KdExampleData() { X = 5, Y = 10, Data = ++i });
+
+            // level 2
+            _exampleStructure.Insert(new KdExampleData() { X = 15, Y = 15, Data = ++i });
+            _exampleStructure.Insert(new KdExampleData() { X = 14, Y = 5, Data = ++i });
+            _exampleStructure.Insert(new KdExampleData() { X = 10, Y = 15, Data = ++i });
+            _exampleStructure.Insert(new KdExampleData() { X = 10, Y = 5, Data = ++i });
         }
 
         private void _mnitem_Test_Click(object sender, RoutedEventArgs e)
@@ -93,9 +103,11 @@ namespace FRI.AUS2.StuctureTester
 
         private TreeViewItem _createTreeViewItem(KdTreeNode<KdExampleData> node)
         {
+            string prefix = node.IsLeftChild ? "L " : (node.IsRightChild ? "R " : "");
+
             var item = new TreeViewItem()
             {
-                Header = node.Data.ToString(),
+                Header = $"{prefix}{node.Data}",
                 IsExpanded = true,
                 Foreground = node.Level % 2 == 0 ? Brushes.Red : Brushes.Blue // otrasna zlozitost
             };
