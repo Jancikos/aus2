@@ -54,11 +54,15 @@ namespace FRI.AUS2.StuctureTester
             _exampleStructure.Insert(new KdExampleData() { X = 10, Y = 5, Data = ++i });
         }
 
-        private void _mnitem_Test_Click(object sender, RoutedEventArgs e)
+        private void _mnitem_TreeClear_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show($"ExampleStructure node count: {_exampleStructure.NodesCount}", Title);
-        }
+            // clear tree
+            _exampleStructure.Clear();
 
+            // rerender tree view and stats
+            _viewerRerenderTree();
+            _updateStatistics();
+        }
         private void _mnitem_Close_Click(object sender, RoutedEventArgs e)
         {
             Close();

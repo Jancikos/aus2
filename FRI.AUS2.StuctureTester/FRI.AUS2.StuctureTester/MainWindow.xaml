@@ -22,9 +22,10 @@
 
         <StackPanel>
             <Menu>
-                <MenuItem Header="File">
-                    <MenuItem x:Name="_mnitem_Test" Header="Test" Click="_mnitem_Test_Click" />
+                <MenuItem Header="Tree">
+                    <MenuItem x:Name="_mnitem_TreeClear" Header="Clear" Click="_mnitem_TreeClear_Click" />
                 </MenuItem>
+                
                 <MenuItem x:Name="_mnitem_Close" Header="Close" Click="_mnitem_Close_Click" />
             </Menu>
         </StackPanel>
