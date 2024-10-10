@@ -22,6 +22,11 @@ namespace FRI.AUS2.Libs.Structures.Trees
             _rootNode = null;
         }
 
+        public void Clear()
+        {
+            _rootNode = null;
+        }
+
         public void Insert(T data)
         {
             if (_rootNode is null)
