@@ -14,7 +14,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
         public int Depth
         {
-            get => _getDepth(_rootNode);
+            get => _rootNode?.SubtreeDepth ?? 0;
         }
 
         public KdTree()
@@ -120,17 +120,6 @@ namespace FRI.AUS2.Libs.Structures.Trees
         {
             throw new NotImplementedException();
         }
-
-        private int _getDepth(KdTreeNode<T>? node)
-        {
-            if (node is null)
-            {
-                return 0;
-            }
-
-            // POZOR na rekurziu
-            return 1 + System.Math.Max(_getDepth(node.LeftChild), _getDepth(node.RightChild));
-        }
     }
 
     public class KdTreeNode<T> where T : class, IKdTreeData
@@ -153,6 +142,31 @@ namespace FRI.AUS2.Libs.Structures.Trees
             get => _getLevel();
         }
 
+        /// <value>depth of the subtree where this note is root</value>
+        public int SubtreeDepth
+        {
+            get => _getSubtreeDepth(this);
+        }
+
+        /// <value>indicates whether the node is the right child of its parent</value>
+        public bool IsRightChild
+        {
+            get
+            {
+                return Parent?.RightChild == this;
+            }
+        }
+
+        /// <value>indicates whether the node is the left child of its parent</value>
+        public bool IsLeftChild
+        {
+            get
+            {
+                return Parent?.LeftChild == this;
+            }
+        }
+
+
         public KdTreeNode(KdTreeNode<T>? parent, T data)
         {
             Parent = parent;
@@ -172,6 +186,18 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
 
             return level;
+        }
+
+        /// <returns>depth of the subtree</returns>
+        private int _getSubtreeDepth(KdTreeNode<T>? node)
+        {
+            if (node is null)
+            {
+                return 0;
+            }
+
+            // POZOR na rekurziu
+            return 1 + System.Math.Max(_getSubtreeDepth(node.LeftChild), _getSubtreeDepth(node.RightChild));
         }
     }
 }
