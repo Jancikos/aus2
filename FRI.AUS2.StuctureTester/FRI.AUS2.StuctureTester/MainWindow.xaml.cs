@@ -36,6 +36,7 @@ namespace FRI.AUS2.StuctureTester
             _exampleStructure.Insert(new KdExampleData() { X = 5, Y = 8, Data = 6 });
             _exampleStructure.Insert(new KdExampleData() { X = 8, Y = 13, Data = 7 });
             _exampleStructure.Insert(new KdExampleData() { X = 13, Y = 21, Data = 8 });
+            _updateStatistics();
         }
 
         private void _mnitem_Test_Click(object sender, RoutedEventArgs e)
@@ -46,6 +47,24 @@ namespace FRI.AUS2.StuctureTester
         private void _mnitem_Close_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void _btn_ManualInsert_Click(object sender, RoutedEventArgs e)
+        {
+            var newExampleData = new KdExampleData()
+            {
+                X = int.Parse(_txtb_X.Text),
+                Y = int.Parse(_txtb_Y.Text),
+                Data = int.Parse(_txtb_Data.Text)
+            };
+
+            _exampleStructure.Insert(newExampleData);
+            _updateStatistics();
+        }
+
+        private void _updateStatistics()
+        {
+            _txt_NodesCount.Text = _exampleStructure.NodesCount.ToString();
         }
     }
 
