@@ -12,6 +12,11 @@ namespace FRI.AUS2.Libs.Structures.Trees
             get => _countNodes(_rootNode);
         }
 
+        public int Depth
+        {
+            get => _getDepth(_rootNode);
+        }
+
         public KdTree()
         {
             _rootNode = null;
@@ -46,7 +51,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
 
             KdTreeNode<T> newNode = new KdTreeNode<T>(parentNode, data);
-            int comparison = data.Compare(_getNodeLevel(parentNode), parentNode.Data);
+            int comparison = data.Compare(parentNode.Level, parentNode.Data);
             if (comparison <= 0)
             {
                 parentNode.LeftChild = newNode;
@@ -71,7 +76,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
             while (currentNode != null)
             {
                 lastVisitedNode = currentNode;
-                int comparison = data.Compare(_getNodeLevel(currentNode), currentNode.Data);
+                int comparison = data.Compare(currentNode.Level, currentNode.Data);
 
                 if (comparison == 0)
                 {
@@ -94,20 +99,6 @@ namespace FRI.AUS2.Libs.Structures.Trees
             return null;
         }
 
-        private int _getNodeLevel(KdTreeNode<T> node)
-        {
-            int level = 0;
-            var currentNode = node;
-
-            while (currentNode.Parent != null)
-            {
-                level++;
-                currentNode = currentNode.Parent;
-            }
-
-            return level;
-        }
-
         private int _countNodes(KdTreeNode<T>? node)
         {
             if (node is null)
@@ -116,7 +107,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
 
             // POZOR na rekurziu => nahradit iteratorom
-            return 1 + _countNodes(node.LeftChild) + _countNodes(node.RightChild); 
+            return 1 + _countNodes(node.LeftChild) + _countNodes(node.RightChild);
         }
         public T? Find(T data)
         {
@@ -130,6 +121,16 @@ namespace FRI.AUS2.Libs.Structures.Trees
             throw new NotImplementedException();
         }
 
+        private int _getDepth(KdTreeNode<T>? node)
+        {
+            if (node is null)
+            {
+                return 0;
+            }
+
+            // POZOR na rekurziu
+            return 1 + System.Math.Max(_getDepth(node.LeftChild), _getDepth(node.RightChild));
+        }
     }
 
     public class KdTreeNode<T> where T : class, IKdTreeData
@@ -142,15 +143,35 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
         public KdTreeNode<T>? LeftChild { get; set; }
 
-
         public KdTreeNode<T>? RightChild { get; set; }
 
         public T Data { get; set; }
+
+        /// <value>level of the node in the tree</value>
+        public int Level
+        {
+            get => _getLevel();
+        }
 
         public KdTreeNode(KdTreeNode<T>? parent, T data)
         {
             Parent = parent;
             Data = data;
+        }
+
+        /// <returns>level of the node in the tree</returns>
+        private int _getLevel()
+        {
+            int level = 0;
+            var currentNode = this;
+
+            while (currentNode.Parent != null)
+            {
+                level++;
+                currentNode = currentNode.Parent;
+            }
+
+            return level;
         }
     }
 }
