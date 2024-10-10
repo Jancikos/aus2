@@ -77,8 +77,16 @@
                         <TextBlock x:Name="_txt_NodesCount" Grid.Column="2" TextAlignment="Right" />
                     </Grid>
                 </GroupBox>
+            </StackPanel>
+            
+            <!-- tree visualization -->
+            <StackPanel Orientation="Vertical">
+                <TreeView x:Name="_treeView_Structure" />
+
+                <Button x:Name="_btn_Render" Content="Rerender tree" Click="_btn_Render_Click" />
 
             </StackPanel>
+                
         </StackPanel>
 
     </Grid>

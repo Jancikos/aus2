@@ -37,6 +37,7 @@ namespace FRI.AUS2.StuctureTester
             _exampleStructure.Insert(new KdExampleData() { X = 8, Y = 13, Data = 7 });
             _exampleStructure.Insert(new KdExampleData() { X = 13, Y = 21, Data = 8 });
             _updateStatistics();
+            _rerenderTree();
         }
 
         private void _mnitem_Test_Click(object sender, RoutedEventArgs e)
@@ -60,11 +61,48 @@ namespace FRI.AUS2.StuctureTester
 
             _exampleStructure.Insert(newExampleData);
             _updateStatistics();
+            _rerenderTree();
         }
 
         private void _updateStatistics()
         {
             _txt_NodesCount.Text = _exampleStructure.NodesCount.ToString();
+        }
+
+        private void _btn_Render_Click(object sender, RoutedEventArgs e)
+        {
+            _rerenderTree();
+        }
+
+        private void _rerenderTree()
+        {
+            _treeView_Structure.Items.Clear();
+
+            if (_exampleStructure.RootNode is not null)
+            {
+                _treeView_Structure.Items.Add(_createTreeViewItem(_exampleStructure.RootNode));
+            }
+        }
+
+        private TreeViewItem _createTreeViewItem(KdTreeNode<KdExampleData> node)
+        {
+            var item = new TreeViewItem()
+            {
+                Header = node.Data.ToString(),
+                IsExpanded = true
+            };
+
+            if (node.LeftChild is not null)
+            {
+                item.Items.Add(_createTreeViewItem(node.LeftChild));
+            }
+
+            if (node.RightChild is not null)
+            {
+                item.Items.Add(_createTreeViewItem(node.RightChild));
+            }
+
+            return item;
         }
     }
 
