@@ -71,7 +71,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="root">root note of visited hierarchy </param>
+        /// <param name="root">root node of hierarchy that will be visited </param>
         /// <param name="data"></param>
         /// <param name="lastVisitedNode">the node, which was visited last before returning value</param>
         /// <returns> the node where the data lives</returns>
@@ -79,18 +79,21 @@ namespace FRI.AUS2.Libs.Structures.Trees
         {
             lastVisitedNode = null;
             var currentNode = root;
+            int level = root.Level;
 
-            // POZOR  level - zbytocne narasta zlozitost
             while (currentNode != null)
             {
                 lastVisitedNode = currentNode;
-                int comparison = data.Compare(currentNode.Level, currentNode.Data);
+                int comparison = data.Compare(level, currentNode.Data);
 
                 if (comparison == 0)
                 {
                     // found
                     return currentNode;
                 }
+
+                // not found, go to next level
+                level++;
 
                 if (comparison < 0)
                 {
