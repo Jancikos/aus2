@@ -35,20 +35,21 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 return;
             }
 
-            KdTreeNode<T>? parentNode = _findNode(data, out var lastVisitedNode);
-            if (parentNode is not null)
-            {
-                // data already exists, duplicate => go to the deepest left child
-                while (parentNode.LeftChild is not null)
+            KdTreeNode<T>? parentNode = _findNode(_rootNode, data, out var lastVisitedNode);
+
+            if (parentNode is not null && parentNode.LeftChild is not null)
+            { 
+                // data already exists, duplicate => go to the left child and find parent from that tree
+                parentNode = parentNode?.LeftChild;
+                while (parentNode is not null)
                 {
-                    parentNode = parentNode.LeftChild;
+                    parentNode = _findNode(parentNode, data, out lastVisitedNode);
+                    parentNode = parentNode?.LeftChild;
                 }
             }
-            else
-            {
-                // data does not exist, insert new node to the last visited node
-                parentNode = lastVisitedNode;
-            }
+
+            // data does not exist, insert new node to the last visited node
+            parentNode = lastVisitedNode;
 
             if (parentNode is null)
             {
@@ -70,14 +71,16 @@ namespace FRI.AUS2.Libs.Structures.Trees
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="root">root note of visited hierarchy </param>
         /// <param name="data"></param>
         /// <param name="lastVisitedNode">the node, which was visited last before returning value</param>
         /// <returns> the node where the data lives</returns>
-        private KdTreeNode<T>? _findNode(T data, out KdTreeNode<T>? lastVisitedNode)
+        private KdTreeNode<T>? _findNode(KdTreeNode<T> root, T data, out KdTreeNode<T>? lastVisitedNode)
         {
             lastVisitedNode = null;
-            var currentNode = _rootNode;
+            var currentNode = root;
 
+            // POZOR  level - zbytocne narasta zlozitost
             while (currentNode != null)
             {
                 lastVisitedNode = currentNode;
@@ -116,7 +119,12 @@ namespace FRI.AUS2.Libs.Structures.Trees
         }
         public T? Find(T data)
         {
-            var node = _findNode(data, out _);
+            if (_rootNode is null)
+            {
+                return null;
+            }
+
+            var node = _findNode(_rootNode, data, out _);
 
             return node?.Data ?? null;
         }
