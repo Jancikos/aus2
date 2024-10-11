@@ -38,7 +38,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
             KdTreeNode<T>? parentNode = _findNode(_rootNode, data, out var lastVisitedNode);
 
             if (parentNode is not null && parentNode.LeftChild is not null)
-            { 
+            {
                 // data already exists, duplicate => go to the left child and find parent from that tree
                 parentNode = parentNode?.LeftChild;
                 while (parentNode is not null)
@@ -120,14 +120,43 @@ namespace FRI.AUS2.Libs.Structures.Trees
             // POZOR na rekurziu => nahradit iteratorom
             return 1 + _countNodes(node.LeftChild) + _countNodes(node.RightChild);
         }
-        public T? Find(T data)
+        public T? Find(T filter)
         {
             if (_rootNode is null)
             {
                 return null;
             }
 
-            var node = _findNode(_rootNode, data, out _);
+            var node = _findNode(_rootNode, filter, out _);
+
+            if (node is null)
+            {
+                // not found
+                return null;
+            }
+
+            // check if keys are same in all dimensions
+            bool allDimesionsMatch = false;
+            while (node is not null && !allDimesionsMatch)
+            {
+                allDimesionsMatch = true;
+                for (int i = 0; i < filter.GetDiminesionsCount(); i++)
+                {
+                    if (filter.Compare(i, node.Data) != 0)
+                    {
+                        allDimesionsMatch = false;
+
+                        // not same, try to find in left subtree
+                        if (node.LeftChild is null)
+                        {
+                            return null; // left tree doesnt exists, cant be found
+                        }
+
+                        node = _findNode(node.LeftChild, filter, out _);
+                        break;
+                    }
+                }
+            }
 
             return node?.Data ?? null;
         }

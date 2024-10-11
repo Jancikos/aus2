@@ -3,5 +3,6 @@
     public interface IKdTreeData
     {
         public int Compare(int level, IKdTreeData other);
+        public int GetDiminesionsCount();
     }
 }
