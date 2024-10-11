@@ -239,13 +239,14 @@ namespace FRI.AUS2.StuctureTester
         private void _chk_ViewerActive_Checked(object sender, RoutedEventArgs e)
         {
             if (_treeView_Tree is null) return;
-            
+
             IsViewerActivated = _chk_ViewerActive?.IsChecked ?? false;
         }
 
         private void _btn_GenerateNodes_Click(object sender, RoutedEventArgs e)
         {
-            try {
+            try
+            {
                 int count = int.Parse(_txtb_Count.Text);
                 int seed = int.Parse(_txtb_Seed.Text);
 
@@ -267,7 +268,31 @@ namespace FRI.AUS2.StuctureTester
 
                 _updateStatistics();
                 _viewerRerenderTree();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void _btn_ManualFind_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var data = new KdExampleData()
+                {
+                    X = int.Parse(_txtb_findX.Text),
+                    Y = int.Parse(_txtb_findY.Text)
+                };
+
+                var found = _exampleStructure.Find(data);
+
+                _txt_findResult.Text = found is null
+                    ? "Data not found!"
+                    : $"Data: {found.Data}";
+            }
+            catch (Exception ex)
+            {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -281,7 +306,7 @@ namespace FRI.AUS2.StuctureTester
 
             public int Compare(int level, IKdTreeData other)
             {
-                switch (level % 2)
+                switch (level % GetDiminesionsCount())
                 {
                     case 0:
                         return X.CompareTo(((KdExampleData)other).X);
@@ -291,6 +316,8 @@ namespace FRI.AUS2.StuctureTester
                         throw new InvalidOperationException("Invalid level.");
                 }
             }
+
+            public int GetDiminesionsCount() => 2;
 
             public override string ToString()
             {
