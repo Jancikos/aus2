@@ -92,8 +92,10 @@
             <!-- tree visualization -->
             <GroupBox Header="Tree viewer">
                 <StackPanel Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal">
-                        <Button x:Name="_btn_ViewerRerender" Content="Rerender tree" Click="_btn_ViewerRerender_Click" Margin="0 4" />
+                    <StackPanel x:Name="_stk_ViewerControls" Orientation="Horizontal">
+                        <CheckBox x:Name="_chk_ViewerActive" Content="View tree" IsChecked="True" Margin="0 2" VerticalAlignment="Center" Checked="_chk_ViewerActive_Checked" Unchecked="_chk_ViewerActive_Checked" />
+
+                        <Button x:Name="_btn_ViewerRerender" Content="Rerender tree" Click="_btn_ViewerRerender_Click"/>
 
                         <Button x:Name="_btn_ViewerToggleCollapse" Content="Toggle expand" Click="_btn_ViewerToggleCollapse_Click" />
 

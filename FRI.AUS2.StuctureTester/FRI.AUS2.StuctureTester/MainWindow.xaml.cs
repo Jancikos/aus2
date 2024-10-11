@@ -22,6 +22,23 @@ namespace FRI.AUS2.StuctureTester
         private KdTree<KdExampleData> _exampleStructure;
 
         // viewer
+        private bool _isViewerActivated;
+        protected bool IsViewerActivated
+        {
+            get => _isViewerActivated;
+            set
+            {
+                _isViewerActivated = value;
+
+                if (_isViewerActivated)
+                {
+                    _viewerActivate();
+                    return;
+                }
+
+                _viewerDeactivate();
+            }
+        }
         private bool _isViewerExpanded = true;
         private int _viewerExpandedLevel;
 
@@ -33,7 +50,7 @@ namespace FRI.AUS2.StuctureTester
             _initTreeNodes();
 
             _updateStatistics();
-            _viewerRerenderTree();
+            IsViewerActivated = true;
         }
 
         private void _initTreeNodes()
@@ -93,16 +110,43 @@ namespace FRI.AUS2.StuctureTester
             _viewerRerenderTree();
         }
 
-        private void _viewerRerenderTree()
+        private void _viewerDeactivate()
         {
             _treeView_Tree.Items.Clear();
+
+            _isViewerActivated = false;
+
+            _chk_ViewerActive.IsChecked = false;
+            _treeView_Tree.IsEnabled = false;
+
+            // callapse all buttons
+            _stk_ViewerControls.Children.OfType<Button>().ToList().ForEach(b => b.IsEnabled = false);
+        }
+
+        private void _viewerActivate()
+        {
+            _treeView_Tree.IsEnabled = true;
+            _chk_ViewerActive.IsChecked = true;
+            _isViewerActivated = true;
+
+            _viewerRerenderTree();
+
+            // activate all buttons
+            _stk_ViewerControls.Children.OfType<Button>().ToList().ForEach(b => b.IsEnabled = true);
+        }
+
+        private void _viewerRerenderTree()
+        {
+            if (!IsViewerActivated) return;
+
+            _treeView_Tree.Items.Clear();
+            _isViewerExpanded = true;
+            _viewerExpandedLevel = _exampleStructure.Depth - 1;
 
             if (_exampleStructure.RootNode is not null)
             {
                 _treeView_Tree.Items.Add(_createTreeViewItem(_exampleStructure.RootNode));
             }
-
-            _viewerExpandedLevel = _exampleStructure.Depth - 1;
         }
 
         private TreeViewItem _createTreeViewItem(KdTreeNode<KdExampleData> node)
@@ -192,7 +236,12 @@ namespace FRI.AUS2.StuctureTester
             _viewerExpandToLevel(_treeView_Tree, _viewerExpandedLevel);
         }
 
-
+        private void _chk_ViewerActive_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_treeView_Tree is null) return;
+            
+            IsViewerActivated = _chk_ViewerActive?.IsChecked ?? false;
+        }
         internal class KdExampleData : IKdTreeData
         {
             public int X { get; set; }
