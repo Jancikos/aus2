@@ -242,6 +242,12 @@ namespace FRI.AUS2.StuctureTester
             
             IsViewerActivated = _chk_ViewerActive?.IsChecked ?? false;
         }
+
+        private void _btn_GenerateNodes_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Not implemented.");
+        }
+
         internal class KdExampleData : IKdTreeData
         {
             public int X { get; set; }

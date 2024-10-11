@@ -31,14 +31,14 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Vertical" Margin="5">
-            <!-- manual data insert -->
             <StackPanel Orientation="Horizontal">
+                <!-- manual data insert -->
                 <GroupBox Header="Insert node">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" MinWidth="50" />
+                            <ColumnDefinition Width="auto" MinWidth="30" />
                             <ColumnDefinition Width="5" />
-                            <ColumnDefinition Width="*" MinWidth="100" />
+                            <ColumnDefinition Width="*" MinWidth="50" />
                             <ColumnDefinition Width="5" />
                             <ColumnDefinition Width="auto" />
                         </Grid.ColumnDefinitions>
@@ -52,16 +52,59 @@
 
                         <!--node form-->
                         <TextBlock Text="X:" />
-                        <TextBox x:Name="_txtb_X" Grid.Column="2" />
+                        <TextBox x:Name="_txtb_X" Grid.Column="2" TextAlignment="Right"/>
 
                         <TextBlock Text="Y:" Grid.Row="2" />
-                        <TextBox x:Name="_txtb_Y" Grid.Column="2" Grid.Row="2" />
+                        <TextBox x:Name="_txtb_Y" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>
 
                         <TextBlock Text="Data:" Grid.Row="4" />
-                        <TextBox x:Name="_txtb_Data" Grid.Column="2" Grid.Row="4" />
+                        <TextBox x:Name="_txtb_Data" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
 
-                        <Button x:Name="_btn_Insert" Content="Insert" Grid.Column="4" Grid.Row="1" Grid.RowSpan="3"
+                        <Button x:Name="_btn_Insert" Content="Insert" Grid.Column="4" Grid.Row="1" Grid.RowSpan="3" Margin="0"
                             Click="_btn_ManualInsert_Click" />
+                    </Grid>
+                </GroupBox>
+
+                <!-- generate nodes -->
+                <GroupBox Header="Generate nodes">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" MinWidth="30" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="*" MinWidth="50" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="*" MinWidth="30" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="*" MinWidth="50" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="2" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="2" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <!--node form-->
+                        <TextBlock Text="Min X:" />
+                        <TextBox x:Name="_txtb_MinX" Grid.Column="2" TextAlignment="Right" />
+                        <TextBlock Text="Max X:" Grid.Column="4" />
+                        <TextBox x:Name="_txtb_MaxX" Grid.Column="6" TextAlignment="Right" />
+
+                        <TextBlock Text="Min Y:" Grid.Row="2" />
+                        <TextBox x:Name="_txtb_MinY" Grid.Column="2" Grid.Row="2" TextAlignment="Right" />
+                        <TextBlock Text="Max Y:" Grid.Column="4" Grid.Row="2" />
+                        <TextBox x:Name="_txtb_MaxY" Grid.Column="6" Grid.Row="2" TextAlignment="Right" />
+
+                        <TextBlock Text="Count:" Grid.Row="4" />
+                        <TextBox x:Name="_txtb_Count" Grid.Column="2" Grid.Row="4" TextAlignment="Right" />
+                        <TextBlock Text="Seed:" Grid.Column="4" Grid.Row="4" />
+                        <TextBox x:Name="_txtb_Seed" Grid.Column="6" Grid.Row="4" TextAlignment="Right" />
+
+                        <Button x:Name="_btn_GenerateNodes" Content="Generate" Grid.Column="8" Grid.Row="1" Grid.RowSpan="3" Margin="0"
+                            Click="_btn_GenerateNodes_Click" />
                     </Grid>
                 </GroupBox>
             </StackPanel>
