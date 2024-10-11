@@ -245,7 +245,31 @@ namespace FRI.AUS2.StuctureTester
 
         private void _btn_GenerateNodes_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Not implemented.");
+            try {
+                int count = int.Parse(_txtb_Count.Text);
+                int seed = int.Parse(_txtb_Seed.Text);
+
+                int minX = int.Parse(_txtb_MinX.Text);
+                int maxX = int.Parse(_txtb_MaxX.Text);
+
+                int minY = int.Parse(_txtb_MinY.Text);
+                int maxY = int.Parse(_txtb_MaxY.Text);
+
+                var random = new Random(seed);
+                int i = 0;
+                while (++i <= count)
+                {
+                    int x = random.Next(minX, maxX);
+                    int y = random.Next(minY, maxY);
+
+                    _exampleStructure.Insert(new KdExampleData() { X = x, Y = y, Data = i });
+                }
+
+                _updateStatistics();
+                _viewerRerenderTree();
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         internal class KdExampleData : IKdTreeData

@@ -87,21 +87,20 @@
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
-                        <!--node form-->
                         <TextBlock Text="Min X:" />
-                        <TextBox x:Name="_txtb_MinX" Grid.Column="2" TextAlignment="Right" />
+                        <TextBox x:Name="_txtb_MinX" Grid.Column="2" TextAlignment="Right" Text="0" />
                         <TextBlock Text="Max X:" Grid.Column="4" />
-                        <TextBox x:Name="_txtb_MaxX" Grid.Column="6" TextAlignment="Right" />
+                        <TextBox x:Name="_txtb_MaxX" Grid.Column="6" TextAlignment="Right" Text="100" />
 
                         <TextBlock Text="Min Y:" Grid.Row="2" />
-                        <TextBox x:Name="_txtb_MinY" Grid.Column="2" Grid.Row="2" TextAlignment="Right" />
+                        <TextBox x:Name="_txtb_MinY" Grid.Column="2" Grid.Row="2" TextAlignment="Right" Text="0" />
                         <TextBlock Text="Max Y:" Grid.Column="4" Grid.Row="2" />
-                        <TextBox x:Name="_txtb_MaxY" Grid.Column="6" Grid.Row="2" TextAlignment="Right" />
+                        <TextBox x:Name="_txtb_MaxY" Grid.Column="6" Grid.Row="2" TextAlignment="Right" Text="100" />
 
                         <TextBlock Text="Count:" Grid.Row="4" />
-                        <TextBox x:Name="_txtb_Count" Grid.Column="2" Grid.Row="4" TextAlignment="Right" />
+                        <TextBox x:Name="_txtb_Count" Grid.Column="2" Grid.Row="4" TextAlignment="Right" Text="10" />
                         <TextBlock Text="Seed:" Grid.Column="4" Grid.Row="4" />
-                        <TextBox x:Name="_txtb_Seed" Grid.Column="6" Grid.Row="4" TextAlignment="Right" />
+                        <TextBox x:Name="_txtb_Seed" Grid.Column="6" Grid.Row="4" TextAlignment="Right" Text="0" />
 
                         <Button x:Name="_btn_GenerateNodes" Content="Generate" Grid.Column="8" Grid.Row="1" Grid.RowSpan="3" Margin="0"
                             Click="_btn_GenerateNodes_Click" />
