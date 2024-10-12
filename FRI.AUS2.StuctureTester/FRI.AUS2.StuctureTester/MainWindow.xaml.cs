@@ -297,6 +297,28 @@ namespace FRI.AUS2.StuctureTester
             }
         }
 
+        private void _btn_ManualDelete_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var data = new KdExampleData()
+                {
+                    X = int.Parse(_txtb_deleteX.Text),
+                    Y = int.Parse(_txtb_deleteY.Text)
+                };
+
+                _exampleStructure.RemoveException(data);
+
+                _updateStatistics();
+                _viewerRerenderTree();
+
+                _txt_deleteResult.Text = "Data deleted.";
+            } catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         internal class KdExampleData : IKdTreeData
         {
             public int X { get; set; }

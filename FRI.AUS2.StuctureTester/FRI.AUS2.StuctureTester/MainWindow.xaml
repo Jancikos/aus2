@@ -137,6 +137,37 @@
                             Click="_btn_ManualFind_Click" VerticalAlignment="Center" />
                     </Grid>
                 </GroupBox>
+
+                <!-- delete node -->
+                <GroupBox Header="Delete node">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="30" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="*" MinWidth="50" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="2" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="2" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="X:" />
+                        <TextBox x:Name="_txtb_deleteX" Grid.Column="2" TextAlignment="Right"/>
+
+                        <TextBlock Text="Y:" Grid.Row="2" />
+                        <TextBox x:Name="_txtb_deleteY" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>
+
+                        <TextBlock x:Name="_txt_deleteResult" Text="" Grid.Row="5" Grid.ColumnSpan="4" />
+
+                        <Button x:Name="_btn_Delete" Content="Delete" Grid.Column="4" Grid.RowSpan="3" Margin="0"
+                            Click="_btn_ManualDelete_Click" VerticalAlignment="Center" />
+                    </Grid>
+                </GroupBox>
             </StackPanel>
 
             <!-- tree statistics -->
