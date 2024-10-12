@@ -110,24 +110,16 @@ namespace FRI.AUS2.Libs.Structures.Trees
             return null;
         }
 
-        private int _countNodes(KdTreeNode<T>? node)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="filter"></param>
+        /// <param name="lastVisitedNode"></param>
+        /// <returns> the node where all dimensions of data are same as in the node</returns>
+        private KdTreeNode<T>? _findConcretNode(KdTreeNode<T> root, T filter, out KdTreeNode<T>? lastVisitedNode)
         {
-            if (node is null)
-            {
-                return 0;
-            }
-
-            // POZOR na rekurziu => nahradit iteratorom
-            return 1 + _countNodes(node.LeftChild) + _countNodes(node.RightChild);
-        }
-        public T? Find(T filter)
-        {
-            if (_rootNode is null)
-            {
-                return null;
-            }
-
-            var node = _findNode(_rootNode, filter, out _);
+            var node = _findNode(root, filter, out lastVisitedNode);
 
             if (node is null)
             {
@@ -158,12 +150,83 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 }
             }
 
+            return node;
+        }
+
+        private int _countNodes(KdTreeNode<T>? node)
+        {
+            if (node is null)
+            {
+                return 0;
+            }
+
+            // POZOR na rekurziu => nahradit iteratorom
+            return 1 + _countNodes(node.LeftChild) + _countNodes(node.RightChild);
+        }
+        public T? Find(T filter)
+        {
+            if (_rootNode is null)
+            {
+                return null;
+            }
+
+            var node = _findConcretNode(_rootNode, filter, out _);
+
             return node?.Data ?? null;
         }
 
-        public void Remove(T data)
+        /// <param name="filter"></param>
+        /// <param name="throwIfNotFound">whether to throw exception if the filter is not found</param>
+        public void Remove(T filter, bool throwIfNotFound = false)
         {
-            throw new NotImplementedException();
+            if (_rootNode is null)
+            {
+                if (throwIfNotFound)
+                {
+                    throw new InvalidOperationException("Tree is empty.");
+                }
+                return;
+            }
+
+            var node = _findConcretNode(_rootNode, filter, out _);
+
+            if (node is null)
+            {
+                if (throwIfNotFound)
+                {
+                    throw new InvalidOperationException("Node not found.");
+                }
+                return;
+            }
+
+            if (node.IsLeaf)
+            {
+                // remove leaf node
+                if (node.Parent is not null)
+                {
+                    if (node.IsLeftChild)
+                    {
+                        node.Parent.LeftChild = null;
+                    }
+                    if (node.IsRightChild)
+                    {
+                        node.Parent.RightChild = null;
+                    }
+                    node.Parent = null;
+                }
+                return;
+            }
+
+            throw new NotImplementedException("Deletion of not leaf node is not implemented yet.");
+        }
+
+        /// <summary>
+        /// throws exception if the filter is not found
+        /// </summary>
+        /// <param name="filter"></param>
+        public void RemoveException(T filter)
+        {
+            Remove(filter, true);
         }
     }
 
@@ -191,6 +254,12 @@ namespace FRI.AUS2.Libs.Structures.Trees
         public int SubtreeDepth
         {
             get => _getSubtreeDepth(this);
+        }
+
+        /// <value>indicates whether the node is the leaf node</value>
+        public bool IsLeaf
+        {
+            get => LeftChild is null && RightChild is null;
         }
 
         /// <value>indicates whether the node is the right child of its parent</value>
