@@ -153,19 +153,50 @@ namespace FRI.AUS2.Libs.Structures.Trees
             return node;
         }
 
-        private int _countNodes(KdTreeNode<T>? node)
+        /// <summary>
+        /// count all nodes in the tree
+        /// </summary>
+        /// <param name="rootNode"></param>
+        /// <returns></returns>
+        private int _countNodes(KdTreeNode<T>? rootNode)
         {
-            if (node is null)
+            if (rootNode is null)
             {
                 return 0;
             }
 
-            // POZOR na rekurziu => nahradit iteratorom
-            return 1 + _countNodes(node.LeftChild) + _countNodes(node.RightChild);
+            var nodesToProcess = new Queue<KdTreeNode<T>>();
+            nodesToProcess.Enqueue(rootNode);
+
+            int count = 0;
+            while (nodesToProcess.Count > 0)
+            {
+                var currentNode = nodesToProcess.Dequeue();
+
+                if (currentNode is null)
+                {
+                    continue;
+                }
+
+                if (currentNode.LeftChild is not null)
+                {
+                    nodesToProcess.Enqueue(currentNode.LeftChild);
+
+                }
+
+                if (currentNode.RightChild is not null)
+                {
+                    nodesToProcess.Enqueue(currentNode.RightChild);
+                }
+
+                count++;
+            }
+
+            return count;
         }
         public IList<T> Find(T filter)
         {
-            var data = new LinkedList<T>();
+            var data = new List<T>();
 
             if (_rootNode is null)
             {
@@ -174,7 +205,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
             KdTreeNode<T>? node;
             var currentParent = _rootNode;
-            do {
+            do
+            {
                 node = _findConcretNode(currentParent, filter, out _);
 
                 if (node is not null)
