@@ -163,16 +163,30 @@ namespace FRI.AUS2.Libs.Structures.Trees
             // POZOR na rekurziu => nahradit iteratorom
             return 1 + _countNodes(node.LeftChild) + _countNodes(node.RightChild);
         }
-        public T? Find(T filter)
+        public IList<T> Find(T filter)
         {
+            var data = new LinkedList<T>();
+
             if (_rootNode is null)
             {
-                return null;
+                return data;
             }
 
-            var node = _findConcretNode(_rootNode, filter, out _);
+            KdTreeNode<T>? node;
+            var currentParent = _rootNode;
+            do {
+                node = _findConcretNode(currentParent, filter, out _);
 
-            return node?.Data ?? null;
+                if (node is not null)
+                {
+                    data.Add(node.Data);
+                }
+
+                // search also in left subtree
+                currentParent = node?.LeftChild;
+            } while (currentParent is not null);
+
+            return data;
         }
 
         /// <param name="filter"></param>

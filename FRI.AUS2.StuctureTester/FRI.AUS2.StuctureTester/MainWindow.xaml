@@ -107,8 +107,8 @@
                     </Grid>
                 </GroupBox>
 
-                <!-- find node -->
-                <GroupBox Header="Find node">
+                <!-- find data -->
+                <GroupBox Header="Find data">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" MinWidth="30" />

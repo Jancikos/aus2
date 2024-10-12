@@ -287,9 +287,9 @@ namespace FRI.AUS2.StuctureTester
 
                 var found = _exampleStructure.Find(data);
 
-                _txt_findResult.Text = found is null
+                _txt_findResult.Text = found.Count == 0
                     ? "Data not found!"
-                    : $"Data: {found.Data}";
+                    : $"Data: [{string.Join(", ", found.Select(d => d.Data))}]";
             }
             catch (Exception ex)
             {
@@ -313,7 +313,8 @@ namespace FRI.AUS2.StuctureTester
                 _viewerRerenderTree();
 
                 _txt_deleteResult.Text = "Data deleted.";
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
