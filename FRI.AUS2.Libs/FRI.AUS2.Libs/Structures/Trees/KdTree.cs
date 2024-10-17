@@ -1,4 +1,4 @@
-﻿using FRI.AUS2.Libs.Structures.Trees.Interfaces;
+using FRI.AUS2.Libs.Structures.Trees.Interfaces;
 
 namespace FRI.AUS2.Libs.Structures.Trees
 {
@@ -290,10 +290,36 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
         public T Data { get; set; }
 
+        /// <value>degree (number of direct sons) of the node</value>
+        public int Degree
+        {
+            get
+            {
+                int degree = 0;
+         
+                if (LeftChild is not null)
+                {
+                    degree++;
+                }
+                if (RightChild is not null)
+                {
+                    degree++;
+                }
+
+                return degree;
+            }
+        }
+
         /// <value>level of the node in the tree</value>
         public int Level
         {
             get => _getLevel();
+        }
+
+        /// <value>dimension of the node in the tree</value>
+        public int Dimension
+        {
+            get => Level % Data.GetDiminesionsCount();
         }
 
         /// <value>depth of the subtree where this note is root</value>
