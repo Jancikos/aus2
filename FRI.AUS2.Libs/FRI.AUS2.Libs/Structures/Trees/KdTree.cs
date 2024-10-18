@@ -1,3 +1,4 @@
+using System.Collections;
 using FRI.AUS2.Libs.Structures.Trees.Interfaces;
 
 namespace FRI.AUS2.Libs.Structures.Trees
@@ -263,7 +264,27 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 return;
             }
 
-            throw new NotImplementedException("Deletion of not leaf node is not implemented yet.");
+        public KdTreeInOrderIterator<T>? GetInOrderIterator(T filter)
+        {
+            if (_rootNode is null)
+            {
+                return null;
+            }
+
+            var node = _findConcretNode(_rootNode, filter, out _);
+
+            if (node is null)
+            {
+                return null;
+            }
+
+            return GetInOrderIterator(node);
+        }
+
+
+        public KdTreeInOrderIterator<T> GetInOrderIterator(KdTreeNode<T> rootNode)
+        {
+            return new KdTreeInOrderIterator<T>(rootNode);
         }
 
         /// <summary>
@@ -384,6 +405,60 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
             // POZOR na rekurziu
             return 1 + System.Math.Max(_getSubtreeDepth(node.LeftChild), _getSubtreeDepth(node.RightChild));
+        }
+    }
+
+    public class KdTreeInOrderIterator<T> : IEnumerator<T>
+        where T : class, IKdTreeData
+    {
+        private Queue<KdTreeNode<T>> _nodesToProcess;
+
+        private KdTreeNode<T>? _root;
+        private KdTreeNode<T>? _current;
+        public T Current => _current?.Data ?? throw new InvalidOperationException("Current node is not set.");
+        public KdTreeNode<T>? CurrentNode => _current;
+
+        object IEnumerator.Current => Current;
+
+        public KdTreeInOrderIterator(Trees.KdTreeNode<T> rootNode)
+        {
+            _nodesToProcess = new Queue<KdTreeNode<T>>();
+            _root = rootNode;
+            _processNode(_root);
+        }
+
+        public void Dispose()
+        {
+            _nodesToProcess.Clear();
+        }
+
+        public bool MoveNext()
+        {
+            if (_nodesToProcess.Count == 0)
+            {
+                return false;
+            }
+
+            _current = _nodesToProcess.Dequeue();
+            return true;
+        }
+
+        public void Reset()
+        {
+            _nodesToProcess.Clear();
+            _processNode(_root);
+        }
+
+        private void _processNode(KdTreeNode<T>? node)
+        {
+            if (node is null)
+            {
+                return;
+            }
+
+            _processNode(node.LeftChild);
+            _nodesToProcess.Enqueue(node);
+            _processNode(node.RightChild);
         }
     }
 }
