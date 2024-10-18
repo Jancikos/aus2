@@ -1,4 +1,4 @@
-using FRI.AUS2.Libs;
+﻿using FRI.AUS2.Libs;
 using FRI.AUS2.Libs.Structures.Trees;
 using FRI.AUS2.Libs.Structures.Trees.Interfaces;
 using System.Text;
@@ -371,6 +371,16 @@ namespace FRI.AUS2.StuctureTester
             }
 
             public int GetDiminesionsCount() => 2;
+
+            public double GetDiminesionValue(int dim)
+            {
+                return dim switch
+                {
+                    0 => X,
+                    1 => Y,
+                    _ => throw new InvalidOperationException("Invalid dimension.")
+                };
+            }
 
             public override string ToString()
             {

@@ -4,5 +4,6 @@
     {
         public int Compare(int level, IKdTreeData other);
         public int GetDiminesionsCount();
+        public double GetDiminesionValue(int dim);
     }
 }

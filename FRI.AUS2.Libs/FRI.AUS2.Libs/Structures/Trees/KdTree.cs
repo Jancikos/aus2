@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using FRI.AUS2.Libs.Structures.Trees.Interfaces;
 
 namespace FRI.AUS2.Libs.Structures.Trees
@@ -248,6 +248,13 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
             if (node.IsLeaf)
             {
+                if (node == _rootNode)
+                {
+                    // only one node in the tree
+                    _setRootNode(null);
+                    return;
+                }
+
                 // remove leaf node
                 if (node.Parent is not null)
                 {
@@ -263,6 +270,166 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 }
                 return;
             }
+
+            // zasobnik uzlov, ktore sa budu medzi sebou vymienat
+            Stack<KdTreeNode<T>> nodesToBeReplaced = new Stack<KdTreeNode<T>>();
+            nodesToBeReplaced.Push(node);
+
+            bool isLastReplacedNodeLeaf = false;
+            do
+            {
+                KdTreeNode<T> ? replacementNode = _findReplacementNode(nodesToBeReplaced.Peek());
+
+                if (replacementNode is null)
+                {
+                    // no replacement node found
+                    throw new InvalidOperationException("Nenasiel sa ziadny vrchol na nahradenie.");
+                }
+
+                nodesToBeReplaced.Push(replacementNode);
+
+                if (replacementNode.IsLeaf)
+                {
+                    isLastReplacedNodeLeaf = true;
+                }
+            } while (!isLastReplacedNodeLeaf);
+
+            // postupne vymienaj uzly v zasobniku
+            KdTreeNode<T> acutalLeaf = nodesToBeReplaced.Pop();
+            do {
+                KdTreeNode<T> toBeReplaced = nodesToBeReplaced.Pop();
+                _replaceNode(toBeReplaced, acutalLeaf);
+                acutalLeaf = toBeReplaced;
+            } while (nodesToBeReplaced.Count > 0);
+        }
+
+        private KdTreeNode<T>? _findReplacementNode(KdTreeNode<T>? node)
+        {
+            KdTreeNode<T>? replacementNode = null;
+
+            // ak ma praveho syna
+            // // najdi uzol s minimum aktualnej dimenzie v pravom podstrome
+            // // vymen ho s tymto uzlom
+
+            if (node?.RightChild is not null)
+            {
+                // find node with minimum value in the right subtree
+                var nodeDimension = node.Dimension;
+                var minNode = node.RightChild;
+                var minDValue = minNode.Data.GetDiminesionValue(nodeDimension);
+
+                // prejdi cely strom, kdeje node.RightChild rootom
+                var it = GetInOrderIterator(node.RightChild);
+                while (it.MoveNext())
+                {
+                    var currentNode = it.CurrentNode;
+                    var currentDValue = currentNode?.Data?.GetDiminesionValue(nodeDimension);
+
+                    if (currentDValue is not null && currentDValue < minDValue)
+                    {
+                        // FUTURE - porovnaj levely uzlov a vymemn, len ak je ten novy node leaf
+
+                        minNode = it.CurrentNode;
+                        minDValue = currentDValue.Value;
+                    }
+                }
+
+                replacementNode = minNode;
+            }
+
+
+            // ak nema praveho syna ale ma laveho
+            // // najdi uzol s maximum aktualnej dimenzie v lavom podstrome 
+            // // // ak ma nejakeho laveho syna, tak najdi nahradcu tohto uzla
+            // // vymen ho s tymto uzlom
+            if (replacementNode is null && node?.LeftChild is not null)
+            {
+                // find node with maximum value in the left subtree
+                var nodeDimension = node.Dimension;
+                var maxNode = node.LeftChild;
+                var maxDValue = maxNode.Data.GetDiminesionValue(nodeDimension);
+
+                // prejdi cely strom, kdeje node.LeftChild rootom
+                var it = GetInOrderIterator(node.LeftChild);
+                while (it.MoveNext())
+                {
+                    var currentNode = it.CurrentNode;
+                    var currentDValue = currentNode?.Data?.GetDiminesionValue(nodeDimension);
+
+                    if (currentDValue is not null && currentDValue > maxDValue)
+                    {
+                        // FUTURE - porovnaj levely uzlov a vymen, len ak je ten novy node leaf
+
+                        maxNode = it.CurrentNode;
+                        maxDValue = currentDValue.Value;
+                    }
+                }
+
+                replacementNode = maxNode;
+            }
+
+            return replacementNode;
+        }
+
+        private void _replaceNode(KdTreeNode<T> toBeReplaced, KdTreeNode<T> leaf)
+        {
+            if (!leaf.IsLeaf)
+            {
+                throw new InvalidOperationException("Leaf node expected.");
+            }
+
+            if (leaf.Parent is not null)
+            {
+                var leafParent = leaf.Parent;
+                // odstran referencie na leaf
+                if (leaf.IsLeftChild)
+                {
+                    leafParent.LeftChild = null;
+                }
+                if (leaf.IsRightChild)
+                {
+                    leafParent.RightChild = null;
+                }
+            }
+
+
+            // pridaj referencie do leafu a jeho novych rodicov/synov
+            leaf.Parent = toBeReplaced.Parent;
+            if (toBeReplaced.Parent is not null)
+            {
+                if (toBeReplaced.IsLeftChild)
+                {
+                    toBeReplaced.Parent.LeftChild = leaf;
+                }
+                if (toBeReplaced.IsRightChild)
+                {
+                    toBeReplaced.Parent.RightChild = leaf;
+                }
+                toBeReplaced.Parent = null;
+            }
+            leaf.LeftChild = toBeReplaced.LeftChild;
+            if (toBeReplaced.LeftChild is not null)
+            {
+                toBeReplaced.LeftChild.Parent = leaf;
+                toBeReplaced.LeftChild = null;
+            }
+            leaf.RightChild = toBeReplaced.RightChild;
+            if (toBeReplaced.RightChild is not null)
+            {
+                toBeReplaced.RightChild.Parent = leaf;
+                toBeReplaced.RightChild = null;
+            }
+
+            if (toBeReplaced == _rootNode)
+            {
+                _setRootNode(leaf);
+            }
+        }
+
+        private void _setRootNode(KdTreeNode<T>? newRoot)
+        {
+            _rootNode = newRoot;
+        }
 
         public KdTreeInOrderIterator<T>? GetInOrderIterator(T filter)
         {
@@ -317,7 +484,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
             get
             {
                 int degree = 0;
-         
+
                 if (LeftChild is not null)
                 {
                     degree++;
