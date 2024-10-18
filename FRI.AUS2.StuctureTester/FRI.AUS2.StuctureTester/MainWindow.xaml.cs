@@ -1,4 +1,4 @@
-﻿using FRI.AUS2.Libs;
+using FRI.AUS2.Libs;
 using FRI.AUS2.Libs.Structures.Trees;
 using FRI.AUS2.Libs.Structures.Trees.Interfaces;
 using System.Text;
@@ -313,6 +313,36 @@ namespace FRI.AUS2.StuctureTester
                 _viewerRerenderTree();
 
                 _txt_deleteResult.Text = "Data deleted.";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void _btn_ManualInOrder_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var data = new KdExampleData()
+                {
+                    X = int.Parse(_txtb_InOrderX.Text),
+                    Y = int.Parse(_txtb_InOrderY.Text)
+                };
+
+                var it = _exampleStructure.GetInOrderIterator(data);
+                if (it is null)
+                {
+                    _txt_InOrderResult.Text = "Data not found!";
+                    return;
+                }
+
+                var sb = new StringBuilder();
+                while (it.MoveNext())
+                {
+                    sb.AppendLine(it.Current.ToString());
+                }
+                _txt_InOrderResult.Text = sb.ToString();
             }
             catch (Exception ex)
             {
