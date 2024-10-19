@@ -71,6 +71,14 @@ namespace FRI.AUS2.StuctureTester
             _exampleStructure.Insert(new KdExampleData() { X = 10, Y = 5, Data = ++i });
         }
 
+        private void _updateStatistics()
+        {
+            _txt_NodesCount.Text = _exampleStructure.NodesCount.ToString();
+            _txt_TreeDepth.Text = _exampleStructure.Depth.ToString();
+            _txt_Root.Text = _exampleStructure.RootNode?.Data.ToString() ?? "none";
+        }
+
+        #region Menu items
         private void _mnitem_TreeClear_Click(object sender, RoutedEventArgs e)
         {
             // clear tree
@@ -84,32 +92,9 @@ namespace FRI.AUS2.StuctureTester
         {
             Close();
         }
+        #endregion
 
-        private void _btn_ManualInsert_Click(object sender, RoutedEventArgs e)
-        {
-            var newExampleData = new KdExampleData()
-            {
-                X = int.Parse(_txtb_X.Text),
-                Y = int.Parse(_txtb_Y.Text),
-                Data = int.Parse(_txtb_Data.Text)
-            };
-
-            _exampleStructure.Insert(newExampleData);
-            _updateStatistics();
-            _viewerRerenderTree();
-        }
-
-        private void _updateStatistics()
-        {
-            _txt_NodesCount.Text = _exampleStructure.NodesCount.ToString();
-            _txt_TreeDepth.Text = _exampleStructure.Depth.ToString();
-            _txt_Root.Text = _exampleStructure.RootNode?.Data.ToString() ?? "none";
-        }
-
-        private void _btn_ViewerRerender_Click(object sender, RoutedEventArgs e)
-        {
-            _viewerRerenderTree();
-        }
+        #region Tree viewer
 
         private void _viewerDeactivate()
         {
@@ -172,6 +157,10 @@ namespace FRI.AUS2.StuctureTester
             }
 
             return item;
+        }
+        private void _btn_ViewerRerender_Click(object sender, RoutedEventArgs e)
+        {
+            _viewerRerenderTree();
         }
 
         private void _btn_ViewerToggleCollapse_Click(object sender, RoutedEventArgs e)
@@ -242,6 +231,24 @@ namespace FRI.AUS2.StuctureTester
             if (_treeView_Tree is null) return;
 
             IsViewerActivated = _chk_ViewerActive?.IsChecked ?? false;
+        }
+
+        #endregion
+
+        #region Other UI events
+        
+        private void _btn_ManualInsert_Click(object sender, RoutedEventArgs e)
+        {
+            var newExampleData = new KdExampleData()
+            {
+                X = int.Parse(_txtb_X.Text),
+                Y = int.Parse(_txtb_Y.Text),
+                Data = int.Parse(_txtb_Data.Text)
+            };
+
+            _exampleStructure.Insert(newExampleData);
+            _updateStatistics();
+            _viewerRerenderTree();
         }
 
         private void _btn_GenerateNodes_Click(object sender, RoutedEventArgs e)
@@ -350,7 +357,9 @@ namespace FRI.AUS2.StuctureTester
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        #endregion
 
+        #region KdExampleData
         internal class KdExampleData : IKdTreeData
         {
             public int X { get; set; }
@@ -388,5 +397,6 @@ namespace FRI.AUS2.StuctureTester
                 return $"[{X}, {Y}]: {Data}";
             }
         }
+        #endregion
     }
 }

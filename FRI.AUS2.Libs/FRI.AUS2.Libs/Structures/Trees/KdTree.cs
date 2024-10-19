@@ -182,7 +182,6 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 if (currentNode.LeftChild is not null)
                 {
                     nodesToProcess.Enqueue(currentNode.LeftChild);
-
                 }
 
                 if (currentNode.RightChild is not null)
@@ -271,19 +270,20 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 return;
             }
 
-            // zasobnik uzlov, ktore sa budu medzi sebou vymienat
+            // nodes stack - nodes will be replaced from the bottom to the top
             Stack<KdTreeNode<T>> nodesToBeReplaced = new Stack<KdTreeNode<T>>();
             nodesToBeReplaced.Push(node);
 
             bool isLastReplacedNodeLeaf = false;
+            // replace nodes from the bottom to the top
             do
             {
-                KdTreeNode<T> ? replacementNode = _findReplacementNode(nodesToBeReplaced.Peek());
+                KdTreeNode<T>? replacementNode = _findReplacementNode(nodesToBeReplaced.Peek());
 
                 if (replacementNode is null)
                 {
                     // no replacement node found
-                    throw new InvalidOperationException("Nenasiel sa ziadny vrchol na nahradenie.");
+                    throw new InvalidOperationException("No replacement node found.");
                 }
 
                 nodesToBeReplaced.Push(replacementNode);
@@ -294,23 +294,29 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 }
             } while (!isLastReplacedNodeLeaf);
 
-            // postupne vymienaj uzly v zasobniku
+            // replace nodes
             KdTreeNode<T> acutalLeaf = nodesToBeReplaced.Pop();
-            do {
+            do
+            {
                 KdTreeNode<T> toBeReplaced = nodesToBeReplaced.Pop();
                 _replaceNode(toBeReplaced, acutalLeaf);
                 acutalLeaf = toBeReplaced;
             } while (nodesToBeReplaced.Count > 0);
         }
 
+        /// <summary>
+        /// finds replacement node for the given node
+        /// 
+        /// replacement node is the that can be used to replace the given node (when the given node wants to be removed)
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         private KdTreeNode<T>? _findReplacementNode(KdTreeNode<T>? node)
         {
             KdTreeNode<T>? replacementNode = null;
 
-            // ak ma praveho syna
-            // // najdi uzol s minimum aktualnej dimenzie v pravom podstrome
-            // // vymen ho s tymto uzlom
-
+            // if node has right child
+            // // fid node with minimum value (in the same dimension) in the right subtree
             if (node?.RightChild is not null)
             {
                 // find node with minimum value in the right subtree
@@ -318,7 +324,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 var minNode = node.RightChild;
                 var minDValue = minNode.Data.GetDiminesionValue(nodeDimension);
 
-                // prejdi cely strom, kdeje node.RightChild rootom
+                // search the whole tree where node.RightChild is root
                 var it = GetInOrderIterator(node.RightChild);
                 while (it.MoveNext())
                 {
@@ -338,10 +344,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
 
 
-            // ak nema praveho syna ale ma laveho
-            // // najdi uzol s maximum aktualnej dimenzie v lavom podstrome 
-            // // // ak ma nejakeho laveho syna, tak najdi nahradcu tohto uzla
-            // // vymen ho s tymto uzlom
+            // if node has no right child, but has left child
+            // // find node with maximum value (in the same dimension) in the left subtree
             if (replacementNode is null && node?.LeftChild is not null)
             {
                 // find node with maximum value in the left subtree
@@ -349,7 +353,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 var maxNode = node.LeftChild;
                 var maxDValue = maxNode.Data.GetDiminesionValue(nodeDimension);
 
-                // prejdi cely strom, kdeje node.LeftChild rootom
+                // search the whole tree where node.LeftChild is root
                 var it = GetInOrderIterator(node.LeftChild);
                 while (it.MoveNext())
                 {
@@ -371,6 +375,14 @@ namespace FRI.AUS2.Libs.Structures.Trees
             return replacementNode;
         }
 
+        /// <summary>
+        /// replaces toBeReplaced node with leaf node
+        /// 
+        /// leaf node will be moved to the place of toBeReplaced node (in the hierarchy)
+        /// toBeReplaced node will be removed from the hierarchy (but not deleted)
+        /// </summary>
+        /// <param name="toBeReplaced"></param>
+        /// <param name="leaf"></param>
         private void _replaceNode(KdTreeNode<T> toBeReplaced, KdTreeNode<T> leaf)
         {
             if (!leaf.IsLeaf)
@@ -381,7 +393,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
             if (leaf.Parent is not null)
             {
                 var leafParent = leaf.Parent;
-                // odstran referencie na leaf
+                // remove leaf from its parent
                 if (leaf.IsLeftChild)
                 {
                     leafParent.LeftChild = null;
@@ -393,7 +405,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
 
 
-            // pridaj referencie do leafu a jeho novych rodicov/synov
+            // add leaf to the place of toBeReplaced
             leaf.Parent = toBeReplaced.Parent;
             if (toBeReplaced.Parent is not null)
             {
@@ -420,6 +432,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 toBeReplaced.RightChild = null;
             }
 
+            // if toBeReplaced is root node, set new root node
             if (toBeReplaced == _rootNode)
             {
                 _setRootNode(leaf);
@@ -583,11 +596,11 @@ namespace FRI.AUS2.Libs.Structures.Trees
         private KdTreeNode<T>? _root;
         private KdTreeNode<T>? _current;
         public T Current => _current?.Data ?? throw new InvalidOperationException("Current node is not set.");
-        public KdTreeNode<T>? CurrentNode => _current;
+        internal KdTreeNode<T>? CurrentNode => _current;
 
         object IEnumerator.Current => Current;
 
-        public KdTreeInOrderIterator(Trees.KdTreeNode<T> rootNode)
+        public KdTreeInOrderIterator(KdTreeNode<T> rootNode)
         {
             _nodesToProcess = new Queue<KdTreeNode<T>>();
             _root = rootNode;
