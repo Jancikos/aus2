@@ -103,6 +103,7 @@ namespace FRI.AUS2.StuctureTester
         {
             _txt_NodesCount.Text = _exampleStructure.NodesCount.ToString();
             _txt_TreeDepth.Text = _exampleStructure.Depth.ToString();
+            _txt_Root.Text = _exampleStructure.RootNode?.Data.ToString() ?? "none";
         }
 
         private void _btn_ViewerRerender_Click(object sender, RoutedEventArgs e)
