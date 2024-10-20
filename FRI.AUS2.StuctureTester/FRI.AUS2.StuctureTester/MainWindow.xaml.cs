@@ -15,6 +15,7 @@ namespace FRI.AUS2.StuctureTester
     public partial class MainWindow : Window
     {
         private KdTree<KdExampleData> _exampleStructure;
+        private OperationsGenerator<KdExampleData>? _operationsGenerator;
 
         // viewer
         private bool _isViewerActivated;
@@ -354,7 +355,7 @@ namespace FRI.AUS2.StuctureTester
 
         private void _btn_testerRunTest_Click(object sender, RoutedEventArgs e)
         {
-            var operationGenerator = new OperationsGenerator<KdExampleData>(
+            _operationsGenerator = new OperationsGenerator<KdExampleData>(
                 _exampleStructure,
                 int.Parse(_txtb_testerOperationsCount.Text),
                 int.Parse(_txtb_testerSeed.Text),
@@ -373,15 +374,33 @@ namespace FRI.AUS2.StuctureTester
             );
 
             // init ratio of operations
-            int.Parse(_txtb_operationsAdd.Text).Repeat(() => operationGenerator.AddOperation(OperationType.Insert));
-            int.Parse(_txtb_operationsDelete.Text).Repeat(() => operationGenerator.AddOperation(OperationType.Delete));
-            int.Parse(_txtb_operationsFind.Text).Repeat(() => operationGenerator.AddOperation(OperationType.Find));
+            int.Parse(_txtb_operationsAdd.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Insert));
+            int.Parse(_txtb_operationsDelete.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Delete));
+            int.Parse(_txtb_operationsFind.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Find));
 
-            operationGenerator.Generate();
+            _operationsGenerator.Generate();
 
             _updateStatistics();
             _viewerRerenderTree();
+
+            MessageBox.Show("Test was runned.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
+        private void _btn_testerLog_Click(object sender, RoutedEventArgs e)
+        {
+            if (_operationsGenerator is null)
+            {
+                MessageBox.Show("No test was runned yet.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var logUri = _operationsGenerator.LogsFileUri;
+            // copy the path to clipboard
+            Clipboard.SetText(logUri.AbsolutePath);
+
+            MessageBox.Show($"Log file path was copied to clipboard: {logUri}", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
         #endregion
 
         #region KdExampleData

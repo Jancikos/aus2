@@ -273,7 +273,6 @@
 
                                 <TextBlock Text="Find:" Grid.Row="4" />
                                 <TextBox x:Name="_txtb_operationsFind" Text="1" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
-
                             </Grid>
                         </GroupBox>
 
@@ -282,8 +281,12 @@
 
                         <TextBlock x:Name="_txt_testerResult" Text="" Grid.Row="6" Grid.ColumnSpan="4" />
 
-                        <Button x:Name="_btn_testerRunTest" Content="Generate" Grid.Column="4" Grid.RowSpan="6" Margin="0"
-                            Click="_btn_testerRunTest_Click" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="4" Grid.RowSpan="6">
+                            <Button x:Name="_btn_testerRunTest" Content="Generate" Grid.Column="4" Margin="0"
+                                Click="_btn_testerRunTest_Click" VerticalAlignment="Center" />
+                            <Button x:Name="_btn_testerLog" Content="Log" ToolTip="Opens tester log file" Grid.Column="4" Grid.Row="6" Margin="0"
+                        Click="_btn_testerLog_Click" VerticalAlignment="Center" />
+                        </StackPanel>
                     </Grid>
                 </GroupBox>
             </StackPanel>
