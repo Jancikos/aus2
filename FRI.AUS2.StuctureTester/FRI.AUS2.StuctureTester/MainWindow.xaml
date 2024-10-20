@@ -244,7 +244,7 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock Text="Count:" />
-                        <TextBox x:Name="_txtb_testerOperationsCount" Grid.Column="2" TextAlignment="Right"/>
+                        <TextBox x:Name="_txtb_testerOperationsCount" Text="100" Grid.Column="2" TextAlignment="Right"/>
 
                         <GroupBox Header="Ratios" Grid.Row="2" Grid.ColumnSpan="3" >
                             <Grid>

@@ -1,16 +1,11 @@
-﻿using FRI.AUS2.Libs;
-using FRI.AUS2.Libs.Structures.Trees;
+﻿using FRI.AUS2.Libs.Structures.Trees;
 using FRI.AUS2.Libs.Structures.Trees.Interfaces;
+using FRI.AUS2.StuctureTester.Utils;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using static FRI.AUS2.Libs.Helpers.IntExtension;
 
 namespace FRI.AUS2.StuctureTester
 {
@@ -359,7 +354,33 @@ namespace FRI.AUS2.StuctureTester
 
         private void _btn_testerRunTest_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Test not implemented.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            var operationGenerator = new OperationsGenerator<KdExampleData>(
+                _exampleStructure,
+                int.Parse(_txtb_testerOperationsCount.Text),
+                int.Parse(_txtb_testerSeed.Text),
+                (Random rnd) => new KdExampleData()
+                {
+                    X = rnd.Next(
+                        int.Parse(_txtb_MinX.Text),
+                        int.Parse(_txtb_MaxX.Text)
+                    ),
+                    Y = rnd.Next(
+                        int.Parse(_txtb_MinY.Text),
+                        int.Parse(_txtb_MaxY.Text)
+                    ),
+                    Data = rnd.Next(-100, 100)
+                }
+            );
+
+            // init ratio of operations
+            int.Parse(_txtb_operationsAdd.Text).Repeat(() => operationGenerator.AddOperation(OperationType.Insert));
+            int.Parse(_txtb_operationsDelete.Text).Repeat(() => operationGenerator.AddOperation(OperationType.Delete));
+            int.Parse(_txtb_operationsFind.Text).Repeat(() => operationGenerator.AddOperation(OperationType.Find));
+
+            operationGenerator.Generate();
+
+            _updateStatistics();
+            _viewerRerenderTree();
         }
         #endregion
 
