@@ -378,6 +378,10 @@ namespace FRI.AUS2.StuctureTester
             int.Parse(_txtb_operationsDelete.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Delete));
             int.Parse(_txtb_operationsFind.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Find));
 
+            // init log settings
+            _operationsGenerator.LogsVerbosity = int.Parse(_txtb_operationsLogVerbosity.Text);
+            _operationsGenerator.LogsStatsFrequency = int.Parse(_txtb_operationsLogStatsFreq.Text);
+
             _operationsGenerator.Generate();
 
             _updateStatistics();

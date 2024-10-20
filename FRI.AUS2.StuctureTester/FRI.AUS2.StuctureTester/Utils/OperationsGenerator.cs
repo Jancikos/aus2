@@ -29,10 +29,13 @@ namespace FRI.AUS2.StuctureTester.Utils
                 _random = new Random(value);
             }
         }
-        
+
         public Uri LogsPath { get; set; } = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\");
         public string LogsFileName { get; set; } = "operations.log";
         public Uri LogsFileUri => new Uri(LogsPath + @"\" + LogsFileName);
+        public int LogsVerbosity { get; set; } = 1;
+        public int LogsStatsFrequency { get; set; } = 0;
+
         private Random _random;
         private List<OperationType> _randomOperations;
         Func<Random, T> _craeteRandomT;
@@ -41,7 +44,7 @@ namespace FRI.AUS2.StuctureTester.Utils
         private string? _structureDataStaticticsBefore;
         private Dictionary<OperationType, int> _operationStatistics = new Dictionary<OperationType, int>();
 
-        public OperationsGenerator(KdTree<T> structure, int count, int seed, Func<Random, T> craeteRandomT )
+        public OperationsGenerator(KdTree<T> structure, int count, int seed, Func<Random, T> craeteRandomT)
         {
             Structure = structure;
             Count = count;
@@ -130,7 +133,7 @@ namespace FRI.AUS2.StuctureTester.Utils
             _log("OperationsGenerator:");
             _log($"Seed: {Seed}", 1);
             _log($"Operations count: {Count}", 1);
-            _log($"Operations: {string.Join(", ", _randomOperations)}", 1);
+            _log($"Operations ratio: {string.Join(", ", _randomOperations)}", 1);
             _log("");
             _log("Structure:");
             _log(_getStructureStatictics(), 1);
@@ -157,7 +160,8 @@ namespace FRI.AUS2.StuctureTester.Utils
 
         private void _beforeOperation(int index, OperationType operation)
         {
-            _log($"#{index} - {operation}");
+            if (LogsVerbosity < 3)
+                _log($"#{index} - {operation}");
         }
 
         private void _makeOperation(OperationType operation)
@@ -182,12 +186,15 @@ namespace FRI.AUS2.StuctureTester.Utils
 
         private void _afterOperation(int index, OperationType operation)
         {
-            if (index % 5 == 0)
+            if (LogsStatsFrequency > 0)
             {
-                _log("");
-                _log("Structure statistics:");
-                _log(_getStructureStatictics(), 1);
-                _log("");
+                if (index % LogsStatsFrequency == 0)
+                {
+                    _log("");
+                    _log($"#{index} structure statistics:");
+                    _log(_getStructureStatictics(), 1);
+                    _log("");
+                }
             }
         }
 
@@ -195,7 +202,8 @@ namespace FRI.AUS2.StuctureTester.Utils
         {
             var t = _craeteRandomT(_random);
 
-            _log($"Inserting: {t}", 1);
+            if (LogsVerbosity < 2)
+                _log($"Inserting: {t}", 1);
 
             Structure.Insert(t);
             _structureData.Add(t);
@@ -206,21 +214,25 @@ namespace FRI.AUS2.StuctureTester.Utils
             var filter = _getRandomKey();
             if (filter is null)
             {
-                _log("No key to delete", 1);
+                if (LogsVerbosity < 2)
+                    _log("No key to delete", 1);
                 // structure is empty
                 return;
             }
 
             try
             {
-                _log($"Deleting: {filter}", 1);
+                if (LogsVerbosity < 2)
+                    _log($"Deleting: {filter}", 1);
+
                 Structure.RemoveException(filter);
                 _structureData.Remove(filter);
             }
             catch (InvalidOperationException e)
             {
                 // key not found
-                _log($"Key not found!!! ({e.Message})", 1);
+                if (LogsVerbosity < 2) 
+                    _log($"Key not found!!! ({e.Message})", 1);
             }
         }
 
@@ -233,17 +245,22 @@ namespace FRI.AUS2.StuctureTester.Utils
                 return;
             }
 
-            _log($"Finding: {filter}", 1);
+            if (LogsVerbosity < 2)
+                _log($"Finding: {filter}", 1);
             var result = Structure.Find(filter);
             if (result.Count == 0)
             {
                 // key not found
-                _log("Key not found!!!", 1);
+                if (LogsVerbosity < 2)
+                    _log("Key not found!!!", 1);
                 return;
             }
 
-            _log($"Found: {result.Count} items", 1);
-            _log(string.Join(", ", result.Select(x => x.ToString())), 2);
+            if (LogsVerbosity < 2)
+            {
+                _log($"Found: {result.Count} items", 1);
+                _log(string.Join(", ", result.Select(x => x.ToString())), 2);
+            }
         }
 
         private T? _getRandomKey()

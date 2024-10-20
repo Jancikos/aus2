@@ -241,6 +241,8 @@
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="2" />
                             <RowDefinition Height="auto" />
+                            <RowDefinition Height="2" />
+                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
                         <TextBlock Text="Count:" />
@@ -279,13 +281,36 @@
                         <TextBlock Text="Seed:" Grid.Row="4" />
                         <TextBox x:Name="_txtb_testerSeed" Text="1" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
 
-                        <TextBlock x:Name="_txt_testerResult" Text="" Grid.Row="6" Grid.ColumnSpan="4" />
+                        <GroupBox Header="Logging" Grid.Row="6" Grid.ColumnSpan="3" >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" MinWidth="25" />
+                                    <ColumnDefinition Width="5" />
+                                    <ColumnDefinition Width="*" MinWidth="50" />
+                                    <ColumnDefinition Width="5" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="ℹ️Verbosity:" ToolTip="1 - all, 2 - only operations, 3 - only stats"/>
+                                <TextBox x:Name="_txtb_operationsLogVerbosity" Text="3" Grid.Column="2" TextAlignment="Right"/>
+
+                                <TextBlock Text="ℹ️Stats f. :" ToolTip="Sequence stats frequency. Every how many lines the strucute stats should be printed. 0 - off"  Grid.Row="2"/>
+                                <TextBox x:Name="_txtb_operationsLogStatsFreq" Text="0" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>
+                            </Grid>
+                        </GroupBox>
 
                         <StackPanel Grid.Column="4" Grid.RowSpan="6">
-                            <Button x:Name="_btn_testerRunTest" Content="Generate" Grid.Column="4" Margin="0"
+                            <Button x:Name="_btn_testerRunTest" Content="Generate" Margin="0"
                                 Click="_btn_testerRunTest_Click" VerticalAlignment="Center" />
-                            <Button x:Name="_btn_testerLog" Content="Log" ToolTip="Opens tester log file" Grid.Column="4" Grid.Row="6" Margin="0"
-                        Click="_btn_testerLog_Click" VerticalAlignment="Center" />
+                            <Button x:Name="_btn_testerLog" Content="Log file" ToolTip="Opens tester log file" Margin="2 0"
+                                Click="_btn_testerLog_Click" VerticalAlignment="Center" />
                         </StackPanel>
                     </Grid>
                 </GroupBox>
