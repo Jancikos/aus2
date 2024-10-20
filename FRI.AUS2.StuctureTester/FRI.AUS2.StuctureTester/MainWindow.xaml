@@ -170,8 +170,8 @@
                 </GroupBox>
             </StackPanel>
 
-            <!-- tree statistics -->
             <StackPanel Orientation="Horizontal">
+                <!-- tree statistics -->
                 <GroupBox Header="Tree statistics">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -223,6 +223,95 @@
 
                         <Button x:Name="_btn_InOrder" Content="InOrder" Grid.Column="4" Grid.RowSpan="3" Margin="0"
                             Click="_btn_ManualInOrder_Click" VerticalAlignment="Center" />
+                    </Grid>
+                </GroupBox>
+                
+                <GroupBox Header="Operations generator">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="30" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="*" MinWidth="50" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="1" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="2" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="2" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Count:" />
+                        <TextBox x:Name="_txtb_testerOperationsCount" Text="100" Grid.Column="2" TextAlignment="Right"/>
+
+                        <GroupBox Header="Ratios" Grid.Row="2" Grid.ColumnSpan="3" >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" MinWidth="25" />
+                                    <ColumnDefinition Width="5" />
+                                    <ColumnDefinition Width="*" MinWidth="50" />
+                                    <ColumnDefinition Width="5" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="ℹ️Add:" ToolTip="Using values from Generate nodes form (except seed and count)."/>
+                                <TextBox x:Name="_txtb_operationsAdd" Text="3" Grid.Column="2" TextAlignment="Right"/>
+
+                                <TextBlock Text="Delete:" Grid.Row="2" />
+                                <TextBox x:Name="_txtb_operationsDelete" Text="2" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>
+
+                                <TextBlock Text="Find:" Grid.Row="4" />
+                                <TextBox x:Name="_txtb_operationsFind" Text="1" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <TextBlock Text="Seed:" Grid.Row="4" />
+                        <TextBox x:Name="_txtb_testerSeed" Text="1" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
+
+                        <GroupBox Header="Logging" Grid.Row="6" Grid.ColumnSpan="3" >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" MinWidth="25" />
+                                    <ColumnDefinition Width="5" />
+                                    <ColumnDefinition Width="*" MinWidth="50" />
+                                    <ColumnDefinition Width="5" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="ℹ️Verbosity:" ToolTip="1 - all, 2 - only operations, 3 - only stats"/>
+                                <TextBox x:Name="_txtb_operationsLogVerbosity" Text="3" Grid.Column="2" TextAlignment="Right"/>
+
+                                <TextBlock Text="ℹ️Stats f. :" ToolTip="Sequence stats frequency. Every how many lines the strucute stats should be printed. 0 - off"  Grid.Row="2"/>
+                                <TextBox x:Name="_txtb_operationsLogStatsFreq" Text="0" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <StackPanel Grid.Column="4" Grid.RowSpan="8" VerticalAlignment="Center" >
+                            <Button x:Name="_btn_testerRunTest" Content="Generate" Margin="0"
+                                Click="_btn_testerRunTest_Click" VerticalAlignment="Center" />
+                            <Button x:Name="_btn_testerLog" Content="Log file" ToolTip="Opens tester log file" Margin="0 2"
+                                Click="_btn_testerLog_Click" VerticalAlignment="Center" />
+                        </StackPanel>
                     </Grid>
                 </GroupBox>
             </StackPanel>
