@@ -306,10 +306,10 @@
                             </Grid>
                         </GroupBox>
 
-                        <StackPanel Grid.Column="4" Grid.RowSpan="6">
+                        <StackPanel Grid.Column="4" Grid.RowSpan="8" VerticalAlignment="Center" >
                             <Button x:Name="_btn_testerRunTest" Content="Generate" Margin="0"
                                 Click="_btn_testerRunTest_Click" VerticalAlignment="Center" />
-                            <Button x:Name="_btn_testerLog" Content="Log file" ToolTip="Opens tester log file" Margin="2 0"
+                            <Button x:Name="_btn_testerLog" Content="Log file" ToolTip="Opens tester log file" Margin="0 2"
                                 Click="_btn_testerLog_Click" VerticalAlignment="Center" />
                         </StackPanel>
                     </Grid>
