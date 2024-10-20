@@ -236,7 +236,6 @@ namespace FRI.AUS2.StuctureTester
         #endregion
 
         #region Other UI events
-        
         private void _btn_ManualInsert_Click(object sender, RoutedEventArgs e)
         {
             var newExampleData = new KdExampleData()
@@ -356,6 +355,11 @@ namespace FRI.AUS2.StuctureTester
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void _btn_testerRunTest_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Test not implemented.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         #endregion
 
