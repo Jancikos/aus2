@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FRI.AUS2.SP1.Libs.Models;
 
 namespace FRI.AUS2.SP1.GUI
 {
@@ -24,7 +25,13 @@ namespace FRI.AUS2.SP1.GUI
         #region UI Event Handlers
         private void _mnitem_Test_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Test", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            var parcel = new Parcel()
+            {
+                X = 10,
+                Y = 20
+            };
+
+            MessageBox.Show($"Test parcel craeted: {parcel}", Title, MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void _mnitem_Close_Click(object sender, RoutedEventArgs e)

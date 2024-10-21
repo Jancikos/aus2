@@ -8,4 +8,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FRI.AUS2.SP1.Libs\FRI.AUS2.SP1.Libs.csproj" />
+  </ItemGroup>
+
 </Project>
