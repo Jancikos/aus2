@@ -38,16 +38,6 @@ namespace FRI.AUS2.SP1.GUI
         {
             Close();
         }
-
-        private void _btn_PropertiesInsert_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void _btn_PropertiesFilter_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
     #endregion
 }

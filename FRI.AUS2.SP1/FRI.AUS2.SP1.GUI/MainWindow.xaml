@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FRI.AUS2.SP1.GUI"
         xmlns:Controls="clr-namespace:System.Windows.Controls;assembly=PresentationFramework"
+        xmlns:uc="clr-namespace:FRI.AUS2.SP1.GUI.Controls"
         mc:Ignorable="d"
         Title="AUS SP1" Height="450" Width="800">
 
@@ -41,59 +42,9 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <GroupBox Header="Nehnuteľnosti">
-                <Grid Margin="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="5" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+            <uc:GeoItemsManagement x:Name="_mng_Properties" Title="Nehnuteľnosti"/>
 
-                    <StackPanel Orientation="Horizontal" >
-
-                        <Button x:Name="_btn_PropertiesInsert" Content="Insert" Grid.Column="4" Grid.Row="1" Grid.RowSpan="3" Margin="0"
-                            Click="_btn_PropertiesInsert_Click" />
-
-                        <GroupBox Header="Filter">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto" MinWidth="30" />
-                                    <ColumnDefinition Width="5" />
-                                    <ColumnDefinition Width="*" MinWidth="50" />
-                                    <ColumnDefinition Width="5" />
-                                    <ColumnDefinition Width="auto" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="2" />
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="2" />
-                                    <RowDefinition Height="auto" />
-                                </Grid.RowDefinitions>
-
-                                <!--node form-->
-                                <TextBlock Text="X:" />
-                                <TextBox x:Name="_txtb_X" Grid.Column="2" TextAlignment="Right"/>
-
-                                <TextBlock Text="Y:" Grid.Row="2" />
-                                <TextBox x:Name="_txtb_Y" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>
-
-                                <Button x:Name="_btn_PropertiesFilter" Content="Filter" Grid.Column="4" Grid.RowSpan="3" Margin="0" Click="_btn_PropertiesFilter_Click" />
-                            </Grid>
-                        </GroupBox>
-                    </StackPanel>
-
-                    <Controls:DataGrid x:Name="_tbl_Properties" Grid.Row="2">
-                    </Controls:DataGrid>
-                </Grid>
-            </GroupBox>
-
-            <GroupBox Header="Parcely" Grid.Column="2">
-
-            </GroupBox>
+            <uc:GeoItemsManagement x:Name="_mng_Parcels" Title="Parcely" Grid.Column="2"/>
         </Grid>
     </Grid>
 </Window>
