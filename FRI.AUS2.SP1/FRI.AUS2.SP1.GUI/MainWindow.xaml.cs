@@ -52,6 +52,15 @@ namespace FRI.AUS2.SP1.GUI
 
                 MessageBox.Show("Property added!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
             };
+
+
+            // setup table
+            _mng_Properties.SetTableItemsSource(_backend.Properties);
+
+            _mng_Properties.AddTableColumn("Sup. č.", "StreetNumber");
+            _mng_Properties.AddTableColumn("Popis", "Description");
+            _mng_Properties.AddTableColumn("Pozícia A", "PositionA");
+            _mng_Properties.AddTableColumn("Pozícia B", "PositionB");
         }
 
         #region UI Event Handlers

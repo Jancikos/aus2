@@ -29,7 +29,35 @@ namespace FRI.AUS2.SP1.GUI.Controls
             InitializeComponent();
 
             this.DataContext = this;
+
+            _initializeTable();
         }
+
+        #region Table
+
+        private void _initializeTable()
+        {
+            _tbl_GeoItems.AutoGenerateColumns = false;
+            _tbl_GeoItems.IsReadOnly = true;
+            _tbl_GeoItems.CanUserSortColumns = false;
+        }
+
+        public void AddTableColumn(string header, string bindingPath)
+        {
+            var column = new DataGridTextColumn
+            {
+                Header = header,
+                Binding = new Binding(bindingPath)
+            };
+
+            _tbl_GeoItems.Columns.Add(column);
+        }
+
+        public void SetTableItemsSource<T>(IEnumerable<T> itemsSource)
+        {
+            _tbl_GeoItems.ItemsSource = itemsSource;
+        }
+        #endregion
 
         #region  UI Event Handlers
         private void _btn_Filter_Click(object sender, RoutedEventArgs e)
@@ -46,6 +74,11 @@ namespace FRI.AUS2.SP1.GUI.Controls
             }
 
             InsertAction();
+        }
+
+        private void _btn_Rerender_Click(object sender, RoutedEventArgs e)
+        {
+            CollectionViewSource.GetDefaultView(_tbl_GeoItems.ItemsSource).Refresh();
         }
     }
     #endregion

@@ -21,8 +21,8 @@ namespace FRI.AUS2.SP1.Libs
             {
                 Number = number,
                 Description = description,
-                PosA = posA,
-                PosB = posB
+                PositionA = posA,
+                PositionB = posB
             };
 
             // TODO: Add properties to the parcel (by the PosA and PosB coordinates)
@@ -36,8 +36,8 @@ namespace FRI.AUS2.SP1.Libs
             {
                 StreetNumber = streetNumber,
                 Description = description,
-                PosA = posA,
-                PosB = posB
+                PositionA = posA,
+                PositionB = posB
             };
 
             // TODO: Add parcels to the property (by the PosA and PosB coordinates)

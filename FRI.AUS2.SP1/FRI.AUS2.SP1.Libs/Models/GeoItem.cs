@@ -2,12 +2,12 @@
 {
     public abstract class GeoItem
     {
-        public GpsPoint? PosA { get; set; }
-        public GpsPoint? PosB { get; set; }
+        public GpsPoint? PositionA { get; set; }
+        public GpsPoint? PositionB { get; set; }
 
         public override string ToString()
         {
-            return $"[{PosA}], [{PosB}]";
+            return $"[{PositionA}], [{PositionB}]";
         }
     }
 }

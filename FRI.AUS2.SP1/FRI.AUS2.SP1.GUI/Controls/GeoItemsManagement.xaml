@@ -24,12 +24,9 @@
             </Grid.RowDefinitions>
 
             <StackPanel Orientation="Horizontal">
+                <Button x:Name="_btn_Insert" Content="Insert" Click="_btn_Insert_Click" />
 
-                <Button x:Name="_btn_Insert" Content="Insert" Grid.Column="4" Grid.Row="1"
-                    Grid.RowSpan="3" Margin="0 0 5 0"
-                    Click="_btn_Insert_Click" />
-
-                <GroupBox Header="Filter">
+                <GroupBox Header="Filter" Margin="5 0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" MinWidth="30" />
@@ -58,6 +55,8 @@
                             Grid.RowSpan="3" Margin="0" Click="_btn_Filter_Click" />
                     </Grid>
                 </GroupBox>
+
+                <Button x:Name="_btn_Rerender" Content="Rerender" Click="_btn_Rerender_Click" />
             </StackPanel>
 
             <Controls:DataGrid x:Name="_tbl_GeoItems" Grid.Row="2">
