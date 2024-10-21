@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 
 namespace FRI.AUS2.SP1.Libs.Models
 {
-    public class Parcel
+    public class Property
     {
-        public int Number { get; set; }
+        public int StreetNumber { get; set; }
         public string Description { get; set; } = string.Empty;
 
         public double X {  get; set; }
         public double Y { get; set; }
 
-        // TODO list of Properties
-        
+        // TODO list of Parcels
+
         public override string ToString()
         {
-            return $"Parcel {Number}. - {Description} [{X}, {Y}]";
+            return $"Property {StreetNumber}. - {Description} [{X}, {Y}]";
         }
     }
 }
