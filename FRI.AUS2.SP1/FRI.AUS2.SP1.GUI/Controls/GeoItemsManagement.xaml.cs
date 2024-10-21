@@ -22,6 +22,8 @@ namespace FRI.AUS2.SP1.GUI.Controls
     {
         public string Title { get; set; } = "Geo Items Management";
 
+        public Action? InsertAction { get; set; }
+
         public GeoItemsManagement()
         {
             InitializeComponent();
@@ -37,7 +39,13 @@ namespace FRI.AUS2.SP1.GUI.Controls
 
         private void _btn_Insert_Click(object sender, RoutedEventArgs e)
         {
+            if (InsertAction is null)
+            {
+                MessageBox.Show("Insert action is not implemented!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
+            InsertAction();
         }
     }
     #endregion
