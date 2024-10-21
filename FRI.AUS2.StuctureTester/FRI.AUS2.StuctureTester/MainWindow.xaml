@@ -268,7 +268,7 @@
                                 </Grid.RowDefinitions>
 
                                 <TextBlock Text="ℹ️Add:" ToolTip="Using values from Generate nodes form (except seed and count)."/>
-                                <TextBox x:Name="_txtb_operationsAdd" Text="3" Grid.Column="2" TextAlignment="Right"/>
+                                <TextBox x:Name="_txtb_operationsAdd" Text="4" Grid.Column="2" TextAlignment="Right"/>
 
                                 <TextBlock Text="Delete:" Grid.Row="2" />
                                 <TextBox x:Name="_txtb_operationsDelete" Text="2" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>
@@ -299,7 +299,7 @@
                                 </Grid.RowDefinitions>
 
                                 <TextBlock Text="ℹ️Verbosity:" ToolTip="1 - all, 2 - only operations, 3 - only stats"/>
-                                <TextBox x:Name="_txtb_operationsLogVerbosity" Text="3" Grid.Column="2" TextAlignment="Right"/>
+                                <TextBox x:Name="_txtb_operationsLogVerbosity" Text="1" Grid.Column="2" TextAlignment="Right"/>
 
                                 <TextBlock Text="ℹ️Stats f. :" ToolTip="Sequence stats frequency. Every how many lines the strucute stats should be printed. 0 - off"  Grid.Row="2"/>
                                 <TextBox x:Name="_txtb_operationsLogStatsFreq" Text="0" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>

@@ -42,6 +42,7 @@ namespace FRI.AUS2.StuctureTester.Utils
 
         private List<T> _structureData;
         private string? _structureDataStaticticsBefore;
+        private int? _structureNodesCountBefore;
         private Dictionary<OperationType, int> _operationStatistics = new Dictionary<OperationType, int>();
 
         public OperationsGenerator(KdTree<T> structure, int count, int seed, Func<Random, T> craeteRandomT)
@@ -91,22 +92,19 @@ namespace FRI.AUS2.StuctureTester.Utils
             // Get all data from the structure (to be able key all keys)
             _structureData = new List<T>();
 
-            if (Structure?.RootNode?.Data is null)
+            if (Structure?.RootNode?.Data is not null)
             {
-                return;
+                var it = Structure.GetInOrderIterator(Structure.RootNode.Data);
+                if (it is not null)
+                {
+                    while (it.MoveNext())
+                    {
+                        _structureData.Add(it.Current);
+                    }
+                    _structureDataStaticticsBefore = _getStructureStatictics();
+                    _structureNodesCountBefore = Structure.NodesCount;
+                }
             }
-
-            var it = Structure.GetInOrderIterator(Structure.RootNode.Data);
-            if (it is null)
-            {
-                return;
-            }
-
-            while (it.MoveNext())
-            {
-                _structureData.Add(it.Current);
-            }
-            _structureDataStaticticsBefore = _getStructureStatictics();
 
             // Initialize operation statistics
             _operationStatistics = new Dictionary<OperationType, int>
@@ -156,6 +154,13 @@ namespace FRI.AUS2.StuctureTester.Utils
             _log("After:", 1);
             _log(_getStructureStatictics(), 2);
             _log("");
+
+            _log("Structure test:");
+            _log("Before nodes count: " + (_structureNodesCountBefore ?? 0), 1);
+            _log($"Operations done: (+{_operationStatistics[OperationType.Insert]}, -{_operationStatistics[OperationType.Delete]})", 1);
+            int expectedNodesCount = _structureNodesCountBefore ?? 0 + _operationStatistics[OperationType.Insert] - _operationStatistics[OperationType.Delete];
+            _log($"After nodes count should be: {expectedNodesCount}", 1);
+            _log("After nodes count is: " + Structure.NodesCount, 1);
         }
 
         private void _beforeOperation(int index, OperationType operation)
@@ -231,7 +236,7 @@ namespace FRI.AUS2.StuctureTester.Utils
             catch (InvalidOperationException e)
             {
                 // key not found
-                if (LogsVerbosity < 2) 
+                if (LogsVerbosity < 2)
                     _log($"Key not found!!! ({e.Message})", 1);
             }
         }
