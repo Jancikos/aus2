@@ -34,7 +34,7 @@ namespace FRI.AUS2.SP1.GUI
 
         private void _initializePropertiesManagment()
         {
-            _initializePropertiesManagmentActions(_mng_Properties, _backend.AddProperty, _backend.GenerateProperties);
+            _initializeGeoItemsManagmentActions(_mng_Properties, _backend.AddProperty, _backend.GenerateProperties);
 
             // setup table orogin items source
             _mng_Properties.GetTableAllItemsSource = () => _backend.Properties;
@@ -48,19 +48,19 @@ namespace FRI.AUS2.SP1.GUI
 
         private void _initializeParcelsManagment()
         {
-            _initializePropertiesManagmentActions(_mng_Parcels, _backend.AddParcel, _backend.GenerateParcels);
+            _initializeGeoItemsManagmentActions(_mng_Parcels, _backend.AddParcel, _backend.GenerateParcels);
 
             // setup table orogin items source
             _mng_Parcels.GetTableAllItemsSource = () => _backend.Parcels;
 
             // setup table columns
-            _mng_Parcels.AddTableColumn("ˇČislo", "Number");
+            _mng_Parcels.AddTableColumn("Čislo", "Number");
             _mng_Parcels.AddTableColumn("Popis", "Description");
             _mng_Parcels.AddTableColumn("Pozícia A", "PositionA");
             _mng_Parcels.AddTableColumn("Pozícia B", "PositionB");
         }
         
-        private void _initializePropertiesManagmentActions(GeoItemsManagement mngItems, Action<int, string, GpsPoint, GpsPoint> addItemAction, Action<int, int, string, (int, int), (int, int), (int, int), (int, int), (int, int)> generateItemsAction)
+        private void _initializeGeoItemsManagmentActions(GeoItemsManagement mngItems, Action<int, string, GpsPoint, GpsPoint> addItemAction, Action<int, int, string, (int, int), (int, int), (int, int), (int, int), (int, int)> generateItemsAction)
         {
             mngItems.InsertAction = () =>
             {
