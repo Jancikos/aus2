@@ -17,6 +17,7 @@ namespace FRI.AUS2.SP1.Libs
         public IList<Parcel> Parcels => _parcels;
 
         private KdTree<GpsPointItem<Property>> _treeProperties { get; init; } = new KdTree<GpsPointItem<Property>>();
+        private KdTree<GpsPointItem<Parcel>> _treeParcels { get; init; } = new KdTree<GpsPointItem<Parcel>>();
 
         public SP1Backend()
         {
@@ -36,13 +37,14 @@ namespace FRI.AUS2.SP1.Libs
 
         private void _initializeParcels()
         {
-            AddParcel(1, "Parcel 1", new GpsPoint(48.1486, 17.1077), new GpsPoint(48.1486, 17.1077));
-            AddParcel(2, "Parcel 2", new GpsPoint(48.1486, 17.1077), new GpsPoint(48.1486, 17.1077));
-            AddParcel(3, "Parcel 3", new GpsPoint(48.1486, 17.1077), new GpsPoint(48.1486, 17.1077));
-            AddParcel(4, "Parcel 4", new GpsPoint(48.1486, 17.1077), new GpsPoint(48.1486, 17.1077));
-            AddParcel(5, "Parcel 5", new GpsPoint(48.1486, 17.1077), new GpsPoint(48.1486, 17.1077));
+            AddParcel(1, "Parcel 1", new GpsPoint(1.1, 1.1), new GpsPoint(1.1, 1.2));
+            AddParcel(2, "Parcel 2", new GpsPoint(-1.1, 1.1), new GpsPoint(1.1, 1.3));
+            AddParcel(3, "Parcel 3", new GpsPoint(1.1, -1.1), new GpsPoint(1.1, 1.4));
+            AddParcel(4, "Parcel 4", new GpsPoint(1.1, 1.2), new GpsPoint(1.1, 1.5));
+            AddParcel(5, "Parcel 5", new GpsPoint(-1.1, 1.1), new GpsPoint(1.1, 1.2));
         }
 
+        #region Adding
         public void AddParcel(int number, string description, GpsPoint posA, GpsPoint posB)
         {
             Parcel parcel = new Parcel
@@ -54,6 +56,17 @@ namespace FRI.AUS2.SP1.Libs
             };
 
             // TODO: Add properties to the parcel (by the PosA and PosB coordinates)
+
+            // add parcel to the structures
+            _parcels.Add(parcel);
+            _treeParcels.Insert(new GpsPointItem<Parcel>(
+                parcel.PositionA, 
+                parcel
+            ));
+            _treeParcels.Insert(new GpsPointItem<Parcel>(
+                parcel.PositionB, 
+                parcel
+            ));
         }
 
         public void AddProperty(int streetNumber, string description, GpsPoint posA, GpsPoint posB)
@@ -79,7 +92,9 @@ namespace FRI.AUS2.SP1.Libs
                 property
             ));
         }
+        #endregion
 
+        #region Generating
         public void GenerateParcels(int count, int seed, string descriptionPrefix, (int min, int max) streetNumber, (int min, int max) posA_X, (int min, int max) posA_Y, (int min, int max) posB_X, (int min, int max) posB_Y)
         {
             _generateGeoItems(count, seed, descriptionPrefix, streetNumber, posA_X, posA_Y, posB_X, posB_Y, AddParcel);
@@ -117,7 +132,13 @@ namespace FRI.AUS2.SP1.Libs
 
             return random.NextInt64(range.min * precisionFactor, range.max * precisionFactor) / (double)precisionFactor;
         }
-
+        #endregion
+        
+        #region Finding
+        public IList<Parcel> FindParcels(GpsPoint point)
+        {
+            return _findItems(point, _treeParcels);
+        }
 
         public IList<Property> FindProperties(GpsPoint point)
         {
@@ -133,6 +154,6 @@ namespace FRI.AUS2.SP1.Libs
             // can use ! because the data is not null
             return data!.ToList<T>();
         }
-
+        #endregion
     }
 }

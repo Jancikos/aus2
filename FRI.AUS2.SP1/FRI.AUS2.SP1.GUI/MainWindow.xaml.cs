@@ -53,6 +53,7 @@ namespace FRI.AUS2.SP1.GUI
 
             // setup table orogin items source
             _mng_Parcels.GetTableAllItemsSource = () => _backend.Parcels;
+            _mng_Parcels.GetTableFilteredItemsSource = _backend.FindParcels;
 
             // setup table columns
             _mng_Parcels.AddTableColumn("Čislo", "Number");
