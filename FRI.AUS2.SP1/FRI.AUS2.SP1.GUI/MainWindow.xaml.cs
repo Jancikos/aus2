@@ -55,6 +55,33 @@ namespace FRI.AUS2.SP1.GUI
                 MessageBox.Show("Property added!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
             };
 
+            _mng_Properties.GenerateAction = () =>
+            {
+                var form = new PropertyGenerationFormWindow();
+
+                form.ShowDialog();
+
+                if (form.DialogResult == false)
+                {
+                    return;
+                }
+
+                _backend.GenerateProperties(
+                    form.Count,
+                    form.Seed,
+                    form.DescriptionPrefix,
+                    form.StreetNumber,
+                    form.PosA_X,
+                    form.PosA_Y,
+                    form.PosB_X,
+                    form.PosB_Y
+                );
+
+                _mng_Properties.RerenderTable();
+
+                MessageBox.Show("Properties generated!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            };
+
 
             // setup table
             _mng_Properties.GetTableAllItemsSource = () => _backend.Properties;

@@ -70,5 +70,35 @@ namespace FRI.AUS2.SP1.Libs
             _properties.Add(property);
         }
 
+        public void GenerateProperties(int count, int seed, string descriptionPrefix, (int min, int max) streetNumber, (int min, int max) posA_X, (int min, int max) posA_Y, (int min, int max) posB_X, (int min, int max) posB_Y)
+        {
+            Random random = new Random(seed);
+
+            for (int i = 0; i < count; i++)
+            {
+                var randomX = _getRandomDouble(random, posA_X);
+
+                AddProperty(
+                    random.Next(streetNumber.min, streetNumber.max),
+                    $"{descriptionPrefix} {i + 1}",
+                    new GpsPoint(
+                        _getRandomDouble(random, posA_X),
+                        _getRandomDouble(random, posA_Y)
+                    ),
+                    new GpsPoint(
+                        _getRandomDouble(random, posB_X),
+                        _getRandomDouble(random, posB_Y)
+                    )
+                );
+            }
+        }
+
+        private double _getRandomDouble(Random random, (int min, int max) range, int precision = 6)
+        {
+            var precisionFactor = (int) Math.Pow(10, precision);
+
+            return random.NextInt64(range.min * precisionFactor, range.max * precisionFactor) / (double)precisionFactor;
+        }
+
     }
 }

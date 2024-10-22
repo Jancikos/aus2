@@ -1,0 +1,146 @@
+﻿<Window x:Class="FRI.AUS2.SP1.GUI.Windows.PropertyGenerationFormWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:FRI.AUS2.SP1.GUI.Windows"
+    mc:Ignorable="d"
+    SizeToContent="WidthAndHeight"
+    Title="Generátor nehnuteľností"
+    Height="300"
+    Width="200">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <Menu>
+                <MenuItem x:Name="_mnitem_Generator" Header="Generovať"
+                    Click="_mnitem_Generate_Click" />
+
+                <MenuItem x:Name="_mnitem_Close" Header="Zavrieť" Click="_mnitem_Close_Click" />
+            </Menu>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="5">
+
+            <GroupBox Header="Generátor">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" MinWidth="30" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="*" MinWidth="50" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="auto" MinWidth="30" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="*" MinWidth="50" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Počet:" />
+                    <TextBox x:Name="_txtb_Count" Text="100" Grid.Column="2" />
+
+                    <TextBlock Text="Seed:" Grid.Column="4" />
+                    <TextBox x:Name="_txtb_Seed" Text="1" Grid.Column="6" />
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Header="Súp. č.">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" MinWidth="30" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="*" MinWidth="50" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="auto" MinWidth="30" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="*" MinWidth="50" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="2" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Min:" />
+                    <TextBox x:Name="_txtb_StreetNumberMin" Text="1" Grid.Column="2" />
+
+                    <TextBlock Text="Max:" Grid.Column="4" />
+                    <TextBox x:Name="_txtb_StreetNumberMax" Text="1000" Grid.Column="6" />
+
+                    <TextBlock Text="Prefix popisu:" Grid.Row="2" Grid.ColumnSpan="3"  />
+                    <TextBox x:Name="_txtb_DescriptionPrefix" Text="č. " Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="3" />
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Header="Pozícia A" ToolTip="Zadávať celé čísla. Generované budú desatiné s presnosťou na 6 miest.">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" MinWidth="30" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="*" MinWidth="50" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="auto" MinWidth="30" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="*" MinWidth="50" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="2" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Min X:" />
+                    <TextBox x:Name="_txtb_PosA_XMin" Text="16" Grid.Column="2" />
+
+                    <TextBlock Text="Max X:" Grid.Column="4" />
+                    <TextBox x:Name="_txtb_PosA_XMax" Text="47" Grid.Column="6" />
+
+                    <TextBlock Text="Min Y:" Grid.Row="2" />
+                    <TextBox x:Name="_txtb_PosA_YMin" Text="22" Grid.Column="2" Grid.Row="2" />
+
+                    <TextBlock Text="Max Y:" Grid.Row="2" Grid.Column="4" />
+                    <TextBox x:Name="_txtb_PosA_YMax" Text="49" Grid.Column="6" Grid.Row="2" />
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Header="Pozícia B" ToolTip="Zadávať celé čísla. Generované budú desatiné s presnosťou na 6 miest.">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" MinWidth="30" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="*" MinWidth="50" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="auto" MinWidth="30" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="*" MinWidth="50" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="2" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Min X:" />
+                    <TextBox x:Name="_txtb_PosB_XMin" Text="16" Grid.Column="2" />
+
+                    <TextBlock Text="Max X:" Grid.Column="4" />
+                    <TextBox x:Name="_txtb_PosB_XMax" Text="47" Grid.Column="6" />
+
+                    <TextBlock Text="Min Y:" Grid.Row="2" />
+                    <TextBox x:Name="_txtb_PosB_YMin" Text="22" Grid.Column="2" Grid.Row="2" />
+
+                    <TextBlock Text="Max Y:" Grid.Row="2" Grid.Column="4" />
+                    <TextBox x:Name="_txtb_PosB_YMax" Text="49" Grid.Column="6" Grid.Row="2" />
+                </Grid>
+            </GroupBox>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -43,7 +43,6 @@
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
-            <!--node form-->
             <TextBlock Text="Súp. č.:" />
             <TextBox x:Name="_txtb_StreetNumber" Grid.Column="2" />
 
@@ -102,4 +101,3 @@
         </Grid>
     </Grid>
 </Window>
-
