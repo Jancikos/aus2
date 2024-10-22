@@ -38,6 +38,7 @@ namespace FRI.AUS2.SP1.GUI
 
             // setup table orogin items source
             _mng_Properties.GetTableAllItemsSource = () => _backend.Properties;
+            _mng_Properties.GetTableFilteredItemsSource = _backend.FindProperties;
 
             // setup table columns
             _mng_Properties.AddTableColumn("Sup. č.", "StreetNumber");
