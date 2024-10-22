@@ -1,4 +1,6 @@
-﻿namespace FRI.AUS2.SP1.Libs.Models
+﻿using FRI.AUS2.Libs.Helpers;
+
+namespace FRI.AUS2.SP1.Libs.Models
 {
     public class GpsPoint
     {
@@ -14,6 +16,11 @@
         {
             X = x;
             Y = y;
+        }
+
+        public bool Equals(GpsPoint other)
+        {
+            return X.CompareE(other.X) == 0 && Y.CompareE(other.Y) == 0;
         }
 
         public override string ToString()

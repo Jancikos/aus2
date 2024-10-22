@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FRI.AUS2.Libs.Structures.Trees.Interfaces;
+using static FRI.AUS2.Libs.Helpers.DoubleExtension;
 
 namespace FRI.AUS2.SP1.Libs.Models
 {
@@ -28,13 +29,7 @@ namespace FRI.AUS2.SP1.Libs.Models
             double val1 = GetDiminesionValue(level % GetDiminesionsCount());
             double val2 = other.GetDiminesionValue(level % GetDiminesionsCount());
 
-            double diff = val1 - val2;
-            if (diff < E)
-            {
-                return 0;
-            }
-
-            return diff > 0 ? 1 : -1;
+            return val1.CompareE(val2, E);
         }
 
         public int GetDiminesionsCount() => 2;
