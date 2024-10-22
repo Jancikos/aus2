@@ -3,6 +3,7 @@ using FRI.AUS2.SP1.Libs.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -59,14 +60,7 @@ namespace FRI.AUS2.SP1.Libs
 
             // add parcel to the structures
             _parcels.Add(parcel);
-            _treeParcels.Insert(new GpsPointItem<Parcel>(
-                parcel.PositionA, 
-                parcel
-            ));
-            _treeParcels.Insert(new GpsPointItem<Parcel>(
-                parcel.PositionB, 
-                parcel
-            ));
+            _addToTree(parcel, _treeParcels);
         }
 
         public void AddProperty(int streetNumber, string description, GpsPoint posA, GpsPoint posB)
@@ -83,15 +77,28 @@ namespace FRI.AUS2.SP1.Libs
 
             // add property to the structures
             _properties.Add(property);
-            _treeProperties.Insert(new GpsPointItem<Property>(
-                property.PositionA, 
-                property
-            ));
-            _treeProperties.Insert(new GpsPointItem<Property>(
-                property.PositionB, 
-                property
-            ));
+            _addToTree(property, _treeProperties);
         }
+
+        private void _addToTree<T>(T item, KdTree<GpsPointItem<T>> tree) where T : GeoItem
+        {
+            if (item.PositionA is not null)
+            {
+                tree.Insert(new GpsPointItem<T>(
+                    item.PositionA, 
+                    (T)item
+                ));
+            }
+
+            if (item.PositionB is not null)
+            {
+                tree.Insert(new GpsPointItem<T>(
+                    item.PositionB, 
+                    (T)item
+                ));
+            }
+        }
+
         #endregion
 
         #region Generating
