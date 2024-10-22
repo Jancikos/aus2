@@ -72,11 +72,16 @@ namespace FRI.AUS2.SP1.Libs
 
         public void GenerateProperties(int count, int seed, string descriptionPrefix, (int min, int max) streetNumber, (int min, int max) posA_X, (int min, int max) posA_Y, (int min, int max) posB_X, (int min, int max) posB_Y)
         {
+            _generateGeoItems(count, seed, descriptionPrefix, streetNumber, posA_X, posA_Y, posB_X, posB_Y, AddProperty);
+        }
+
+        private void _generateGeoItems(int count, int seed, string descriptionPrefix, (int min, int max) streetNumber, (int min, int max) posA_X, (int min, int max) posA_Y, (int min, int max) posB_X, (int min, int max) posB_Y, Action<int, string, GpsPoint, GpsPoint> addAction)
+        {
             Random random = new Random(seed);
 
             for (int i = 0; i < count; i++)
             {
-                AddProperty(
+                addAction(
                     random.Next(streetNumber.min, streetNumber.max),
                     $"{descriptionPrefix} {i + 1}",
                     new GpsPoint(
