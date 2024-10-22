@@ -29,6 +29,7 @@ namespace FRI.AUS2.SP1.GUI
             _backend = new SP1Backend();
 
             _initializePropertiesManagment();
+            _initializeParcelsManagment();
         }
 
         private void _initializePropertiesManagment()
@@ -43,6 +44,20 @@ namespace FRI.AUS2.SP1.GUI
             _mng_Properties.AddTableColumn("Popis", "Description");
             _mng_Properties.AddTableColumn("Pozícia A", "PositionA");
             _mng_Properties.AddTableColumn("Pozícia B", "PositionB");
+        }
+
+        private void _initializeParcelsManagment()
+        {
+            _initializePropertiesManagmentActions(_mng_Parcels, _backend.AddParcel, _backend.GenerateParcels);
+
+            // setup table orogin items source
+            _mng_Parcels.GetTableAllItemsSource = () => _backend.Parcels;
+
+            // setup table columns
+            _mng_Parcels.AddTableColumn("ˇČislo", "Number");
+            _mng_Parcels.AddTableColumn("Popis", "Description");
+            _mng_Parcels.AddTableColumn("Pozícia A", "PositionA");
+            _mng_Parcels.AddTableColumn("Pozícia B", "PositionB");
         }
         
         private void _initializePropertiesManagmentActions(GeoItemsManagement mngItems, Action<int, string, GpsPoint, GpsPoint> addItemAction, Action<int, int, string, (int, int), (int, int), (int, int), (int, int), (int, int)> generateItemsAction)
