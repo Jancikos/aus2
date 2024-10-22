@@ -467,6 +467,16 @@ namespace FRI.AUS2.Libs.Structures.Trees
             return new KdTreeInOrderIterator<T>(rootNode);
         }
 
+        public KdTreeInOrderIterator<T>? GetInOrderIterator()
+        {
+            if (_rootNode is null)
+            {
+                return null;
+            }
+
+            return GetInOrderIterator(_rootNode);
+        }
+
         /// <summary>
         /// throws exception if the filter is not found
         /// </summary>
