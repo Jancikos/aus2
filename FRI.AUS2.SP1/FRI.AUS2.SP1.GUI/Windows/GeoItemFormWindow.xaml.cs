@@ -18,17 +18,17 @@ namespace FRI.AUS2.SP1.GUI.Windows
     /// <summary>
     /// Interaction logic for PropertyFormWindow.xaml
     /// </summary>
-    public partial class PropertyFormWindow : Window
+    public partial class GeoItemFormWindow : Window
     {
-        public int StreetNumber
+        public int Number
         {
             get
             {
-                return int.Parse(_txtb_StreetNumber.Text);
+                return int.Parse(_txtb_Number.Text);
             }
             set
             {
-                _txtb_StreetNumber.Text = value.ToString();
+                _txtb_Number.Text = value.ToString();
             }
         }
 
@@ -78,7 +78,7 @@ namespace FRI.AUS2.SP1.GUI.Windows
             }
         }
 
-        public PropertyFormWindow()
+        public GeoItemFormWindow()
         {
             InitializeComponent();
         }

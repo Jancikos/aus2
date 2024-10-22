@@ -17,7 +17,7 @@ namespace FRI.AUS2.SP1.GUI.Windows
     /// <summary>
     /// Interaction logic for PropertyGenerationWindow.xaml
     /// </summary>
-    public partial class PropertyGenerationFormWindow : Window
+    public partial class GeoItemGenerationFormWindow : Window
     {
         public int Count 
         {
@@ -97,11 +97,8 @@ namespace FRI.AUS2.SP1.GUI.Windows
                 );
             }
         }
-
-
-
         
-        public PropertyGenerationFormWindow()
+        public GeoItemGenerationFormWindow()
         {
             InitializeComponent();
         }

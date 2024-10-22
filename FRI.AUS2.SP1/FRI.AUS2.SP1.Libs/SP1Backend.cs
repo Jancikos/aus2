@@ -76,8 +76,6 @@ namespace FRI.AUS2.SP1.Libs
 
             for (int i = 0; i < count; i++)
             {
-                var randomX = _getRandomDouble(random, posA_X);
-
                 AddProperty(
                     random.Next(streetNumber.min, streetNumber.max),
                     $"{descriptionPrefix} {i + 1}",

@@ -34,7 +34,7 @@ namespace FRI.AUS2.SP1.GUI
         {
             _mng_Properties.InsertAction = () =>
             {
-                var form = new PropertyFormWindow();
+                var form = new GeoItemFormWindow();
 
                 form.ShowDialog();
 
@@ -44,7 +44,7 @@ namespace FRI.AUS2.SP1.GUI
                 }
 
                 _backend.AddProperty(
-                    form.StreetNumber,
+                    form.Number,
                     form.Description,
                     form.PosA,
                     form.PosB
@@ -57,7 +57,7 @@ namespace FRI.AUS2.SP1.GUI
 
             _mng_Properties.GenerateAction = () =>
             {
-                var form = new PropertyGenerationFormWindow();
+                var form = new GeoItemGenerationFormWindow();
 
                 form.ShowDialog();
 

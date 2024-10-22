@@ -10,10 +10,10 @@
     <Compile Update="Controls\GeoItemsManagement.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Windows\PropertyFormWindow.xaml.cs">
+    <Compile Update="Windows\GeoItemFormWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Windows\PropertyGenerationFormWindow.xaml.cs">
+    <Compile Update="Windows\GeoItemGenerationFormWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
@@ -24,10 +24,10 @@
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Windows\PropertyFormWindow.xaml">
+    <Page Update="Windows\GeoItemFormWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Windows\PropertyGenerationFormWindow.xaml">
+    <Page Update="Windows\GeoItemGenerationFormWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
