@@ -25,9 +25,16 @@
 
             <StackPanel Orientation="Horizontal">
                 <Button x:Name="_btn_Insert" Content="Insert" Click="_btn_Insert_Click" />
+                <GroupBox Header="Zobrazenie" Margin="5 0" Padding="4 2">
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <ComboBox x:Name="_cmbx_ViewMode" SelectionChanged="_cmbx_ViewMode_SelectionChanged">
+                        </ComboBox>
+                        <Button x:Name="_btn_Rerender" Content="Prekresliť" Click="_btn_Rerender_Click" HorizontalAlignment="Stretch" />
+                    </StackPanel>
+                </GroupBox>
 
                 <GroupBox Header="Filter" Margin="5 0">
-                    <Grid>
+                    <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" MinWidth="30" />
                             <ColumnDefinition Width="5" />
@@ -39,24 +46,21 @@
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="2" />
                             <RowDefinition Height="auto" />
-                            <RowDefinition Height="2" />
-                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
                         <!--node
                         form-->
                         <TextBlock Text="X:" />
-                        <TextBox x:Name="_txtb_X" Grid.Column="2" TextAlignment="Right" />
+                        <TextBox x:Name="_txtb_FilterX" Grid.Column="2" TextAlignment="Right" />
 
                         <TextBlock Text="Y:" Grid.Row="2" />
-                        <TextBox x:Name="_txtb_Y" Grid.Column="2" Grid.Row="2" TextAlignment="Right" />
+                        <TextBox x:Name="_txtb_FilterY" Grid.Column="2" Grid.Row="2" TextAlignment="Right" />
 
-                        <Button x:Name="_btn_Filter" Content="Filter" Grid.Column="4"
+                        <Button x:Name="_btn_Filter" Content="Filtrovať" Grid.Column="4"
                             Grid.RowSpan="3" Margin="0" Click="_btn_Filter_Click" />
                     </Grid>
                 </GroupBox>
 
-                <Button x:Name="_btn_Rerender" Content="Rerender" Click="_btn_Rerender_Click" />
             </StackPanel>
 
             <Controls:DataGrid x:Name="_tbl_GeoItems" Grid.Row="2">

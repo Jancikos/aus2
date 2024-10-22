@@ -50,12 +50,14 @@ namespace FRI.AUS2.SP1.GUI
                     form.PosB
                 );
 
+                _mng_Properties.RerenderTable();
+
                 MessageBox.Show("Property added!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
             };
 
 
             // setup table
-            _mng_Properties.SetTableItemsSource(_backend.Properties);
+            _mng_Properties.GetTableAllItemsSource = () => _backend.Properties;
 
             _mng_Properties.AddTableColumn("Sup. č.", "StreetNumber");
             _mng_Properties.AddTableColumn("Popis", "Description");

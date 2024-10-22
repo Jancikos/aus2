@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FRI.AUS2.SP1.Libs.Models;
 
 namespace FRI.AUS2.SP1.GUI.Controls
 {
@@ -22,7 +23,23 @@ namespace FRI.AUS2.SP1.GUI.Controls
     {
         public string Title { get; set; } = "Geo Items Management";
 
+        public ItemsViewMode TableViewMode
+        {
+            get
+            {
+                return (ItemsViewMode)_cmbx_ViewMode.SelectedValue;
+            }
+            set
+            {
+                _cmbx_ViewMode.SelectedValue = (int)value;
+            }
+        }
+
         public Action? InsertAction { get; set; }
+
+        public Func<IEnumerable<object>> GetTableAllItemsSource { protected get; set; } = () => new List<object>();
+
+        public Func<GpsPoint, IEnumerable<object>>? GetTableFilteredItemsSource { protected get; set; } = null;
 
         public GeoItemsManagement()
         {
@@ -30,11 +47,22 @@ namespace FRI.AUS2.SP1.GUI.Controls
 
             this.DataContext = this;
 
+            _initializeCmbxViewMode();
             _initializeTable();
         }
 
-        #region Table
+        private void _initializeCmbxViewMode()
+        {
+            _cmbx_ViewMode.SelectedValuePath = "Key";
+            _cmbx_ViewMode.DisplayMemberPath = "Value";
 
+            _cmbx_ViewMode.Items.Add(new KeyValuePair<int, string>((int)ItemsViewMode.All, "Všetky"));
+            _cmbx_ViewMode.Items.Add(new KeyValuePair<int, string>((int)ItemsViewMode.Filtered, "Filtrované"));
+
+            _cmbx_ViewMode.SelectedIndex = 0;
+        }
+
+        #region Table
         private void _initializeTable()
         {
             _tbl_GeoItems.AutoGenerateColumns = false;
@@ -53,16 +81,44 @@ namespace FRI.AUS2.SP1.GUI.Controls
             _tbl_GeoItems.Columns.Add(column);
         }
 
-        public void SetTableItemsSource<T>(IEnumerable<T> itemsSource)
+        public void RerenderTable()
         {
-            _tbl_GeoItems.ItemsSource = itemsSource;
+            switch ((ItemsViewMode)_cmbx_ViewMode.SelectedValue)
+            {
+                case ItemsViewMode.All:
+                    // weird but somehow offical way to do it
+                    _tbl_GeoItems.ItemsSource = null;
+                    _tbl_GeoItems.ItemsSource = GetTableAllItemsSource();
+                    break;
+                case ItemsViewMode.Filtered:
+                    _filterData();
+                    break;
+            }
         }
+
+        private void _filterData()
+        {
+            if (GetTableFilteredItemsSource is null)
+            {
+                MessageBox.Show("Filter action is not implemented!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var gpsFilter = new GpsPoint()
+            {
+                X = double.Parse(_txtb_FilterX.Text),
+                Y = double.Parse(_txtb_FilterY.Text)
+            };
+
+            _tbl_GeoItems.ItemsSource = GetTableFilteredItemsSource(gpsFilter);
+        }
+
         #endregion
 
         #region  UI Event Handlers
         private void _btn_Filter_Click(object sender, RoutedEventArgs e)
         {
-
+            _filterData();
         }
 
         private void _btn_Insert_Click(object sender, RoutedEventArgs e)
@@ -78,8 +134,19 @@ namespace FRI.AUS2.SP1.GUI.Controls
 
         private void _btn_Rerender_Click(object sender, RoutedEventArgs e)
         {
-            CollectionViewSource.GetDefaultView(_tbl_GeoItems.ItemsSource).Refresh();
+            RerenderTable();
+        }
+
+        private void _cmbx_ViewMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            RerenderTable();
         }
     }
     #endregion
+
+    public enum ItemsViewMode
+    {
+        All,
+        Filtered
+    }
 }
