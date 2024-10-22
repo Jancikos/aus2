@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FRI.AUS2.SP1.GUI.Controls;
 using FRI.AUS2.SP1.GUI.Windows;
 using FRI.AUS2.SP1.Libs;
 using FRI.AUS2.SP1.Libs.Models;
@@ -32,7 +33,21 @@ namespace FRI.AUS2.SP1.GUI
 
         private void _initializePropertiesManagment()
         {
-            _mng_Properties.InsertAction = () =>
+            _initializePropertiesManagmentActions(_mng_Properties, _backend.AddProperty, _backend.GenerateProperties);
+
+            // setup table orogin items source
+            _mng_Properties.GetTableAllItemsSource = () => _backend.Properties;
+
+            // setup table columns
+            _mng_Properties.AddTableColumn("Sup. č.", "StreetNumber");
+            _mng_Properties.AddTableColumn("Popis", "Description");
+            _mng_Properties.AddTableColumn("Pozícia A", "PositionA");
+            _mng_Properties.AddTableColumn("Pozícia B", "PositionB");
+        }
+        
+        private void _initializePropertiesManagmentActions(GeoItemsManagement mngItems, Action<int, string, GpsPoint, GpsPoint> addItemAction, Action<int, int, string, (int, int), (int, int), (int, int), (int, int), (int, int)> generateItemsAction)
+        {
+            mngItems.InsertAction = () =>
             {
                 var form = new GeoItemFormWindow();
 
@@ -43,19 +58,19 @@ namespace FRI.AUS2.SP1.GUI
                     return;
                 }
 
-                _backend.AddProperty(
+                addItemAction(
                     form.Number,
                     form.Description,
                     form.PosA,
                     form.PosB
                 );
 
-                _mng_Properties.RerenderTable();
+                mngItems.RerenderTable();
 
-                MessageBox.Show("Property added!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"{mngItems.Title} pridaná!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
             };
 
-            _mng_Properties.GenerateAction = () =>
+            mngItems.GenerateAction = () =>
             {
                 var form = new GeoItemGenerationFormWindow();
 
@@ -66,7 +81,7 @@ namespace FRI.AUS2.SP1.GUI
                     return;
                 }
 
-                _backend.GenerateProperties(
+                generateItemsAction(
                     form.Count,
                     form.Seed,
                     form.DescriptionPrefix,
@@ -77,20 +92,12 @@ namespace FRI.AUS2.SP1.GUI
                     form.PosB_Y
                 );
 
-                _mng_Properties.RerenderTable();
+                mngItems.RerenderTable();
 
-                MessageBox.Show("Properties generated!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"{mngItems.Title} vygenerované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
             };
-
-
-            // setup table
-            _mng_Properties.GetTableAllItemsSource = () => _backend.Properties;
-
-            _mng_Properties.AddTableColumn("Sup. č.", "StreetNumber");
-            _mng_Properties.AddTableColumn("Popis", "Description");
-            _mng_Properties.AddTableColumn("Pozícia A", "PositionA");
-            _mng_Properties.AddTableColumn("Pozícia B", "PositionB");
         }
+
 
         #region UI Event Handlers
         private void _mnitem_Test_Click(object sender, RoutedEventArgs e)
