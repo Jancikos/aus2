@@ -7,7 +7,7 @@
         xmlns:Controls="clr-namespace:System.Windows.Controls;assembly=PresentationFramework"
         xmlns:uc="clr-namespace:FRI.AUS2.SP1.GUI.Controls"
         mc:Ignorable="d"
-        Title="AUS SP1" Height="450" Width="800">
+        Title="AUS SP1" Height="450" Width="1100">
 
     <Window.Resources>
         <ResourceDictionary Source="Resources/Dictionary.xaml" />

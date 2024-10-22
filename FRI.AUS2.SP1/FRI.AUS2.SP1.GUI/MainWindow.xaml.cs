@@ -46,6 +46,10 @@ namespace FRI.AUS2.SP1.GUI
             _mng_Properties.AddTableColumn("Popis", "Description");
             _mng_Properties.AddTableColumn("Pozícia A", "PositionA");
             _mng_Properties.AddTableColumn("Pozícia B", "PositionB");
+            _mng_Properties.AddTableColumn("P. parc.", "ParcelsCount");
+
+            // render table
+            _mng_Properties.RerenderTable();
         }
 
         private void _initializeParcelsManagment()
@@ -61,6 +65,10 @@ namespace FRI.AUS2.SP1.GUI
             _mng_Parcels.AddTableColumn("Popis", "Description");
             _mng_Parcels.AddTableColumn("Pozícia A", "PositionA");
             _mng_Parcels.AddTableColumn("Pozícia B", "PositionB");
+            _mng_Parcels.AddTableColumn("P. nehn.", "PropertiesCount");
+
+            // render table
+            _mng_Parcels.RerenderTable();
         }
 
         private void _initializeCombinedItemsManagment()

@@ -19,7 +19,7 @@ namespace FRI.AUS2.SP1.Libs
         public IList<GeoItem> Combined
         {
             // TODO - prerobit iterator...
-            get 
+            get
             {
                 var data = new List<GeoItem>();
 
@@ -53,21 +53,20 @@ namespace FRI.AUS2.SP1.Libs
 
         private void _initializeProperties()
         {
-            AddProperty(1, "Property 1", new GpsPoint(1.1, 1.1), new GpsPoint(1.1, 1.2));
-            AddProperty(2, "Property 2", new GpsPoint(-1.1, 1.1), new GpsPoint(1.1, 1.3));
-            AddProperty(3, "Property 3", new GpsPoint(1.1, -1.1), new GpsPoint(1.1, 1.4));
-            AddProperty(4, "Property 4", new GpsPoint(1.1, 1.2), new GpsPoint(1.1, 1.5));
-            AddProperty(5, "Property 5", new GpsPoint(-1.1, 1.1), new GpsPoint(1.1, 1.2));
+            AddProperty(1, "H1", new GpsPoint(1, 2), new GpsPoint(2, 2));
+            AddProperty(2, "H2", new GpsPoint(1, 1), new GpsPoint(-1, -1));
+            AddProperty(3, "H3", new GpsPoint(1, -2), new GpsPoint(0, 0));
+            AddProperty(4, "H4", new GpsPoint(3, 3), new GpsPoint(1, 5));
+            AddProperty(5, "H5", new GpsPoint(-1, 1), new GpsPoint(1, 1));
         }
 
 
         private void _initializeParcels()
         {
-            AddParcel(1, "Parcel 1", new GpsPoint(1.1, 1.1), new GpsPoint(1.1, 1.2));
-            AddParcel(2, "Parcel 2", new GpsPoint(-1.1, 1.1), new GpsPoint(1.1, 1.3));
-            AddParcel(3, "Parcel 3", new GpsPoint(1.1, -1.1), new GpsPoint(1.1, 1.4));
-            AddParcel(4, "Parcel 4", new GpsPoint(1.1, 1.2), new GpsPoint(1.1, 1.5));
-            AddParcel(5, "Parcel 5", new GpsPoint(-1.1, 1.1), new GpsPoint(1.1, 1.2));
+            AddParcel(1, "P1", new GpsPoint(1, 1), new GpsPoint(2, 2));
+            AddParcel(2, "P2", new GpsPoint(1, -1), new GpsPoint(4, 4));
+            AddParcel(3, "P3", new GpsPoint(1, 2), new GpsPoint(2, 2));
+            AddParcel(4, "P4", new GpsPoint(1, 5), new GpsPoint(1, 1));
         }
 
         #region Adding
@@ -81,7 +80,23 @@ namespace FRI.AUS2.SP1.Libs
                 PositionB = posB
             };
 
-            // TODO: Add properties to the parcel (by the PosA and PosB coordinates)
+            //  Add properties to the parcel (by the PosA and PosB coordinates)
+            // find properties by the PosA
+            var properties = _findItems(posA, _treeProperties);
+            
+            // find properties by the PosB
+            if (!posB.Equals(posA))
+            {
+                var propertiesByPosB = _findItems(posB, _treeProperties);
+            
+                // merge properties
+                properties = properties.Union(propertiesByPosB).ToList();
+            }
+            foreach (var property in properties)
+            {
+                parcel.AddProperty(property);
+                property.AddParcel(parcel);
+            }
 
             // add parcel to the structures
             _parcels.Add(parcel);
@@ -99,7 +114,25 @@ namespace FRI.AUS2.SP1.Libs
                 PositionB = posB
             };
 
-            // TODO: Add parcels to the property (by the PosA and PosB coordinates)
+            // Add parcels to the property (by the PosA and PosB coordinates)
+            // find parcels by the PosA
+            var parcels = _findItems(posA, _treeParcels);
+            
+            // find parcels by the PosB
+            if (!posB.Equals(posA))
+            {
+                var parcelsByPosB = _findItems(posB, _treeParcels);
+            
+                // merge parcels
+                parcels = parcels.Union(parcelsByPosB).ToList();
+            }
+
+            foreach (var parcel in parcels)
+            {
+                property.AddParcel(parcel);
+                parcel.AddProperty(property);
+            }
+            
 
             // add property to the structures
             _properties.Add(property);
@@ -112,7 +145,7 @@ namespace FRI.AUS2.SP1.Libs
             if (item.PositionA is not null)
             {
                 tree.Insert(new GpsPointItem<T>(
-                    item.PositionA, 
+                    item.PositionA,
                     (T)item
                 ));
             }
@@ -120,7 +153,7 @@ namespace FRI.AUS2.SP1.Libs
             if (item.PositionB is not null)
             {
                 tree.Insert(new GpsPointItem<T>(
-                    item.PositionB, 
+                    item.PositionB,
                     (T)item
                 ));
             }
@@ -162,12 +195,12 @@ namespace FRI.AUS2.SP1.Libs
 
         private double _getRandomDouble(Random random, (int min, int max) range, int precision = 6)
         {
-            var precisionFactor = (int) Math.Pow(10, precision);
+            var precisionFactor = (int)Math.Pow(10, precision);
 
             return random.NextInt64(range.min * precisionFactor, range.max * precisionFactor) / (double)precisionFactor;
         }
         #endregion
-        
+
         #region Finding
         public IList<Parcel> FindParcels(GpsPoint point)
         {

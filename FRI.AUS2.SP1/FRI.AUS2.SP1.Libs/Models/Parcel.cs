@@ -7,7 +7,20 @@
 
         public override string Data => $"Parcel {Number}. - {Description}";
 
-        // TODO list of Properties
+        private IList<Property> _properties = new List<Property>();
+        public IList<Property> Properties => _properties;
+
+        public int PropertiesCount => _properties.Count;
+
+        public void AddProperty(Property property)
+        {
+            _properties.Add(property);
+        }
+
+        public void RemoveProperty(Property property)
+        {
+            _properties.Remove(property);
+        }
         
         public override string ToString()
         {

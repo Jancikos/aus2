@@ -7,7 +7,21 @@
 
         public override string Data => $"Property {StreetNumber}. - {Description}";
 
-        // TODO list of Parcels
+        private IList<Parcel> _parcels = new List<Parcel>();
+        public IList<Parcel> Parcels => _parcels;
+
+        public int ParcelsCount => _parcels.Count;
+
+        public void AddParcel(Parcel parcel)
+        {
+            _parcels.Add(parcel);
+        }
+
+        public void RemoveParcel(Parcel parcel)
+        {
+            _parcels.Remove(parcel);
+        }
+
         public override string ToString()
         {
             return $"Property {StreetNumber}. - {Description} [{base.ToString()}]";
