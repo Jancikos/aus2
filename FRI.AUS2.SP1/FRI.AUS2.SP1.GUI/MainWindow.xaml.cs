@@ -30,6 +30,7 @@ namespace FRI.AUS2.SP1.GUI
 
             _initializePropertiesManagment();
             _initializeParcelsManagment();
+            _initializeCombinedItemsManagment();
         }
 
         private void _initializePropertiesManagment()
@@ -60,6 +61,18 @@ namespace FRI.AUS2.SP1.GUI
             _mng_Parcels.AddTableColumn("Popis", "Description");
             _mng_Parcels.AddTableColumn("Pozícia A", "PositionA");
             _mng_Parcels.AddTableColumn("Pozícia B", "PositionB");
+        }
+
+        private void _initializeCombinedItemsManagment()
+        {
+            // setup table orogin items source
+            _mng_CombinedItems.GetTableAllItemsSource = () => _backend.Combined;
+            _mng_CombinedItems.GetTableFilteredItemsSource = _backend.FindCombined;
+
+            // setup table columns
+            _mng_CombinedItems.AddTableColumn("Data", "Data");
+            _mng_CombinedItems.AddTableColumn("Pozícia A", "PositionA");
+            _mng_CombinedItems.AddTableColumn("Pozícia B", "PositionB");
         }
         
         private void _initializeGeoItemsManagmentActions(GeoItemsManagement mngItems, Action<int, string, GpsPoint, GpsPoint> addItemAction, Action<int, int, string, (int, int), (int, int), (int, int), (int, int), (int, int)> generateItemsAction)

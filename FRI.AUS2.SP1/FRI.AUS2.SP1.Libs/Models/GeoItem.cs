@@ -5,9 +5,11 @@
         public GpsPoint? PositionA { get; set; }
         public GpsPoint? PositionB { get; set; }
 
+        public abstract string Data { get; }
+
         public override string ToString()
         {
-            return $"[{PositionA}], [{PositionB}]";
+            return $"{Data} [{PositionA}], [{PositionB}]";
         }
     }
 }

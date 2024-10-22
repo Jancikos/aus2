@@ -5,6 +5,8 @@
         public int StreetNumber { get; set; }
         public string Description { get; set; } = string.Empty;
 
+        public override string Data => $"Property {StreetNumber}. - {Description}";
+
         // TODO list of Parcels
         public override string ToString()
         {

@@ -37,6 +37,8 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="5" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -45,6 +47,8 @@
             <uc:GeoItemsManagement x:Name="_mng_Properties" Title="Nehnuteľnosti"/>
 
             <uc:GeoItemsManagement x:Name="_mng_Parcels" Title="Parcely" Grid.Column="2"/>
+            
+            <uc:GeoItemsManagement x:Name="_mng_CombinedItems" Title="Spojené položky" Grid.Column="4"/>
         </Grid>
     </Grid>
 </Window>

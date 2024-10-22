@@ -16,9 +16,34 @@ namespace FRI.AUS2.SP1.Libs
 
         public IList<Property> Properties => _properties;
         public IList<Parcel> Parcels => _parcels;
+        public IList<GeoItem> Combined
+        {
+            // TODO - prerobit iterator...
+            get 
+            {
+                var data = new List<GeoItem>();
+
+                var it = _treeCombined.GetInOrderIterator();
+                if (it is null)
+                {
+                    return data;
+                }
+
+                while (it.MoveNext())
+                {
+                    if (it.Current.Item is not null)
+                    {
+                        data.Add(it.Current.Item);
+                    }
+                }
+
+                return data;
+            }
+        }
 
         private KdTree<GpsPointItem<Property>> _treeProperties { get; init; } = new KdTree<GpsPointItem<Property>>();
         private KdTree<GpsPointItem<Parcel>> _treeParcels { get; init; } = new KdTree<GpsPointItem<Parcel>>();
+        private KdTree<GpsPointItem<GeoItem>> _treeCombined { get; init; } = new KdTree<GpsPointItem<GeoItem>>();
 
         public SP1Backend()
         {
@@ -61,6 +86,7 @@ namespace FRI.AUS2.SP1.Libs
             // add parcel to the structures
             _parcels.Add(parcel);
             _addToTree(parcel, _treeParcels);
+            _addToTree(parcel, _treeCombined);
         }
 
         public void AddProperty(int streetNumber, string description, GpsPoint posA, GpsPoint posB)
@@ -78,6 +104,7 @@ namespace FRI.AUS2.SP1.Libs
             // add property to the structures
             _properties.Add(property);
             _addToTree(property, _treeProperties);
+            _addToTree(property, _treeCombined);
         }
 
         private void _addToTree<T>(T item, KdTree<GpsPointItem<T>> tree) where T : GeoItem
@@ -150,6 +177,11 @@ namespace FRI.AUS2.SP1.Libs
         public IList<Property> FindProperties(GpsPoint point)
         {
             return _findItems(point, _treeProperties);
+        }
+
+        public IList<GeoItem> FindCombined(GpsPoint point)
+        {
+            return _findItems(point, _treeCombined);
         }
 
         private IList<T> _findItems<T>(GpsPoint point, KdTree<GpsPointItem<T>> tree)
