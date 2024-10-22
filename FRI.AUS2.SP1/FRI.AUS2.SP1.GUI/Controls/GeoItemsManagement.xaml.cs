@@ -36,6 +36,7 @@ namespace FRI.AUS2.SP1.GUI.Controls
         }
 
         public Action? InsertAction { get; set; }
+        public Action? GenerateAction { get; set; }
 
         public Func<IEnumerable<object>> GetTableAllItemsSource { protected get; set; } = () => new List<object>();
 
@@ -118,6 +119,7 @@ namespace FRI.AUS2.SP1.GUI.Controls
         #region  UI Event Handlers
         private void _btn_Filter_Click(object sender, RoutedEventArgs e)
         {
+            TableViewMode = ItemsViewMode.Filtered;
             _filterData();
         }
 
@@ -141,8 +143,19 @@ namespace FRI.AUS2.SP1.GUI.Controls
         {
             RerenderTable();
         }
+
+        private void _btn_Generate_Click(object sender, RoutedEventArgs e)
+        {
+            if (GenerateAction is null)
+            {
+                MessageBox.Show("Generate action is not implemented!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            GenerateAction();
+        }
+        #endregion
     }
-    #endregion
 
     public enum ItemsViewMode
     {
