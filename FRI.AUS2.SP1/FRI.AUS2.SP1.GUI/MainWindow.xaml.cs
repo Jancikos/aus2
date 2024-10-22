@@ -35,7 +35,7 @@ namespace FRI.AUS2.SP1.GUI
 
         private void _initializePropertiesManagment()
         {
-            _initializeGeoItemsManagmentActions(_mng_Properties, _backend.AddProperty, _backend.GenerateProperties);
+            _initializeGeoItemsManagmentActions(_mng_Properties, _backend.AddProperty, _backend.GenerateProperties, (item) => _backend.DeleteProperty((Property)item));
 
             // setup table orogin items source
             _mng_Properties.GetTableAllItemsSource = () => _backend.Properties;
@@ -54,7 +54,7 @@ namespace FRI.AUS2.SP1.GUI
 
         private void _initializeParcelsManagment()
         {
-            _initializeGeoItemsManagmentActions(_mng_Parcels, _backend.AddParcel, _backend.GenerateParcels);
+            _initializeGeoItemsManagmentActions(_mng_Parcels, _backend.AddParcel, _backend.GenerateParcels, (item) => _backend.DeleteParcel((Parcel)item));
 
             // setup table orogin items source
             _mng_Parcels.GetTableAllItemsSource = () => _backend.Parcels;
@@ -83,7 +83,7 @@ namespace FRI.AUS2.SP1.GUI
             _mng_CombinedItems.AddTableColumn("Pozícia B", "PositionB");
         }
         
-        private void _initializeGeoItemsManagmentActions(GeoItemsManagement mngItems, Action<int, string, GpsPoint, GpsPoint> addItemAction, Action<int, int, string, (int, int), (int, int), (int, int), (int, int), (int, int)> generateItemsAction)
+        private void _initializeGeoItemsManagmentActions(GeoItemsManagement mngItems, Action<int, string, GpsPoint, GpsPoint> addItemAction, Action<int, int, string, (int, int), (int, int), (int, int), (int, int), (int, int)> generateItemsAction, Action<object> deleteItemAction)
         {
             mngItems.InsertAction = () =>
             {
@@ -133,6 +133,15 @@ namespace FRI.AUS2.SP1.GUI
                 mngItems.RerenderTable();
 
                 MessageBox.Show($"{mngItems.Title} vygenerované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            };
+
+            mngItems.DeleteAction = (item) =>
+            {
+                deleteItemAction(item);
+
+                mngItems.RerenderTable();
+
+                MessageBox.Show($"{mngItems.Title} odstránená!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
             };
         }
 

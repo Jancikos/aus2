@@ -69,6 +69,10 @@
             <StackPanel VerticalAlignment="Center"  Grid.Row="2" Grid.Column="1">
                 <Button x:Name="_btn_Insert" Content="Vložiť" Click="_btn_Insert_Click" />
                 <Button x:Name="_btn_Generate" Content="Generovať" Click="_btn_Generate_Click" />
+
+                <Separator Margin="0 5" />
+                
+                <Button x:Name="_btn_Delete" Content="Vymazať" Click="_btn_Delete_Click" />
             </StackPanel>
         </Grid>
     </GroupBox>

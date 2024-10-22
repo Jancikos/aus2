@@ -227,5 +227,32 @@ namespace FRI.AUS2.SP1.Libs
             return data!.ToList<T>();
         }
         #endregion
+
+        #region Deleting
+
+        public void DeleteParcel(Parcel parcel)
+        {
+            // remove parcel from the list
+            var index = _parcels.FindIndex(p => p.Number == parcel.Number);
+
+            if (index == -1)
+            {
+                return;
+            }
+
+            // remove references from the properties
+
+            // remove parcel from the tree
+            // // find and DELETE ALL parcels by the PosA
+            // // // from that parcels remove the right parcel (by Parcel reference)
+            // // // // insert the rest of the parcels back to the tree
+        }
+
+        public void DeleteProperty(Property property)
+        {
+            
+        }
+
+        #endregion
     }
 }

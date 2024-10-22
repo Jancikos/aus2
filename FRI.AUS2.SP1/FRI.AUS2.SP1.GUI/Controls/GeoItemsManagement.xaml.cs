@@ -37,6 +37,7 @@ namespace FRI.AUS2.SP1.GUI.Controls
 
         public Action? InsertAction { get; set; }
         public Action? GenerateAction { get; set; }
+        public Action<object>? DeleteAction { get; set; }
 
         public Func<IEnumerable<object>> GetTableAllItemsSource { protected get; set; } = () => new List<object>();
 
@@ -154,8 +155,26 @@ namespace FRI.AUS2.SP1.GUI.Controls
 
             GenerateAction();
         }
-        #endregion
+        private void _btn_Delete_Click(object sender, RoutedEventArgs e)
+        {
+            if (DeleteAction is null)
+            {
+                MessageBox.Show("Delete action is not implemented!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // get selected item
+            var selectedItem = _tbl_GeoItems.SelectedItem;
+            if (selectedItem is null)
+            {
+                MessageBox.Show("No item selected!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            DeleteAction(selectedItem);
+        }
     }
+#endregion
 
     public enum ItemsViewMode
     {
