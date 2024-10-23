@@ -83,12 +83,12 @@ namespace FRI.AUS2.SP1.Libs
             //  Add properties to the parcel (by the PosA and PosB coordinates)
             // find properties by the PosA
             var properties = _findItems(posA, _treeProperties);
-            
+
             // find properties by the PosB
             if (!posB.Equals(posA))
             {
                 var propertiesByPosB = _findItems(posB, _treeProperties);
-            
+
                 // merge properties
                 properties = properties.Union(propertiesByPosB).ToList();
             }
@@ -117,12 +117,12 @@ namespace FRI.AUS2.SP1.Libs
             // Add parcels to the property (by the PosA and PosB coordinates)
             // find parcels by the PosA
             var parcels = _findItems(posA, _treeParcels);
-            
+
             // find parcels by the PosB
             if (!posB.Equals(posA))
             {
                 var parcelsByPosB = _findItems(posB, _treeParcels);
-            
+
                 // merge parcels
                 parcels = parcels.Union(parcelsByPosB).ToList();
             }
@@ -132,7 +132,7 @@ namespace FRI.AUS2.SP1.Libs
                 property.AddParcel(parcel);
                 parcel.AddProperty(property);
             }
-            
+
 
             // add property to the structures
             _properties.Add(property);
@@ -233,24 +233,81 @@ namespace FRI.AUS2.SP1.Libs
         public void DeleteParcel(Parcel parcel)
         {
             // remove parcel from the list
-            var index = _parcels.FindIndex(p => p.Number == parcel.Number);
-
-            if (index == -1)
+            var result = _parcels.Remove(parcel);
+            if (!result)
             {
+                // not found
                 return;
             }
 
             // remove references from the properties
+            foreach (var property in parcel.Properties)
+            {
+                property.RemoveParcel(parcel);
+            }
 
+            // remove from trees
+            _removeFromTree(parcel, _treeParcels);
+            _removeFromTree(parcel, _treeCombined);
+
+            /// NOTES
             // remove parcel from the tree
-            // // find and DELETE ALL parcels by the PosA
+            // // find and DELETE ALL parcels by the PosA/B
             // // // from that parcels remove the right parcel (by Parcel reference)
             // // // // insert the rest of the parcels back to the tree
         }
 
         public void DeleteProperty(Property property)
         {
-            
+            // remove property from the list
+            var result = _properties.Remove(property);
+            if (!result)
+            {
+                // not found
+                return;
+            }
+
+            // remove references from the parcels
+            foreach (var parcel in property.Parcels)
+            {
+                parcel.RemoveProperty(property);
+            }
+
+            // remove from trees
+            _removeFromTree(property, _treeProperties);
+            _removeFromTree(property, _treeCombined);
+        }
+
+
+        private void _removeFromTree<T>(T item, KdTree<GpsPointItem<T>> tree) where T : GeoItem
+        {
+            removeItemByPosition(item, item.PositionA, tree);
+            removeItemByPosition(item, item.PositionB, tree);
+
+            void removeItemByPosition(T itemToBeDeleted, GpsPoint? gpsPoint, KdTree<GpsPointItem<T>> tree)
+            {
+                if (gpsPoint is not null)
+                {
+                    IList<T> deletedItems = new List<T>();
+                    var itemsByPosA = _findItems(gpsPoint, tree);
+
+                    // vsetky zo stromu odstran
+                    foreach (var itemByPosA in itemsByPosA)
+                    {
+                        tree.Remove(new GpsPointItem<T>(gpsPoint, itemByPosA));
+                        deletedItems.Add(itemByPosA);
+                    }
+
+                    // before insert remove the item from the deleted list
+                    deletedItems.Remove(itemToBeDeleted);
+
+                    // insert the rest of the items back to the tree
+                    foreach (var deletedItem in deletedItems)
+                    {
+                        tree.Insert(new GpsPointItem<T>(gpsPoint, deletedItem));
+                    }
+                }
+            }
         }
 
         #endregion

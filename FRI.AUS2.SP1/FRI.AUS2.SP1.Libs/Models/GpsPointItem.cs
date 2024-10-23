@@ -24,6 +24,11 @@ namespace FRI.AUS2.SP1.Libs.Models
             Item = item;
         }
 
+        public bool EqualsPosition(GpsPointItem<T> other) 
+        {
+            return Position.Equals(other.Position);
+        }
+
         public int Compare(int level, IKdTreeData other)
         {
             double val1 = GetDiminesionValue(level % GetDiminesionsCount());

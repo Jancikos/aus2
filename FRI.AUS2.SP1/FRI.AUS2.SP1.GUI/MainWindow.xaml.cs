@@ -103,9 +103,9 @@ namespace FRI.AUS2.SP1.GUI
                     form.PosB
                 );
 
-                mngItems.RerenderTable();
-
                 MessageBox.Show($"{mngItems.Title} pridaná!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+
+                RerenderTables();
             };
 
             mngItems.GenerateAction = () =>
@@ -130,21 +130,31 @@ namespace FRI.AUS2.SP1.GUI
                     form.PosB_Y
                 );
 
-                mngItems.RerenderTable();
-
                 MessageBox.Show($"{mngItems.Title} vygenerované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+
+                // ask for rerender
+                if (MessageBox.Show("Chcete prekresliť vygenerované tabuľky?", Title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    RerenderTables();
+                }
             };
 
             mngItems.DeleteAction = (item) =>
             {
                 deleteItemAction(item);
 
-                mngItems.RerenderTable();
-
                 MessageBox.Show($"{mngItems.Title} odstránená!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+
+                RerenderTables();
             };
         }
 
+        public void RerenderTables()
+        {
+            _mng_Properties.RerenderTable();
+            _mng_Parcels.RerenderTable();
+            _mng_CombinedItems.RerenderTable();
+        }
 
         #region UI Event Handlers
         private void _mnitem_Test_Click(object sender, RoutedEventArgs e)
