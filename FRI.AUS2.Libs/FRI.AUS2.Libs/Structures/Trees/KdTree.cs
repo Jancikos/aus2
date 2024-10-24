@@ -240,7 +240,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
             {
                 if (throwIfNotFound)
                 {
-                    throw new InvalidOperationException("Node not found.");
+                    throw new InvalidOperationException("Concrete node not found.");
                 }
                 return;
             }
@@ -276,6 +276,9 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
             bool isLastReplacedNodeLeaf = false;
             // replace nodes from the bottom to the top
+            var lastReplacedNode = nodesToBeReplaced.Peek();
+            var nodesToBeInsertedAfterRemoveFinished = new List<KdTreeNode<T>>();
+
             do
             {
                 KdTreeNode<T>? replacementNode = _findReplacementNode(nodesToBeReplaced.Peek());
@@ -302,77 +305,109 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 _replaceNode(toBeReplaced, acutalLeaf);
                 acutalLeaf = toBeReplaced;
             } while (nodesToBeReplaced.Count > 0);
-        }
 
-        /// <summary>
-        /// finds replacement node for the given node
-        /// 
-        /// replacement node is the that can be used to replace the given node (when the given node wants to be removed)
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        private KdTreeNode<T>? _findReplacementNode(KdTreeNode<T>? node)
-        {
-            KdTreeNode<T>? replacementNode = null;
-
-            // if node has right child
-            // // fid node with minimum value (in the same dimension) in the right subtree
-            if (node?.RightChild is not null)
+            // insert nodes that were removed during the remove process
+            foreach (var nodeToInsert in nodesToBeInsertedAfterRemoveFinished)
             {
-                // find node with minimum value in the right subtree
-                var nodeDimension = node.Dimension;
-                var minNode = node.RightChild;
-                var minDValue = minNode.Data.GetDiminesionValue(nodeDimension);
-
-                // search the whole tree where node.RightChild is root
-                var it = GetInOrderIterator(node.RightChild);
-                while (it.MoveNext())
-                {
-                    var currentNode = it.CurrentNode;
-                    var currentDValue = currentNode?.Data?.GetDiminesionValue(nodeDimension);
-
-                    if (currentDValue is not null && currentDValue < minDValue)
-                    {
-                        // FUTURE - porovnaj levely uzlov a vymemn, len ak je ten novy node leaf
-
-                        minNode = it.CurrentNode;
-                        minDValue = currentDValue.Value;
-                    }
-                }
-
-                replacementNode = minNode;
+                Insert(nodeToInsert.Data);
             }
 
 
-            // if node has no right child, but has left child
-            // // find node with maximum value (in the same dimension) in the left subtree
-            if (replacementNode is null && node?.LeftChild is not null)
+            /// <summary>
+            /// finds replacement node for the given node
+            /// 
+            /// replacement node is the that can be used to replace the given node (when the given node wants to be removed)
+            /// </summary>
+            /// <param name="node"></param>
+            /// <returns></returns>
+            KdTreeNode<T>? _findReplacementNode(KdTreeNode<T>? node)
             {
-                // find node with maximum value in the left subtree
-                var nodeDimension = node.Dimension;
-                var maxNode = node.LeftChild;
-                var maxDValue = maxNode.Data.GetDiminesionValue(nodeDimension);
+                KdTreeNode<T>? replacementNode = null;
 
-                // search the whole tree where node.LeftChild is root
-                var it = GetInOrderIterator(node.LeftChild);
-                while (it.MoveNext())
+                // if node has right child
+                // // find node with minimum value (in the same dimension) in the right subtree
+                if (node?.RightChild is not null)
                 {
-                    var currentNode = it.CurrentNode;
-                    var currentDValue = currentNode?.Data?.GetDiminesionValue(nodeDimension);
+                    // find node with minimum value in the right subtree
+                    var nodeDimension = node.Dimension;
+                    var minNode = node.RightChild;
+                    var minDValue = minNode.Data.GetDiminesionValue(nodeDimension);
+                    var nodesWithSameValueAsMinNode = new List<KdTreeNode<T>>();
 
-                    if (currentDValue is not null && currentDValue > maxDValue)
+                    // search the whole tree where node.RightChild is root
+                    var it = GetLevelOrderIterator(node.RightChild);
+                    while (it.MoveNext())
                     {
-                        // FUTURE - porovnaj levely uzlov a vymen, len ak je ten novy node leaf
+                        var currentNode = it.CurrentNode;
+                        var currentDValue = currentNode?.Data?.GetDiminesionValue(nodeDimension);
 
-                        maxNode = it.CurrentNode;
-                        maxDValue = currentDValue.Value;
+                        if (currentDValue is not null )
+                        {
+                            if (currentDValue == minDValue && currentNode != node.RightChild) {
+                                nodesWithSameValueAsMinNode.Add(currentNode);
+                                continue;
+                            }
+
+                            if (currentDValue < minDValue) {
+                                minNode = it.CurrentNode;
+                                minDValue = currentDValue.Value;
+                                nodesWithSameValueAsMinNode.Clear();
+                            }
+                        }
                     }
+
+                    if (minNode is not null)
+                    {
+                        if (nodesWithSameValueAsMinNode.Count > 0)
+                        {
+                            // tak vymaz tento node uplne zo stromu
+                            // poznac si ho, ze ho mas znovu vlozit ked skonci cely tento remove
+
+                            foreach (var nodeWithSameValue in nodesWithSameValueAsMinNode)
+                            {
+                                nodesToBeInsertedAfterRemoveFinished.Add(nodeWithSameValue);
+                                Remove(nodeWithSameValue.Data); // pozor znovu rekurzive delete podla dat
+                            }
+
+                            return _findReplacementNode(node); // ZBAVIT SA REKURZIE!!!
+                        }
+                    }
+
+                    replacementNode = minNode;
                 }
 
-                replacementNode = maxNode;
+
+                // if node has no right child, but has left child
+                // // find node with maximum value (in the same dimension) in the left subtree
+                if (replacementNode is null && node?.LeftChild is not null)
+                {
+                    // find node with maximum value in the left subtree
+                    var nodeDimension = node.Dimension;
+                    var maxNode = node.LeftChild;
+                    var maxDValue = maxNode.Data.GetDiminesionValue(nodeDimension);
+
+                    // search the whole tree where node.LeftChild is root
+                    var it = GetInOrderIterator(node.LeftChild);
+                    while (it.MoveNext())
+                    {
+                        var currentNode = it.CurrentNode;
+                        var currentDValue = currentNode?.Data?.GetDiminesionValue(nodeDimension);
+
+                        if (currentDValue is not null && currentDValue > maxDValue)
+                        {
+                            // FUTURE - porovnaj levely uzlov a vymen, len ak je ten novy node leaf
+
+                            maxNode = it.CurrentNode;
+                            maxDValue = currentDValue.Value;
+                        }
+                    }
+
+                    replacementNode = maxNode;
+                }
+
+                return replacementNode;
             }
 
-            return replacementNode;
         }
 
         /// <summary>
@@ -442,6 +477,28 @@ namespace FRI.AUS2.Libs.Structures.Trees
         private void _setRootNode(KdTreeNode<T>? newRoot)
         {
             _rootNode = newRoot;
+        }
+
+        public KdTreeLevelOrderIterator<T>? GetLevelOrderIterator(T filter)
+        {
+            if (_rootNode is null)
+            {
+                return null;
+            }
+
+            var node = _findConcretNode(_rootNode, filter, out _);
+
+            if (node is null)
+            {
+                return null;
+            }
+
+            return new KdTreeLevelOrderIterator<T>(node);
+        }
+
+        public KdTreeLevelOrderIterator<T>? GetLevelOrderIterator(KdTreeNode<T> node)
+        {            
+            return new KdTreeLevelOrderIterator<T>(node);
         }
 
         public KdTreeInOrderIterator<T>? GetInOrderIterator(T filter)
@@ -649,6 +706,75 @@ namespace FRI.AUS2.Libs.Structures.Trees
             _processNode(node.LeftChild);
             _nodesToProcess.Enqueue(node);
             _processNode(node.RightChild);
+        }
+    }
+    
+    public class KdTreeLevelOrderIterator<T> : IEnumerator<T>
+        where T : class, IKdTreeData
+    {
+        private Queue<KdTreeNode<T>> _nodesToProcess;
+
+        private KdTreeNode<T>? _root;
+        private KdTreeNode<T>? _current;
+        public T Current => _current?.Data ?? throw new InvalidOperationException("Current node is not set.");
+        internal KdTreeNode<T>? CurrentNode => _current;
+
+        object IEnumerator.Current => Current;
+
+        public KdTreeLevelOrderIterator(KdTreeNode<T> rootNode)
+        {
+            _nodesToProcess = new Queue<KdTreeNode<T>>();
+            _root = rootNode;
+            _processNode(_root);
+        }
+
+        public void Dispose()
+        {
+            _nodesToProcess.Clear();
+        }
+
+        public bool MoveNext()
+        {
+            if (_nodesToProcess.Count == 0)
+            {
+                return false;
+            }
+
+            _current = _nodesToProcess.Dequeue();
+            return true;
+        }
+
+        public void Reset()
+        {
+            _nodesToProcess.Clear();
+            _processNode(_root);
+        }
+
+        private void _processNode(KdTreeNode<T>? node)
+        {
+            if (node is null)
+            {
+                return;
+            }
+
+            var queue = new Queue<KdTreeNode<T>>();
+            queue.Enqueue(node);
+
+            while (queue.Count > 0)
+            {
+                var currentNode = queue.Dequeue();
+                _nodesToProcess.Enqueue(currentNode);
+
+                if (currentNode.LeftChild is not null)
+                {
+                    queue.Enqueue(currentNode.LeftChild);
+                }
+
+                if (currentNode.RightChild is not null)
+                {
+                    queue.Enqueue(currentNode.RightChild);
+                }
+            }
         }
     }
 }
