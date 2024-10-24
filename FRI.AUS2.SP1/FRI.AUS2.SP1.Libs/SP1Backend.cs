@@ -1,4 +1,4 @@
-﻿using FRI.AUS2.Libs.Structures.Trees;
+using FRI.AUS2.Libs.Structures.Trees;
 using FRI.AUS2.SP1.Libs.Models;
 using System;
 using System.Collections.Generic;
@@ -16,12 +16,12 @@ namespace FRI.AUS2.SP1.Libs
 
         public IList<Property> Properties => _properties;
         public IList<Parcel> Parcels => _parcels;
-        public IList<GeoItem> Combined
+        public IList<GpsPointItem<GeoItem>> Combined
         {
             // TODO - prerobit iterator...
             get
             {
-                var data = new List<GeoItem>();
+                var data = new List<GpsPointItem<GeoItem>>();
 
                 var it = _treeCombined.GetInOrderIterator();
                 if (it is null)
@@ -33,7 +33,7 @@ namespace FRI.AUS2.SP1.Libs
                 {
                     if (it.Current.Item is not null)
                     {
-                        data.Add(it.Current.Item);
+                        data.Add(it.Current);
                     }
                 }
 

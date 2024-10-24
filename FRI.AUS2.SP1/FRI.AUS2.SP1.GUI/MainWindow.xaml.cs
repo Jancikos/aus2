@@ -78,9 +78,8 @@ namespace FRI.AUS2.SP1.GUI
             _mng_CombinedItems.GetTableFilteredItemsSource = _backend.FindCombined;
 
             // setup table columns
-            _mng_CombinedItems.AddTableColumn("Data", "Data");
-            _mng_CombinedItems.AddTableColumn("Pozícia A", "PositionA");
-            _mng_CombinedItems.AddTableColumn("Pozícia B", "PositionB");
+            _mng_CombinedItems.AddTableColumn("Data", "Item.Data");
+            _mng_CombinedItems.AddTableColumn("Pozícia", "Position");
         }
         
         private void _initializeGeoItemsManagmentActions(GeoItemsManagement mngItems, Action<int, string, GpsPoint, GpsPoint> addItemAction, Action<int, int, string, (int, int), (int, int), (int, int), (int, int), (int, int)> generateItemsAction, Action<object> deleteItemAction)
