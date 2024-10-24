@@ -206,10 +206,16 @@ namespace FRI.AUS2.SP1.Libs
             return _findItems(point, _treeProperties);
         }
 
-        public IList<GpsPointItem<GeoItem>> FindCombined(GpsPoint point)
+        public IList<GpsPointItem<GeoItem>> FindCombined(GpsPoint pointA, GpsPoint pointB)
         {
-            return _treeCombined
-                            .Find(new GpsPointItem<GeoItem>(point, default));
+            var itemsByA = _treeCombined
+                            .Find(new GpsPointItem<GeoItem>(pointA, default));
+            var itemsByB = _treeCombined
+                            .Find(new GpsPointItem<GeoItem>(pointB, default));
+
+            return itemsByA
+                    .Concat(itemsByB)
+                    .ToList();
         }
 
         private IList<T> _findItems<T>(GpsPoint point, KdTree<GpsPointItem<T>> tree)

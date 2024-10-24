@@ -76,7 +76,7 @@ namespace FRI.AUS2.SP1.GUI
         {
             // setup table orogin items source
             _mng_CombinedItems.GetTableAllItemsSource = () => _backend.Combined;
-            _mng_CombinedItems.GetTableFilteredByPointItemsSource = _backend.FindCombined;
+            _mng_CombinedItems.GetTableFilteredByRectangleItemsSource = _backend.FindCombined;
             _mng_CombinedItems.FilterMode = ItemsFilterMode.Rectangle;
 
             // setup visibility
