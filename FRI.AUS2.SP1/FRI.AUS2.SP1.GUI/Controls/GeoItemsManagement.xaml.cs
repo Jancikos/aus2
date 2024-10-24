@@ -35,13 +35,75 @@ namespace FRI.AUS2.SP1.GUI.Controls
             }
         }
 
+        private ItemsFilterMode _filterMode;
+        public ItemsFilterMode FilterMode
+        {
+            get
+            {
+                return _filterMode;
+            }
+            set
+            {
+                _filterMode = value;
+                switch (value)
+                {
+                    case ItemsFilterMode.Point:
+                        FilterByPointVisibility = Visibility.Visible;
+                        FilterByRectangleVisibility = Visibility.Collapsed;
+                        break;
+                    case ItemsFilterMode.Rectangle:
+                        FilterByPointVisibility = Visibility.Collapsed;
+                        FilterByRectangleVisibility = Visibility.Visible;
+                        break;
+                }
+            }
+
+        }
+
+        protected Visibility FilterByPointVisibility
+        {
+            get
+            {
+                return _grbx_Filter_ByPoint.Visibility;
+            }
+            set
+            {
+                _grbx_Filter_ByPoint.Visibility = value;
+            }
+        }
+        
+        protected Visibility FilterByRectangleVisibility
+        {
+            get
+            {
+                return _grbx_Filter_ByRect.Visibility;
+            }
+            set
+            {
+                _grbx_Filter_ByRect.Visibility = value;
+            }
+        }
+
+        public Visibility ManageButtonsVisibility
+        {
+            get
+            {
+                return _stck_ManageButtons.Visibility;
+            }
+            set
+            {
+                _stck_ManageButtons.Visibility = value;
+            }
+        }
+
         public Action? InsertAction { get; set; }
         public Action? GenerateAction { get; set; }
         public Action<object>? DeleteAction { get; set; }
 
         public Func<IEnumerable<object>> GetTableAllItemsSource { protected get; set; } = () => new List<object>();
 
-        public Func<GpsPoint, IEnumerable<object>>? GetTableFilteredItemsSource { protected get; set; } = null;
+        public Func<GpsPoint, IEnumerable<object>>? GetTableFilteredByPointItemsSource { protected get; set; } = null;
+        public Func<GpsPoint, GpsPoint, IEnumerable<object>>? GetTableFilteredByRectangleItemsSource { protected get; set; } = null;
 
         public GeoItemsManagement()
         {
@@ -51,6 +113,8 @@ namespace FRI.AUS2.SP1.GUI.Controls
 
             _initializeCmbxViewMode();
             _initializeTable();
+
+            FilterMode = ItemsFilterMode.Point;
         }
 
         private void _initializeCmbxViewMode()
@@ -100,9 +164,22 @@ namespace FRI.AUS2.SP1.GUI.Controls
 
         private void _filterData()
         {
-            if (GetTableFilteredItemsSource is null)
+            switch (FilterMode)
             {
-                MessageBox.Show("Filter action is not implemented!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                case ItemsFilterMode.Point:
+                    _filterByPoint();
+                    break;
+                case ItemsFilterMode.Rectangle:
+                    _filterByRectangle();
+                    break;
+            }
+        }
+        
+        private void _filterByPoint()
+        {
+            if (GetTableFilteredByPointItemsSource is null)
+            {
+                MessageBox.Show("Filter by point action is not implemented!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -112,7 +189,30 @@ namespace FRI.AUS2.SP1.GUI.Controls
                 Y = double.Parse(_txtb_FilterY.Text)
             };
 
-            _tbl_GeoItems.ItemsSource = GetTableFilteredItemsSource(gpsFilter);
+            _tbl_GeoItems.ItemsSource = GetTableFilteredByPointItemsSource(gpsFilter);
+        }
+
+        private void _filterByRectangle()
+        {
+            if (GetTableFilteredByRectangleItemsSource is null)
+            {
+                MessageBox.Show("Filter by rectangle action is not implemented!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var gpsA = new GpsPoint()
+            {
+                X = double.Parse(_txtb_Filter_ByRectA_X.Text),
+                Y = double.Parse(_txtb_Filter_ByRectA_Y.Text)
+            };
+
+            var gpsB = new GpsPoint()
+            {
+                X = double.Parse(_txtb_Filter_ByRectB_X.Text),
+                Y = double.Parse(_txtb_Filter_ByRectB_Y.Text)
+            };
+
+            _tbl_GeoItems.ItemsSource = GetTableFilteredByRectangleItemsSource(gpsA, gpsB);
         }
 
         #endregion
@@ -121,9 +221,7 @@ namespace FRI.AUS2.SP1.GUI.Controls
         private void _btn_Filter_Click(object sender, RoutedEventArgs e)
         {
             TableViewMode = ItemsViewMode.Filtered;
-            _filterData();
         }
-
         private void _btn_Insert_Click(object sender, RoutedEventArgs e)
         {
             if (InsertAction is null)
@@ -174,11 +272,16 @@ namespace FRI.AUS2.SP1.GUI.Controls
             DeleteAction(selectedItem);
         }
     }
-#endregion
+    #endregion
 
     public enum ItemsViewMode
     {
         All,
         Filtered
+    }
+    public enum ItemsFilterMode
+    {
+        Point,
+        Rectangle
     }
 }

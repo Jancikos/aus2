@@ -39,7 +39,7 @@ namespace FRI.AUS2.SP1.GUI
 
             // setup table orogin items source
             _mng_Properties.GetTableAllItemsSource = () => _backend.Properties;
-            _mng_Properties.GetTableFilteredItemsSource = _backend.FindProperties;
+            _mng_Properties.GetTableFilteredByPointItemsSource = _backend.FindProperties;
 
             // setup table columns
             _mng_Properties.AddTableColumn("Sup. č.", "StreetNumber");
@@ -56,9 +56,10 @@ namespace FRI.AUS2.SP1.GUI
         {
             _initializeGeoItemsManagmentActions(_mng_Parcels, _backend.AddParcel, _backend.GenerateParcels, (item) => _backend.DeleteParcel((Parcel)item));
 
+
             // setup table orogin items source
             _mng_Parcels.GetTableAllItemsSource = () => _backend.Parcels;
-            _mng_Parcels.GetTableFilteredItemsSource = _backend.FindParcels;
+            _mng_Parcels.GetTableFilteredByPointItemsSource = _backend.FindParcels;
 
             // setup table columns
             _mng_Parcels.AddTableColumn("Čislo", "Number");
@@ -75,11 +76,16 @@ namespace FRI.AUS2.SP1.GUI
         {
             // setup table orogin items source
             _mng_CombinedItems.GetTableAllItemsSource = () => _backend.Combined;
-            _mng_CombinedItems.GetTableFilteredItemsSource = _backend.FindCombined;
+            _mng_CombinedItems.GetTableFilteredByPointItemsSource = _backend.FindCombined;
+            _mng_CombinedItems.FilterMode = ItemsFilterMode.Rectangle;
+
+            // setup visibility
+            _mng_CombinedItems.ManageButtonsVisibility = Visibility.Collapsed;
+
 
             // setup table columns
-            _mng_CombinedItems.AddTableColumn("Data", "Item.Data");
             _mng_CombinedItems.AddTableColumn("Pozícia", "Position");
+            _mng_CombinedItems.AddTableColumn("Data", "Item.Data");
         }
         
         private void _initializeGeoItemsManagmentActions(GeoItemsManagement mngItems, Action<int, string, GpsPoint, GpsPoint> addItemAction, Action<int, int, string, (int, int), (int, int), (int, int), (int, int), (int, int)> generateItemsAction, Action<object> deleteItemAction)

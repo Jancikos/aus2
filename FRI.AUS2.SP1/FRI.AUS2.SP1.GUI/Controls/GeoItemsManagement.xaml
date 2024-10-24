@@ -11,7 +11,7 @@
     <UserControl.Resources>
         <ResourceDictionary Source="/Resources/Dictionary.xaml" />
     </UserControl.Resources>
-    
+
     <GroupBox Header="{Binding Title}">
         <Grid Margin="2">
             <Grid.ColumnDefinitions>
@@ -33,10 +33,10 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Filter" Margin="5 0">
+                <GroupBox x:Name="_grbx_Filter_ByPoint" Header="Nájdi" Margin="5 0">
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" MinWidth="30" />
+                            <ColumnDefinition Width="15"/>
                             <ColumnDefinition Width="5" />
                             <ColumnDefinition Width="*" MinWidth="50" />
                             <ColumnDefinition Width="5" />
@@ -50,14 +50,72 @@
 
                         <!--node
                         form-->
-                        <TextBlock Text="X:" />
-                        <TextBox x:Name="_txtb_FilterX" Grid.Column="2" TextAlignment="Right" />
+                        <TextBlock Text="X:"/>
+                        <TextBox x:Name="_txtb_FilterX" Grid.Column="2" TextAlignment="Right"/>
 
                         <TextBlock Text="Y:" Grid.Row="2" />
                         <TextBox x:Name="_txtb_FilterY" Grid.Column="2" Grid.Row="2" TextAlignment="Right" />
 
-                        <Button x:Name="_btn_Filter" Content="Filtrovať" Grid.Column="4"
-                            Grid.RowSpan="3" Margin="0" Click="_btn_Filter_Click" />
+                        <Button x:Name="_btn_Filter" Content="Filtrovať" Grid.Column="4" Click="_btn_Filter_Click" Grid.RowSpan="3" />
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox x:Name="_grbx_Filter_ByRect" Header="Nájdi" Margin="5 0">
+                    <Grid VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <GroupBox Header="Bod A">
+                            <Grid VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="15"/>
+                                    <ColumnDefinition Width="5" />
+                                    <ColumnDefinition Width="*" MinWidth="50" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+        
+                                <TextBlock Text="X:"/>
+                                <TextBox x:Name="_txtb_Filter_ByRectA_X" Grid.Column="2" TextAlignment="Right" />
+        
+                                <TextBlock Text="Y:" Grid.Row="2" />
+                                <TextBox x:Name="_txtb_Filter_ByRectA_Y" Grid.Column="2" TextAlignment="Right" Grid.Row="2" />
+                            </Grid>
+                        </GroupBox>
+                        
+                        <GroupBox Header="Bod B" Grid.Column="2">
+                            <Grid VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="15"/>
+                                    <ColumnDefinition Width="5" />
+                                    <ColumnDefinition Width="*" MinWidth="50" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+        
+                                <TextBlock Text="X:"/>
+                                <TextBox x:Name="_txtb_Filter_ByRectB_X" Grid.Column="2" TextAlignment="Right" />
+        
+                                <TextBlock Text="Y:" Grid.Row="2" />
+                                <TextBox x:Name="_txtb_Filter_ByRectB_Y" Grid.Column="2" TextAlignment="Right" Grid.Row="2" />
+                            </Grid>
+                        </GroupBox>
+                        
+                        <Button x:Name="_btn_ByRect_Filter" Content="Filtrovať" Grid.Column="5" Click="_btn_Filter_Click" Grid.Row="1" />
                     </Grid>
                 </GroupBox>
 
@@ -66,12 +124,12 @@
             <Controls:DataGrid x:Name="_tbl_GeoItems" Grid.Row="2">
             </Controls:DataGrid>
 
-            <StackPanel VerticalAlignment="Center"  Grid.Row="2" Grid.Column="1">
+            <StackPanel x:Name="_stck_ManageButtons" VerticalAlignment="Center"  Grid.Row="2" Grid.Column="1">
                 <Button x:Name="_btn_Insert" Content="Vložiť" Click="_btn_Insert_Click" />
                 <Button x:Name="_btn_Generate" Content="Generovať" Click="_btn_Generate_Click" />
 
                 <Separator Margin="0 5" />
-                
+
                 <Button x:Name="_btn_Delete" Content="Vymazať" Click="_btn_Delete_Click" />
             </StackPanel>
         </Grid>
