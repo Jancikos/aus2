@@ -1,11 +1,5 @@
-using FRI.AUS2.Libs.Structures.Trees;
+﻿using FRI.AUS2.Libs.Structures.Trees;
 using FRI.AUS2.SP1.Libs.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FRI.AUS2.SP1.Libs
 {
@@ -212,9 +206,10 @@ namespace FRI.AUS2.SP1.Libs
             return _findItems(point, _treeProperties);
         }
 
-        public IList<GeoItem> FindCombined(GpsPoint point)
+        public IList<GpsPointItem<GeoItem>> FindCombined(GpsPoint point)
         {
-            return _findItems(point, _treeCombined);
+            return _treeCombined
+                            .Find(new GpsPointItem<GeoItem>(point, default));
         }
 
         private IList<T> _findItems<T>(GpsPoint point, KdTree<GpsPointItem<T>> tree)
@@ -248,7 +243,7 @@ namespace FRI.AUS2.SP1.Libs
 
             // remove from trees
             _removeFromTree(parcel, _treeParcels);
-            _removeFromTree(parcel, _treeCombined);
+            _removeFromTree(parcel, _treeCombined); // TODO - chyba pri odstranovani prvkov, ktore maju zhodne suradnice ako iny prvok 
 
             /// NOTES
             // remove parcel from the tree
@@ -275,27 +270,27 @@ namespace FRI.AUS2.SP1.Libs
 
             // remove from trees
             _removeFromTree(property, _treeProperties);
-            _removeFromTree(property, _treeCombined);
+            _removeFromTree(property, _treeCombined); // TODO - chyba pri odstranovani prvkov, ktore maju zhodne suradnice ako iny prvok 
         }
 
 
-        private void _removeFromTree<T>(T item, KdTree<GpsPointItem<T>> tree) where T : GeoItem
+        private void _removeFromTree<T>(T itemToBeDeleted, KdTree<GpsPointItem<T>> tree) where T : GeoItem
         {
-            removeItemByPosition(item, item.PositionA, tree);
-            removeItemByPosition(item, item.PositionB, tree);
+            removeItemByPosition(itemToBeDeleted.PositionA);
+            removeItemByPosition(itemToBeDeleted.PositionB);
 
-            void removeItemByPosition(T itemToBeDeleted, GpsPoint? gpsPoint, KdTree<GpsPointItem<T>> tree)
+            void removeItemByPosition(GpsPoint? gpsPoint)
             {
                 if (gpsPoint is not null)
                 {
                     IList<T> deletedItems = new List<T>();
-                    var itemsByPosA = _findItems(gpsPoint, tree);
+                    var itemsByGpsPoint = _findItems(gpsPoint, tree);
 
                     // vsetky zo stromu odstran
-                    foreach (var itemByPosA in itemsByPosA)
+                    foreach (var itemByGpsPos in itemsByGpsPoint)
                     {
-                        tree.Remove(new GpsPointItem<T>(gpsPoint, itemByPosA));
-                        deletedItems.Add(itemByPosA);
+                        tree.Remove(new GpsPointItem<T>(gpsPoint, itemByGpsPos));
+                        deletedItems.Add(itemByGpsPos);
                     }
 
                     // before insert remove the item from the deleted list
