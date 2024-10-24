@@ -2,6 +2,7 @@
 using FRI.AUS2.Libs.Structures.Trees.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
@@ -158,7 +159,7 @@ namespace FRI.AUS2.StuctureTester.Utils
             _log("Structure test:");
             _log("Before nodes count: " + (_structureNodesCountBefore ?? 0), 1);
             _log($"Operations done: (+{_operationStatistics[OperationType.Insert]}, -{_operationStatistics[OperationType.Delete]})", 1);
-            int expectedNodesCount = _structureNodesCountBefore ?? 0 + _operationStatistics[OperationType.Insert] - _operationStatistics[OperationType.Delete];
+            int expectedNodesCount = (_structureNodesCountBefore ?? 0) + _operationStatistics[OperationType.Insert] - _operationStatistics[OperationType.Delete];
             _log($"After nodes count should be: {expectedNodesCount}", 1);
             _log("After nodes count is: " + Structure.NodesCount, 1);
         }
@@ -280,9 +281,12 @@ namespace FRI.AUS2.StuctureTester.Utils
 
         private void _log(string message, int indentLevel = 0)
         {
-            // premysliet ci to neurobit efektivnejsie (vzhladom na to, ze sa bude casto otvarat a zatvarat subor)
+            var logMessage = $"{new string(' ', indentLevel * 2)}{message}" + Environment.NewLine;
 
-            System.IO.File.AppendAllText(LogsFileUri.LocalPath, $"{new string(' ', indentLevel * 2)}{message}" + Environment.NewLine);
+            // premysliet ci to neurobit efektivnejsie (vzhladom na to, ze sa bude casto otvarat a zatvarat subor)
+            System.IO.File.AppendAllText(LogsFileUri.LocalPath, logMessage);
+            
+            Debug.WriteLine(logMessage);
         }
 
         private string _getStructureStatictics()
