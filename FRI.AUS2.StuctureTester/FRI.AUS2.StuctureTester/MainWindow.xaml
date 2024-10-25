@@ -117,7 +117,7 @@
 
                         <TextBlock x:Name="_txt_deleteResult" Text="" Grid.Row="2" Grid.ColumnSpan="3" />
 
-                        <Button x:Name="_btn_Delete" Content="Find" Grid.Column="2" Margin="0"
+                        <Button x:Name="_btn_Delete" Content="Delete" Grid.Column="2" Margin="0"
          Click="_btn_ManualDelete_Click" VerticalAlignment="Center" />
                     </Grid>
                 </GroupBox>
