@@ -19,16 +19,28 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="2" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="2" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="2" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="2" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <!--node form-->
-        <TextBlock Text="X:" />
-        <TextBox x:Name="_txtb_X" Grid.Column="2" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" />
+        <TextBlock Text="A (d):" />
+        <TextBox x:Name="_txtb_A" Grid.Column="2" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" />
 
-        <TextBlock Text="Y:" Grid.Row="2" />
-        <TextBox x:Name="_txtb_Y" Grid.Column="2" Grid.Row="2" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" />
+        <TextBlock Text="B (s):" Grid.Row="4" />
+        <TextBox x:Name="_txtb_B" Grid.Column="2" Grid.Row="4" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" />
 
-        <TextBlock x:Name="_txt_Data"  Text="Data:" Grid.Row="4" />
-        <TextBox x:Name="_txtb_Data" Grid.Column="2" Grid.Row="4" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" />
+        <TextBlock Text="C (i):" Grid.Row="6" />
+        <TextBox x:Name="_txtb_C" Grid.Column="2" Grid.Row="6" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" />
+
+        <TextBlock Text="D (d):" Grid.Row="8" />
+        <TextBox x:Name="_txtb_D" Grid.Column="2" Grid.Row="8" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" />
+
+        <TextBlock x:Name="_txt_Data" Text="Data:" Grid.Row="10" />
+        <TextBox x:Name="_txtb_Data" Grid.Column="2" Grid.Row="10" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" />
     </Grid>
 </UserControl>

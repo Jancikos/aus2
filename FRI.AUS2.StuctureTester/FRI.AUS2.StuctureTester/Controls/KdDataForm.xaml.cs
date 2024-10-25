@@ -21,27 +21,51 @@ namespace FRI.AUS2.StuctureTester.Controls
     /// </summary>
     public partial class KdDataForm : UserControl
     {
-        public int X
+        public double A
         {
             get
             {
-                return int.Parse(_txtb_X.Text);
+                return double.Parse(_txtb_A.Text);
             }
             set
             {
-                _txtb_X.Text = value.ToString();
+                _txtb_A.Text = value.ToString();
             }
         }
 
-        public int Y
+        public string B 
         {
             get
             {
-                return int.Parse(_txtb_Y.Text);
+                return _txtb_B.Text;
             }
             set
             {
-                _txtb_Y.Text = value.ToString();
+                _txtb_B.Text = value;
+            }
+        }
+
+        public int C
+        {
+            get
+            {
+                return int.Parse(_txtb_C.Text);
+            }
+            set
+            {
+                _txtb_C.Text = value.ToString();
+            }
+        }
+
+        public double D
+        {
+            get
+            {
+                return double.Parse(_txtb_D.Text);
+            }
+            set
+            {
+                _txtb_D.Text = value.ToString();
             }
         }
 
@@ -78,8 +102,10 @@ namespace FRI.AUS2.StuctureTester.Controls
             {
                 return new KdExampleData()
                 {
-                    X = X,
-                    Y = Y,
+                    A = A,
+                    B = B,
+                    C = C,
+                    D = D,
                     Data = IsDataVisibile ? Data : 0
                 };
             }

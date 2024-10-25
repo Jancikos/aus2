@@ -1,4 +1,5 @@
-﻿using FRI.AUS2.Libs.Structures.Trees;
+﻿using FRI.AUS2.Libs.Helpers;
+using FRI.AUS2.Libs.Structures.Trees;
 using FRI.AUS2.Libs.Structures.Trees.Interfaces;
 using FRI.AUS2.StuctureTester.Utils;
 using System.Text;
@@ -53,18 +54,18 @@ namespace FRI.AUS2.StuctureTester
         {
             int i = 0;
 
-            // root
-            _exampleStructure.Insert(new KdExampleData() { X = 10, Y = 10, Data = ++i });
+            // // root
+            // _exampleStructure.Insert(new KdExampleData() { A = 10, B = 10, Data = ++i });
 
-            // level 1
-            _exampleStructure.Insert(new KdExampleData() { X = 15, Y = 10, Data = ++i });
-            _exampleStructure.Insert(new KdExampleData() { X = 5, Y = 10, Data = ++i });
+            // // level 1
+            // _exampleStructure.Insert(new KdExampleData() { A = 15, B = 10, Data = ++i });
+            // _exampleStructure.Insert(new KdExampleData() { A = 5, B = 10, Data = ++i });
 
-            // level 2
-            _exampleStructure.Insert(new KdExampleData() { X = 15, Y = 15, Data = ++i });
-            _exampleStructure.Insert(new KdExampleData() { X = 14, Y = 5, Data = ++i });
-            _exampleStructure.Insert(new KdExampleData() { X = 10, Y = 15, Data = ++i });
-            _exampleStructure.Insert(new KdExampleData() { X = 10, Y = 5, Data = ++i });
+            // // level 2
+            // _exampleStructure.Insert(new KdExampleData() { A = 15, B = 15, Data = ++i });
+            // _exampleStructure.Insert(new KdExampleData() { A = 14, B = 5, Data = ++i });
+            // _exampleStructure.Insert(new KdExampleData() { A = 10, B = 15, Data = ++i });
+            // _exampleStructure.Insert(new KdExampleData() { A = 10, B = 5, Data = ++i });
         }
 
         private void _updateStatistics()
@@ -248,20 +249,31 @@ namespace FRI.AUS2.StuctureTester
                 int count = _frm_Generate.Count;
                 int seed = _frm_Generate.Seed;
 
-                int minX = _frm_Generate.X.min;
-                int maxX = _frm_Generate.X.max;
-
-                int minY = _frm_Generate.Y.min;
-                int maxY = _frm_Generate.Y.max;
+                const int doublePrecision = 100;
 
                 var random = new Random(seed);
                 int i = 0;
                 while (++i <= count)
                 {
-                    int x = random.Next(minX, maxX);
-                    int y = random.Next(minY, maxY);
-
-                    _exampleStructure.Insert(new KdExampleData() { X = x, Y = y, Data = i });
+                    _exampleStructure.Insert(new KdExampleData()
+                    {
+                        A = random.Next(
+                            _frm_Generate.A.min * doublePrecision,
+                            _frm_Generate.A.max * doublePrecision
+                        ) / (double)doublePrecision,
+                        B = random.Next(
+                            _frm_Generate.B.min,
+                            _frm_Generate.B.max
+                        ).ToString(),
+                        C = random.Next(
+                            _frm_Generate.C.min,
+                            _frm_Generate.C.max
+                        ),
+                        D = random.Next(
+                            _frm_Generate.D.min * doublePrecision,
+                            _frm_Generate.D.max * doublePrecision
+                        ) / (double)doublePrecision
+                    });
                 }
 
                 _updateStatistics();
@@ -338,29 +350,41 @@ namespace FRI.AUS2.StuctureTester
 
         private void _btn_testerRunTest_Click(object sender, RoutedEventArgs e)
         {
+            const int doublePrecision = 100;
+
             _operationsGenerator = new OperationsGenerator<KdExampleData>(
                 _exampleStructure,
                 int.Parse(_txtb_testerOperationsCount.Text),
                 int.Parse(_txtb_testerSeed.Text),
-                (Random rnd, KdExampleData? filter) =>
+                (Random random, KdExampleData? filter) =>
                     filter is null
                      ? new KdExampleData()
                      {
-                         X = rnd.Next(
-                            _frm_Generate.X.min,
-                            _frm_Generate.X.max
+                         A = random.Next(
+                            _frm_Generate.A.min * doublePrecision,
+                            _frm_Generate.A.max * doublePrecision
+                        ) / (double)doublePrecision,
+                         B = random.Next(
+                            _frm_Generate.B.min,
+                            _frm_Generate.B.max
+                        ).ToString(),
+                         C = random.Next(
+                            _frm_Generate.C.min,
+                            _frm_Generate.C.max
                         ),
-                         Y = rnd.Next(
-                            _frm_Generate.Y.min,
-                            _frm_Generate.Y.max
-                        ),
-                         Data = rnd.Next(-100, 100)
+                         D = random.Next(
+                            _frm_Generate.D.min * doublePrecision,
+                            _frm_Generate.D.max * doublePrecision
+                        ) / (double)doublePrecision,
+                         Data = random.Next(-100, 100)
                      }
                      : new KdExampleData()
                      {
-                         X = filter.X,
-                         Y = filter.Y,
-                         Data = rnd.Next(-100, 100)
+                         A = filter.A,
+                         B = filter.B,
+                         C = filter.C,
+                         D = filter.D,
+                         Data = random.Next(-100, 100)
                      }
             );
 
@@ -416,29 +440,52 @@ namespace FRI.AUS2.StuctureTester
         #region KdExampleData
         public class KdExampleData : IKdTreeData
         {
-            public int X { get; set; }
-            public int Y { get; set; }
+            public double A { get; set; }
+            public string B { get; set; } = "";
+            public int C { get; set; }
+            public double D { get; set; }
+
 
             public int Data { get; set; }
 
             public int Compare(int level, IKdTreeData other)
             {
+                var otherModel = (KdExampleData)other;
+
                 switch (level % GetDiminesionsCount())
                 {
                     case 0:
-                        return X.CompareTo(((KdExampleData)other).X);
+                        var aCompare = A.CompareE(otherModel.A);
+
+                        if (aCompare == 0)
+                        {
+                            return B.CompareTo(otherModel.B);
+                        }
+
+                        return aCompare;
                     case 1:
-                        return Y.CompareTo(((KdExampleData)other).Y);
+                        return C.CompareTo(otherModel.C);
+                    case 2:
+                        return D.CompareE(otherModel.D);
+                    case 3:
+                        var bCompare = B.CompareTo(otherModel.B);
+
+                        if (bCompare == 0)
+                        {
+                            return C.CompareTo(otherModel.C);
+                        }
+
+                        return bCompare;
                     default:
                         throw new InvalidOperationException("Invalid level.");
                 }
             }
 
-            public int GetDiminesionsCount() => 2;
+            public int GetDiminesionsCount() => 4;
 
             public override string ToString()
             {
-                return $"[{X}, {Y}]: {Data}";
+                return $"[{A}, '{B}', {C}, {D}] - {Data}";
             }
         }
         #endregion
