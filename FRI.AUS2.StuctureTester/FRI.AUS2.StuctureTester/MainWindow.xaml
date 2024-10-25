@@ -149,7 +149,7 @@
                     </Grid>
                 </GroupBox>
                 
-                <GroupBox Header="In order visit">
+                <GroupBox Header="Level order visit">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" MinWidth="80" />
@@ -169,7 +169,7 @@
                         <TextBlock x:Name="_txt_InOrderResult" Text="" Grid.Row="2" Grid.ColumnSpan="3" />
 
                         <Button x:Name="_btn_InOrder" Content="Find" Grid.Column="2" Margin="0"
-        Click="_btn_ManualInOrder_Click" VerticalAlignment="Center" />
+        Click="_btn_ManualIteratorOrder_Click" VerticalAlignment="Center" />
                     </Grid>
                 </GroupBox>
                 

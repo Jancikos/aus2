@@ -322,13 +322,15 @@ namespace FRI.AUS2.StuctureTester
             }
         }
 
-        private void _btn_ManualInOrder_Click(object sender, RoutedEventArgs e)
+        private void _btn_ManualIteratorOrder_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var data = _frm_InOrder.KdDataModel;
+                var data = _frm_InOrder.IsKdDataModelValid 
+                    ? _frm_InOrder.KdDataModel
+                    : _exampleStructure.RootNode?.Data ?? throw new InvalidOperationException("No data in tree.");
 
-                var it = _exampleStructure.GetInOrderIterator(data);
+                var it = _exampleStructure.GetIterator<KdTreeLevelOrderIterator<KdExampleData>>(data);
                 if (it is null)
                 {
                     _txt_InOrderResult.Text = "Data not found!";

@@ -17,7 +17,7 @@ namespace FRI.AUS2.SP1.Libs
             {
                 var data = new List<GpsPointItem<GeoItem>>();
 
-                var it = _treeCombined.GetInOrderIterator();
+                var it = _treeCombined.GetIterator<KdTreeLevelOrderIterator<GpsPointItem<GeoItem>>>();
                 if (it is null)
                 {
                     return data;

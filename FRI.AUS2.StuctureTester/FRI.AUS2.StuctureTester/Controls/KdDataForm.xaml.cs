@@ -110,6 +110,20 @@ namespace FRI.AUS2.StuctureTester.Controls
                 };
             }
         }
+        public bool IsKdDataModelValid
+        {
+            get
+            {
+                try {
+                    var data = KdDataModel;
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
 
         public KdDataForm()
         {

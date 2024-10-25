@@ -8,6 +8,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
+using static FRI.AUS2.StuctureTester.MainWindow;
 
 namespace FRI.AUS2.StuctureTester.Utils
 {
@@ -98,7 +99,7 @@ namespace FRI.AUS2.StuctureTester.Utils
 
             if (Structure?.RootNode?.Data is not null)
             {
-                var it = Structure.GetInOrderIterator(Structure.RootNode.Data);
+                var it = Structure.GetIterator<KdTreeLevelOrderIterator<T>>(Structure.RootNode.Data);
                 if (it is not null)
                 {
                     while (it.MoveNext())
