@@ -455,7 +455,7 @@ namespace FRI.AUS2.StuctureTester
                 switch (level % GetDiminesionsCount())
                 {
                     case 0:
-                        var aCompare = A.CompareE(otherModel.A);
+                        var aCompare = A.CompareToWithE(otherModel.A);
 
                         if (aCompare == 0)
                         {
@@ -466,7 +466,7 @@ namespace FRI.AUS2.StuctureTester
                     case 1:
                         return C.CompareTo(otherModel.C);
                     case 2:
-                        return D.CompareE(otherModel.D);
+                        return D.CompareToWithE(otherModel.D);
                     case 3:
                         var bCompare = B.CompareTo(otherModel.B);
 
