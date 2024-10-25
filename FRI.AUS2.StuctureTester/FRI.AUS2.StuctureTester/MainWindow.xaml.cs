@@ -234,12 +234,7 @@ namespace FRI.AUS2.StuctureTester
         #region Other UI events
         private void _btn_ManualInsert_Click(object sender, RoutedEventArgs e)
         {
-            var newExampleData = new KdExampleData()
-            {
-                X = _frm_Insert.X,
-                Y = _frm_Insert.Y,
-                Data = int.Parse(_frm_Insert.Data)
-            };
+            var newExampleData = _frm_Insert.KdDataModel;
 
             _exampleStructure.Insert(newExampleData);
             _updateStatistics();
@@ -282,11 +277,7 @@ namespace FRI.AUS2.StuctureTester
         {
             try
             {
-                var data = new KdExampleData()
-                {
-                    X = _frm_Find.X,
-                    Y = _frm_Find.Y
-                };
+                var data = _frm_Find.KdDataModel;
 
                 var found = _exampleStructure.Find(data);
 
@@ -304,11 +295,7 @@ namespace FRI.AUS2.StuctureTester
         {
             try
             {
-                var data = new KdExampleData()
-                {
-                    X = _frm_Delete.X,
-                    Y = _frm_Delete.Y
-                };
+                var data = _frm_Delete.KdDataModel;
 
                 _exampleStructure.RemoveException(data);
 
@@ -327,11 +314,7 @@ namespace FRI.AUS2.StuctureTester
         {
             try
             {
-                var data = new KdExampleData()
-                {
-                    X = _frm_InOrder.X,
-                    Y = _frm_InOrder.Y
-                };
+                var data = _frm_InOrder.KdDataModel;
 
                 var it = _exampleStructure.GetInOrderIterator(data);
                 if (it is null)
@@ -431,7 +414,7 @@ namespace FRI.AUS2.StuctureTester
         #endregion
 
         #region KdExampleData
-        internal class KdExampleData : IKdTreeData
+        public class KdExampleData : IKdTreeData
         {
             public int X { get; set; }
             public int Y { get; set; }

@@ -88,7 +88,7 @@
 
 
                         <!--node form-->
-                        <uc:KdDataForm x:Name="_frm_Find" DataVisibility="Collapsed" />
+                        <uc:KdDataForm x:Name="_frm_Find" IsDataVisibile="false" />
 
                         <TextBlock x:Name="_txt_findResult" Text="" Grid.Row="2" Grid.ColumnSpan="3" />
 
@@ -113,7 +113,7 @@
 
 
                         <!--node form-->
-                        <uc:KdDataForm x:Name="_frm_Delete" DataVisibility="Collapsed" />
+                        <uc:KdDataForm x:Name="_frm_Delete" IsDataVisibile="false" />
 
                         <TextBlock x:Name="_txt_deleteResult" Text="" Grid.Row="2" Grid.ColumnSpan="3" />
 
@@ -164,7 +164,7 @@
 
 
                         <!--node form-->
-                        <uc:KdDataForm x:Name="_frm_InOrder" DataVisibility="Collapsed" />
+                        <uc:KdDataForm x:Name="_frm_InOrder" IsDataVisibile="false" />
 
                         <TextBlock x:Name="_txt_InOrderResult" Text="" Grid.Row="2" Grid.ColumnSpan="3" />
 

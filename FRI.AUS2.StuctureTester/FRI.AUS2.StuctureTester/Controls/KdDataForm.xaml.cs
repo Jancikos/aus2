@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static FRI.AUS2.StuctureTester.MainWindow;
 
 namespace FRI.AUS2.StuctureTester.Controls
 {
@@ -44,24 +45,43 @@ namespace FRI.AUS2.StuctureTester.Controls
             }
         }
 
-        public Visibility DataVisibility
+        public bool IsDataVisibile
         {
             set
             {
-                _txt_Data.Visibility = value;
-                _txtb_Data.Visibility = value;
+                var newVisibility = value ? Visibility.Visible : Visibility.Collapsed;
+
+                _txt_Data.Visibility = newVisibility;
+                _txtb_Data.Visibility = newVisibility;
+            }
+            get
+            {
+                 return _txtb_Data.Visibility == Visibility.Visible;
             }
         }
 
-        public string Data
+        public int Data
         {
             get
             {
-                return _txtb_Data.Text;
+                return int.Parse(_txtb_Data.Text);
             }
             set
             {
-                _txtb_Data.Text = value;
+                _txtb_Data.Text = value.ToString();
+            }
+        }
+
+        public KdExampleData KdDataModel
+        {
+            get
+            {
+                return new KdExampleData()
+                {
+                    X = X,
+                    Y = Y,
+                    Data = IsDataVisibile ? Data : 0
+                };
             }
         }
 

@@ -22,11 +22,11 @@
         </Grid.RowDefinitions>
 
         <GroupBox Header="Min" Grid.ColumnSpan="3">
-            <local:KdDataForm x:Name="_frm_Min" DataVisibility="Collapsed" />
+            <local:KdDataForm x:Name="_frm_Min" IsDataVisibile="false" />
         </GroupBox>
 
         <GroupBox Header="Max" Grid.Column="4" Grid.ColumnSpan="3">
-            <local:KdDataForm x:Name="_frm_Max" DataVisibility="Collapsed" />
+            <local:KdDataForm x:Name="_frm_Max" IsDataVisibile="false" />
         </GroupBox>
 
         <TextBlock Text="Count:" Grid.Row="4" />
