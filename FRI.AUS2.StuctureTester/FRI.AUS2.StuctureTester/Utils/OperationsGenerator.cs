@@ -171,8 +171,7 @@ namespace FRI.AUS2.StuctureTester.Utils
 
         private void _beforeOperation(int index, OperationType operation)
         {
-            if (LogsVerbosity < 3)
-                _log($"#{index} - {operation}");
+            _log($"#{index} - {operation}", 0, 2);
         }
 
         private void _makeOperation(OperationType operation)
@@ -220,8 +219,7 @@ namespace FRI.AUS2.StuctureTester.Utils
         {
             var t = _craeteRandomT(_random, filter);
 
-            if (LogsVerbosity < 2)
-                _log($"Inserting: {t}" + (filter is not null ? " (DUPLICATE)" : ""), 1);
+            _log($"Inserting: {t}" + (filter is not null ? " (DUPLICATE)" : ""), 1, 2);
 
             Structure.Insert(t);
             _structureData.Add(t);
@@ -232,16 +230,14 @@ namespace FRI.AUS2.StuctureTester.Utils
             var filter = _getRandomKey();
             if (filter is null)
             {
-                if (LogsVerbosity < 2)
-                    _log("No key to delete", 1);
+                _log("No key to delete", 1, 2);
                 // structure is empty
                 return;
             }
 
             try
             {
-                if (LogsVerbosity < 2)
-                    _log($"Deleting: {filter}", 1);
+                _log($"Deleting: {filter}", 1, 2);
 
                 Structure.RemoveException(filter);
                 _structureData.Remove(filter);
@@ -249,8 +245,7 @@ namespace FRI.AUS2.StuctureTester.Utils
             catch (InvalidOperationException e)
             {
                 // key not found
-                if (LogsVerbosity < 2)
-                    _log($"Key not found!!! ({e.Message})", 1);
+                _log($"Key not found!!! ({e.Message})", 1, 2);
             }
         }
 
@@ -263,22 +258,17 @@ namespace FRI.AUS2.StuctureTester.Utils
                 return;
             }
 
-            if (LogsVerbosity < 2)
-                _log($"Finding: {filter}", 1);
+            _log($"Finding: {filter}", 1, 2);
             var result = Structure.Find(filter);
             if (result.Count == 0)
             {
                 // key not found
-                if (LogsVerbosity < 2)
-                    _log("Key not found!!!", 1);
+                _log("Key not found!!!", 1, 2);
                 return;
             }
 
-            if (LogsVerbosity < 2)
-            {
-                _log($"Found: {result.Count} items", 1);
-                _log(string.Join(", ", result.Select(x => x.ToString())), 2);
-            }
+            _log($"Found: {result.Count} items", 1, 2);
+            _log(string.Join(", ", result.Select(x => x.ToString())), 2, 2);
         }
 
         private T? _getRandomKey()
@@ -291,12 +281,14 @@ namespace FRI.AUS2.StuctureTester.Utils
             return _structureData[_random.Next(0, _structureData.Count)];
         }
 
-        private void _log(string message, int indentLevel = 0)
+        private void _log(string message, int indentLevel = 0, int verbosityLevel = 0)
         {
             var logMessage = $"{new string(' ', indentLevel * 2)}{message}" + Environment.NewLine;
 
             // premysliet ci to neurobit efektivnejsie (vzhladom na to, ze sa bude casto otvarat a zatvarat subor)
-            System.IO.File.AppendAllText(LogsFileUri.LocalPath, logMessage);
+            if (verbosityLevel >= LogsVerbosity || verbosityLevel == 0) {
+                System.IO.File.AppendAllText(LogsFileUri.LocalPath, logMessage);
+            }
             
             Debug.WriteLine(logMessage);
         }
