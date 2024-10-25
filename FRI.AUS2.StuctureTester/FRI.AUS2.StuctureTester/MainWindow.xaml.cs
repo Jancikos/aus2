@@ -405,6 +405,20 @@ namespace FRI.AUS2.StuctureTester
             MessageBox.Show($"Log file path was copied to clipboard: {logUri}", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
+        private void _txtb_Generate_Radnom_Number(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var random = new Random();
+            var txtb = (TextBox)sender;
+
+            if (txtb.Text == "")
+            {
+                txtb.Text = random.Next(0, 100).ToString();
+                return;
+            }
+
+            txtb.Text = (int.Parse(txtb.Text) + 1).ToString();
+        }
+
         #endregion
 
         #region KdExampleData
@@ -446,5 +460,6 @@ namespace FRI.AUS2.StuctureTester
             }
         }
         #endregion
+
     }
 }

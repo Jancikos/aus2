@@ -58,7 +58,7 @@
                         <TextBox x:Name="_txtb_Y" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>
 
                         <TextBlock Text="Data:" Grid.Row="4" />
-                        <TextBox x:Name="_txtb_Data" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
+                        <TextBox x:Name="_txtb_Data" Grid.Column="2" Grid.Row="4" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Number"/>
 
                         <Button x:Name="_btn_Insert" Content="Insert" Grid.Column="4" Grid.Row="1" Grid.RowSpan="3" Margin="0"
                             Click="_btn_ManualInsert_Click" />
@@ -100,7 +100,7 @@
                         <TextBlock Text="Count:" Grid.Row="4" />
                         <TextBox x:Name="_txtb_Count" Grid.Column="2" Grid.Row="4" TextAlignment="Right" Text="10" />
                         <TextBlock Text="Seed:" Grid.Column="4" Grid.Row="4" />
-                        <TextBox x:Name="_txtb_Seed" Grid.Column="6" Grid.Row="4" TextAlignment="Right" Text="0" />
+                        <TextBox x:Name="_txtb_Seed" Grid.Column="6" Grid.Row="4" TextAlignment="Right" Text="0" MouseDoubleClick="_txtb_Generate_Radnom_Number" />
 
                         <Button x:Name="_btn_GenerateNodes" Content="Generate" Grid.Column="8" Grid.Row="1" Grid.RowSpan="3" Margin="0"
                             Click="_btn_GenerateNodes_Click" />
@@ -279,7 +279,7 @@
                         </GroupBox>
 
                         <TextBlock Text="Seed:" Grid.Row="4" />
-                        <TextBox x:Name="_txtb_testerSeed" Text="1" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
+                        <TextBox x:Name="_txtb_testerSeed" Text="1" Grid.Column="2" Grid.Row="4" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Number"/>
 
                         <GroupBox Header="Logging" Grid.Row="6" Grid.ColumnSpan="3" >
                             <Grid>
