@@ -265,16 +265,22 @@
                                     <RowDefinition Height="auto" />
                                     <RowDefinition Height="2" />
                                     <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
 
                                 <TextBlock Text="ℹ️Add:" ToolTip="Using values from Generate nodes form (except seed and count)."/>
                                 <TextBox x:Name="_txtb_operationsAdd" Text="4" Grid.Column="2" TextAlignment="Right"/>
 
-                                <TextBlock Text="Delete:" Grid.Row="2" />
-                                <TextBox x:Name="_txtb_operationsDelete" Text="2" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>
+                                
+                                <TextBlock Text="Add dup.:" Grid.Row="2"/>
+                                <TextBox x:Name="_txtb_operationsAddDuplicate" Text="1" Grid.Row="2" Grid.Column="2" TextAlignment="Right"/>
 
-                                <TextBlock Text="Find:" Grid.Row="4" />
-                                <TextBox x:Name="_txtb_operationsFind" Text="1" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
+                                <TextBlock Text="Delete:" Grid.Row="4" />
+                                <TextBox x:Name="_txtb_operationsDelete" Text="2" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
+
+                                <TextBlock Text="Find:" Grid.Row="6" />
+                                <TextBox x:Name="_txtb_operationsFind" Text="1" Grid.Column="2" Grid.Row="6" TextAlignment="Right"/>
                             </Grid>
                         </GroupBox>
 

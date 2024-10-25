@@ -39,14 +39,17 @@ namespace FRI.AUS2.StuctureTester.Utils
 
         private Random _random;
         private List<OperationType> _randomOperations;
-        Func<Random, T> _craeteRandomT;
+        /// <summary>
+        /// T? is used because when we are inserting new item with the specified key
+        /// </summary>
+        Func<Random, T?, T> _craeteRandomT;
 
         private List<T> _structureData;
         private string? _structureDataStaticticsBefore;
         private int? _structureNodesCountBefore;
         private Dictionary<OperationType, int> _operationStatistics = new Dictionary<OperationType, int>();
 
-        public OperationsGenerator(KdTree<T> structure, int count, int seed, Func<Random, T> craeteRandomT)
+        public OperationsGenerator(KdTree<T> structure, int count, int seed, Func<Random, T?, T> craeteRandomT)
         {
             Structure = structure;
             Count = count;
@@ -111,6 +114,7 @@ namespace FRI.AUS2.StuctureTester.Utils
             _operationStatistics = new Dictionary<OperationType, int>
             {
                 { OperationType.Insert, 0 },
+                { OperationType.InsertDuplicate, 0 },
                 { OperationType.Delete, 0 },
                 { OperationType.Find, 0 }
             };
@@ -158,8 +162,9 @@ namespace FRI.AUS2.StuctureTester.Utils
 
             _log("Structure test:");
             _log("Before nodes count: " + (_structureNodesCountBefore ?? 0), 1);
-            _log($"Operations done: (+{_operationStatistics[OperationType.Insert]}, -{_operationStatistics[OperationType.Delete]})", 1);
-            int expectedNodesCount = (_structureNodesCountBefore ?? 0) + _operationStatistics[OperationType.Insert] - _operationStatistics[OperationType.Delete];
+            _log($"Operations done: (+{_operationStatistics[OperationType.Insert] + _operationStatistics[OperationType.InsertDuplicate] }, -{_operationStatistics[OperationType.Delete]})", 1);
+            
+            int expectedNodesCount = (_structureNodesCountBefore ?? 0) + _operationStatistics[OperationType.Insert]  + _operationStatistics[OperationType.InsertDuplicate] - _operationStatistics[OperationType.Delete];
             _log($"After nodes count should be: {expectedNodesCount}", 1);
             _log("After nodes count is: " + Structure.NodesCount, 1);
         }
@@ -176,6 +181,9 @@ namespace FRI.AUS2.StuctureTester.Utils
             {
                 case OperationType.Insert:
                     _makeInsert();
+                    break;
+                case OperationType.InsertDuplicate:
+                    _makeInsert(_getRandomKey());
                     break;
                 case OperationType.Delete:
                     _makeDelete();
@@ -204,12 +212,16 @@ namespace FRI.AUS2.StuctureTester.Utils
             }
         }
 
-        private void _makeInsert()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filter">ak je zadany, tak urcuje kluc prvku, ktory bude vlozeny</param>
+        private void _makeInsert(T? filter = null)
         {
-            var t = _craeteRandomT(_random);
+            var t = _craeteRandomT(_random, filter);
 
             if (LogsVerbosity < 2)
-                _log($"Inserting: {t}", 1);
+                _log($"Inserting: {t}" + (filter is not null ? " (DUPLICATE)" : ""), 1);
 
             Structure.Insert(t);
             _structureData.Add(t);
@@ -298,6 +310,7 @@ namespace FRI.AUS2.StuctureTester.Utils
     public enum OperationType
     {
         Insert,
+        InsertDuplicate,
         Delete,
         Find
     }
