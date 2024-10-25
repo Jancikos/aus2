@@ -31,25 +31,19 @@ namespace FRI.AUS2.SP1.Libs.Models
 
         public int Compare(int level, IKdTreeData other)
         {
-            double val1 = GetDiminesionValue(level % GetDiminesionsCount());
-            double val2 = other.GetDiminesionValue(level % GetDiminesionsCount());
+            var otherModel = (GpsPointItem<T>) other;
 
-            return val1.CompareE(val2, E);
-        }
-
-        public int GetDiminesionsCount() => 2;
-
-        public double GetDiminesionValue(int dim)
-        {
-            switch (dim)
+            switch (level % GetDiminesionsCount())
             {
                 case 0:
-                    return Position.X;
+                    return Position.X.CompareToWithE(otherModel.Position.X);
                 case 1:
-                    return Position.Y;
+                    return Position.Y.CompareToWithE(otherModel.Position.Y);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        public int GetDiminesionsCount() => 2;
     }
 }

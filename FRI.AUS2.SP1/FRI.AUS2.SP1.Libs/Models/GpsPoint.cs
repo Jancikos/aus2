@@ -20,7 +20,7 @@ namespace FRI.AUS2.SP1.Libs.Models
 
         public bool Equals(GpsPoint other)
         {
-            return X.CompareE(other.X) == 0 && Y.CompareE(other.Y) == 0;
+            return X.CompareToWithE(other.X) == 0 && Y.CompareToWithE(other.Y) == 0;
         }
 
         public override string ToString()
