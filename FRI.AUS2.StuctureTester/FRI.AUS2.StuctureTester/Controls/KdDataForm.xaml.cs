@@ -1,0 +1,93 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace FRI.AUS2.StuctureTester.Controls
+{
+    /// <summary>
+    /// Interaction logic for KdDataForm.xaml
+    /// </summary>
+    public partial class KdDataForm : UserControl
+    {
+        public int X
+        {
+            get
+            {
+                return int.Parse(_txtb_X.Text);
+            }
+            set
+            {
+                _txtb_X.Text = value.ToString();
+            }
+        }
+
+        public int Y
+        {
+            get
+            {
+                return int.Parse(_txtb_Y.Text);
+            }
+            set
+            {
+                _txtb_Y.Text = value.ToString();
+            }
+        }
+
+        public Visibility DataVisibility
+        {
+            set
+            {
+                _txt_Data.Visibility = value;
+                _txtb_Data.Visibility = value;
+            }
+        }
+
+        public string Data
+        {
+            get
+            {
+                return _txtb_Data.Text;
+            }
+            set
+            {
+                _txtb_Data.Text = value;
+            }
+        }
+
+        public KdDataForm()
+        {
+            InitializeComponent();
+        }
+
+        #region UI Events
+        private void _txtb_Generate_Radnom_Int(object sender, MouseButtonEventArgs e)
+        {
+            var random = new Random();
+            var txtb = (TextBox)sender;
+
+            if (txtb.Text == "")
+            {
+                txtb.Text = random.Next(0, 100).ToString();
+                return;
+            }
+
+            if (int.TryParse(txtb.Text, out int result))
+            {
+                txtb.Text = (result + 1).ToString();
+                return;
+            }
+        }
+    }
+    #endregion
+}

@@ -236,9 +236,9 @@ namespace FRI.AUS2.StuctureTester
         {
             var newExampleData = new KdExampleData()
             {
-                X = int.Parse(_txtb_X.Text),
-                Y = int.Parse(_txtb_Y.Text),
-                Data = int.Parse(_txtb_Data.Text)
+                X = _frm_Insert.X,
+                Y = _frm_Insert.Y,
+                Data = int.Parse(_frm_Insert.Data)
             };
 
             _exampleStructure.Insert(newExampleData);
@@ -284,8 +284,8 @@ namespace FRI.AUS2.StuctureTester
             {
                 var data = new KdExampleData()
                 {
-                    X = int.Parse(_txtb_findX.Text),
-                    Y = int.Parse(_txtb_findY.Text)
+                    X = _frm_Find.X,
+                    Y = _frm_Find.Y
                 };
 
                 var found = _exampleStructure.Find(data);
@@ -306,8 +306,8 @@ namespace FRI.AUS2.StuctureTester
             {
                 var data = new KdExampleData()
                 {
-                    X = int.Parse(_txtb_deleteX.Text),
-                    Y = int.Parse(_txtb_deleteY.Text)
+                    X = _frm_Delete.X,
+                    Y = _frm_Delete.Y
                 };
 
                 _exampleStructure.RemoveException(data);
@@ -329,8 +329,8 @@ namespace FRI.AUS2.StuctureTester
             {
                 var data = new KdExampleData()
                 {
-                    X = int.Parse(_txtb_InOrderX.Text),
-                    Y = int.Parse(_txtb_InOrderY.Text)
+                    X = _frm_InOrder.X,
+                    Y = _frm_InOrder.Y
                 };
 
                 var it = _exampleStructure.GetInOrderIterator(data);
