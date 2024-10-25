@@ -250,14 +250,14 @@ namespace FRI.AUS2.StuctureTester
         {
             try
             {
-                int count = int.Parse(_txtb_Count.Text);
-                int seed = int.Parse(_txtb_Seed.Text);
+                int count = _frm_Generate.Count;
+                int seed = _frm_Generate.Seed;
 
-                int minX = int.Parse(_txtb_MinX.Text);
-                int maxX = int.Parse(_txtb_MaxX.Text);
+                int minX = _frm_Generate.X.min;
+                int maxX = _frm_Generate.X.max;
 
-                int minY = int.Parse(_txtb_MinY.Text);
-                int maxY = int.Parse(_txtb_MaxY.Text);
+                int minY = _frm_Generate.Y.min;
+                int maxY = _frm_Generate.Y.max;
 
                 var random = new Random(seed);
                 int i = 0;
@@ -364,12 +364,12 @@ namespace FRI.AUS2.StuctureTester
                      ? new KdExampleData()
                      {
                          X = rnd.Next(
-                            int.Parse(_txtb_MinX.Text),
-                            int.Parse(_txtb_MaxX.Text)
+                            _frm_Generate.X.min,
+                            _frm_Generate.X.max
                         ),
                          Y = rnd.Next(
-                            int.Parse(_txtb_MinY.Text),
-                            int.Parse(_txtb_MaxY.Text)
+                            _frm_Generate.Y.min,
+                            _frm_Generate.Y.max
                         ),
                          Data = rnd.Next(-100, 100)
                      }

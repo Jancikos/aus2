@@ -7,7 +7,7 @@
              mc:Ignorable="d" d:DesignHeight="120" d:DesignWidth="200" >
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto" MinWidth="30" />
+            <ColumnDefinition Width="auto" MinWidth="20" />
             <ColumnDefinition Width="5" />
             <ColumnDefinition Width="*" MinWidth="50" />
             <ColumnDefinition Width="5" />
