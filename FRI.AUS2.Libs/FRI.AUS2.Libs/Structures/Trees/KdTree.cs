@@ -3,7 +3,7 @@ using FRI.AUS2.Libs.Structures.Trees.Interfaces;
 
 namespace FRI.AUS2.Libs.Structures.Trees
 {
-    public class KdTree<T> where T : class, IKdTreeData
+    public class KdTree<T> : IEnumerable<T> where T : class, IKdTreeData
     {
         #region Properties
         private KdTreeNode<T>? _rootNode;
@@ -518,6 +518,14 @@ namespace FRI.AUS2.Libs.Structures.Trees
         #endregion
 
         #region Iterators
+        
+        // IEnumerable
+        public IEnumerator<T> GetEnumerator()
+        {
+            return GetIterator<KdTreeLevelOrderIterator<T>>();
+        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
         public TKdTreeIterator? GetIterator<TKdTreeIterator>(T filter) where TKdTreeIterator : KdTreeIterator<T>
         {
             if (_rootNode is null)
@@ -535,20 +543,15 @@ namespace FRI.AUS2.Libs.Structures.Trees
             return GetIterator<TKdTreeIterator>(node);
         }
 
-        public TKdTreeIterator GetIterator<TKdTreeIterator>(KdTreeNode<T> node) where TKdTreeIterator : KdTreeIterator<T>
+        public TKdTreeIterator GetIterator<TKdTreeIterator>(KdTreeNode<T>? node) where TKdTreeIterator : KdTreeIterator<T>
         {           
             // must be created by reflection, because of the generic type 
             // !!! be aware of possible run time exception, if the iterator does not have a constructor with the node parameter
             return (TKdTreeIterator)Activator.CreateInstance(typeof(TKdTreeIterator), node)!;
         }
 
-        public TKdTreeIterator? GetIterator<TKdTreeIterator>() where TKdTreeIterator : KdTreeIterator<T>
+        public TKdTreeIterator GetIterator<TKdTreeIterator>() where TKdTreeIterator : KdTreeIterator<T>
         {
-            if (RootNode is null)
-            {
-                return null;
-            }
-        
             return GetIterator<TKdTreeIterator>(RootNode);
         }
         #endregion
@@ -680,7 +683,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
         object IEnumerator.Current => Current;
 
-        public KdTreeIterator(KdTreeNode<T> rootNode)
+        public KdTreeIterator(KdTreeNode<T>? rootNode)
         {
             _root = rootNode;
             _nodesToProcess = new Queue<KdTreeNode<T>>();

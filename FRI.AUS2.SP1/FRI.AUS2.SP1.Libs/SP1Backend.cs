@@ -10,29 +10,9 @@ namespace FRI.AUS2.SP1.Libs
 
         public IList<Property> Properties => _properties;
         public IList<Parcel> Parcels => _parcels;
-        public IList<GpsPointItem<GeoItem>> Combined
+        public IEnumerable<GpsPointItem<GeoItem>> Combined
         {
-            // TODO - prerobit iterator...
-            get
-            {
-                var data = new List<GpsPointItem<GeoItem>>();
-
-                var it = _treeCombined.GetIterator<KdTreeLevelOrderIterator<GpsPointItem<GeoItem>>>();
-                if (it is null)
-                {
-                    return data;
-                }
-
-                while (it.MoveNext())
-                {
-                    if (it.Current.Item is not null)
-                    {
-                        data.Add(it.Current);
-                    }
-                }
-
-                return data;
-            }
+            get => _treeCombined;
         }
 
         private KdTree<GpsPointItem<Property>> _treeProperties { get; init; } = new KdTree<GpsPointItem<Property>>();
