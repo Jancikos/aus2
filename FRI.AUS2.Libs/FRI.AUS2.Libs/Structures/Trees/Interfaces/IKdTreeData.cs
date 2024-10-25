@@ -12,8 +12,5 @@
         /// <returns></returns>
         public int Compare(int level, IKdTreeData other);
         public int GetDiminesionsCount();
-
-        // POZOR: typ double obmedzuje, ze kluce dimenzii nemozu byt iny typ ako double
-        public double GetDiminesionValue(int dim);
     }
 }

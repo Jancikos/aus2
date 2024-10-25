@@ -330,39 +330,43 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 {
                     // find node with minimum value in the right subtree
                     var nodeDimension = node.Dimension;
+                    var nodeLevel = node.Level;
                     var minNode = node.RightChild;
-                    var minDValue = minNode.Data.GetDiminesionValue(nodeDimension);
                     var nodesWithSameValueAsMinNode = new List<KdTreeNode<T>>();
+
 
                     // search the whole tree where node.RightChild is root
                     var it = GetLevelOrderIterator(node.RightChild);
-                    while (it.MoveNext())
-                    {
-                        var currentNode = it.CurrentNode;
-                        var currentDValue = currentNode?.Data?.GetDiminesionValue(nodeDimension);
-
-                        if (currentDValue is not null )
+                    if (it is not null) {
+                        while (it.MoveNext())
                         {
-                            if (currentDValue == minDValue && currentNode != node.RightChild) {
-                                nodesWithSameValueAsMinNode.Add(currentNode);
-                                continue;
+                            var currentNode = it.CurrentNode;
+
+                            if (minNode is null) {
+                                throw new InvalidOperationException("Min node cannot be null.");
                             }
 
-                            if (currentDValue < minDValue) {
-                                minNode = it.CurrentNode;
-                                minDValue = currentDValue.Value;
-                                nodesWithSameValueAsMinNode.Clear();
+                            if (currentNode is not null )
+                            {
+                                var currentComparison = currentNode.Data.Compare(nodeLevel, minNode.Data);
+                                if (currentComparison == 0 && currentNode != node.RightChild) {
+                                    nodesWithSameValueAsMinNode.Add(currentNode);
+                                    continue;
+                                }
+
+                                if (currentComparison < 0) {
+                                    minNode = it.CurrentNode;
+                                    nodesWithSameValueAsMinNode.Clear();
+                                }
                             }
                         }
                     }
 
                     if (minNode is not null)
                     {
+                        // if there are nodes with the same dimension value as minNode, remove them first
                         if (nodesWithSameValueAsMinNode.Count > 0)
                         {
-                            // tak vymaz tento node uplne zo stromu
-                            // poznac si ho, ze ho mas znovu vlozit ked skonci cely tento remove
-
                             foreach (var nodeWithSameValue in nodesWithSameValueAsMinNode)
                             {
                                 nodesToBeInsertedAfterRemoveFinished.Add(nodeWithSameValue);
@@ -382,23 +386,25 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 if (replacementNode is null && node?.LeftChild is not null)
                 {
                     // find node with maximum value in the left subtree
-                    var nodeDimension = node.Dimension;
+                    var nodeLevel = node.Level;
                     var maxNode = node.LeftChild;
-                    var maxDValue = maxNode.Data.GetDiminesionValue(nodeDimension);
 
                     // search the whole tree where node.LeftChild is root
                     var it = GetInOrderIterator(node.LeftChild);
                     while (it.MoveNext())
                     {
+                        if (maxNode is null) {
+                            throw new InvalidOperationException("Max node cannot be null.");
+                        }
+
                         var currentNode = it.CurrentNode;
-                        var currentDValue = currentNode?.Data?.GetDiminesionValue(nodeDimension);
+                        if (currentNode is not null) {
+                            var currentComparison = currentNode.Data.Compare(nodeLevel, maxNode.Data);
 
-                        if (currentDValue is not null && currentDValue > maxDValue)
-                        {
-                            // FUTURE - porovnaj levely uzlov a vymen, len ak je ten novy node leaf
-
-                            maxNode = it.CurrentNode;
-                            maxDValue = currentDValue.Value;
+                            if (currentComparison > 0)
+                            {
+                                maxNode = it.CurrentNode;
+                            }
                         }
                     }
 
