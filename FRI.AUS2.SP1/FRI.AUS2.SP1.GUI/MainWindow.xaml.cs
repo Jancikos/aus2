@@ -37,6 +37,41 @@ namespace FRI.AUS2.SP1.GUI
         {
             _initializeGeoItemsManagmentActions(_mng_Properties, _backend.AddProperty, _backend.GenerateProperties, (item) => _backend.DeleteProperty((Property)item));
 
+            _mng_Properties.EditAction = (item) =>
+            {
+                var property = (Property)item;
+
+                var form = new GeoItemFormWindow()
+                {
+                    Number = property.StreetNumber,
+                    Description = property.Description,
+                    PosA = property.PositionA ?? throw new Exception("Position A is null"),
+                    PosB = property.PositionB ?? throw new Exception("Position B is null"),
+                };
+
+                form.ShowDialog();
+
+                if (form.DialogResult == false)
+                {
+                    return;
+                }
+
+                _backend.EditProperty(
+                    property,
+                    new Property()
+                    {
+                        StreetNumber = form.Number,
+                        Description = form.Description,
+                        PositionA = form.PosA,
+                        PositionB = form.PosB
+                    }
+                );
+
+                MessageBox.Show($"Nehnuteľnosť upravená!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+
+                RerenderTables();
+            };
+
             // setup table orogin items source
             _mng_Properties.GetTableAllItemsSource = () => _backend.Properties;
             _mng_Properties.GetTableFilteredByPointItemsSource = _backend.FindProperties;
@@ -55,6 +90,41 @@ namespace FRI.AUS2.SP1.GUI
         private void _initializeParcelsManagment()
         {
             _initializeGeoItemsManagmentActions(_mng_Parcels, _backend.AddParcel, _backend.GenerateParcels, (item) => _backend.DeleteParcel((Parcel)item));
+
+            _mng_Parcels.EditAction = (item) =>
+            {
+                var parcel = (Parcel)item;
+
+                var form = new GeoItemFormWindow()
+                {
+                    Number = parcel.Number,
+                    Description = parcel.Description,
+                    PosA = parcel.PositionA ?? throw new Exception("Position A is null"),
+                    PosB = parcel.PositionB ?? throw new Exception("Position B is null"),
+                };
+
+                form.ShowDialog();
+
+                if (form.DialogResult == false)
+                {
+                    return;
+                }
+
+                _backend.EditParcel(
+                    parcel,
+                    new Parcel()
+                    {
+                        Number = form.Number,
+                        Description = form.Description,
+                        PositionA = form.PosA,
+                        PositionB = form.PosB
+                    }
+                );
+
+                MessageBox.Show($"Parcela upravená!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+
+                RerenderTables();
+            };
 
 
             // setup table orogin items source

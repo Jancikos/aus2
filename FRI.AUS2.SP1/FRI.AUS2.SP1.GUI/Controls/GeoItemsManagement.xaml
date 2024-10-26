@@ -130,6 +130,7 @@
 
                 <Separator Margin="0 5" />
 
+                <Button x:Name="_btn_Edit" Content="Upraviť" Click="_btn_Edit_Click" />
                 <Button x:Name="_btn_Delete" Content="Vymazať" Click="_btn_Delete_Click" />
             </StackPanel>
         </Grid>

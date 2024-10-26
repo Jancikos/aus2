@@ -290,6 +290,56 @@ namespace FRI.AUS2.SP1.Libs
                 }
             }
         }
+        #endregion
+
+        #region Editing
+
+        public void EditParcel(Parcel actual, Parcel updated)
+        {
+            if (updated.PositionA is null || updated.PositionB is null)
+            {
+                throw new ArgumentException("The updated parcel must have both positions.");
+            }
+
+
+            if ((actual.PositionA?.Equals(updated.PositionA) ?? false) && (actual.PositionB?.Equals(updated.PositionB) ?? false))
+            {
+                // update only the parcel details
+                actual.Number = updated.Number;
+                actual.Description = updated.Description;
+
+                return;
+            }
+
+            // remove the actual parcel
+            DeleteParcel(actual);
+
+            // add the updated parcel
+            AddParcel(updated.Number, updated.Description, updated.PositionA, updated.PositionB);
+        }
+
+        public void EditProperty(Property actual, Property updated)
+        {
+            if (updated.PositionA is null || updated.PositionB is null)
+            {
+                throw new ArgumentException("The updated property must have both positions.");
+            }
+
+            if ((actual.PositionA?.Equals(updated.PositionA) ?? false) && (actual.PositionB?.Equals(updated.PositionB) ?? false))
+            {
+                // update only the property details
+                actual.StreetNumber = updated.StreetNumber;
+                actual.Description = updated.Description;
+
+                return;
+            }
+
+            // remove the actual property
+            DeleteProperty(actual);
+
+            // add the updated property
+            AddProperty(updated.StreetNumber, updated.Description, updated.PositionA, updated.PositionB);
+        }
 
         #endregion
     }

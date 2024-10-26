@@ -18,8 +18,13 @@ namespace FRI.AUS2.SP1.Libs.Models
             Y = y;
         }
 
-        public bool Equals(GpsPoint other)
+        public bool Equals(GpsPoint? other)
         {
+            if (other is null)
+            {
+                return false;
+            }
+
             return X.CompareToWithE(other.X) == 0 && Y.CompareToWithE(other.Y) == 0;
         }
 
