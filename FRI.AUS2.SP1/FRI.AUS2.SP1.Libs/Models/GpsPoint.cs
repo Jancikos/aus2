@@ -4,8 +4,11 @@ namespace FRI.AUS2.SP1.Libs.Models
 {
     public class GpsPoint
     {
-        public double X {  get; set; }
+        public double X { get; set; }
         public double Y { get; set; }
+
+        public string Latitude => $"{X}° {(X >= 0 ? "N" : "S")}";
+        public string Longitude => $"{Y}° {(Y >= 0 ? "E" : "W")}";
 
         public GpsPoint()
         {
@@ -30,6 +33,7 @@ namespace FRI.AUS2.SP1.Libs.Models
 
         public override string ToString()
         {
+            // return $"{Latitude}, {Longitude}";
             return $"{X}, {Y}";
         }
     }
