@@ -10,9 +10,23 @@ namespace FRI.AUS2.SP1.Libs
 
         public IList<Property> Properties => _properties;
         public IList<Parcel> Parcels => _parcels;
-        public IEnumerable<GpsPointItem<GeoItem>> Combined
+
+        // public IEnumerable<GpsPointItem<GeoItem>> Combined 
+        public IList<GpsPointItem<GeoItem>> Combined
         {
-            get => _treeCombined;
+            // TOTO urctie to prerobit na IEnumerable, len nejako dosiahnut aby sa to refresovalo na GUI
+            get 
+            {
+                var items = new List<GpsPointItem<GeoItem>>();
+                var it = _treeCombined.GetIterator<KdTreeLevelOrderIterator<GpsPointItem<GeoItem>>>();
+                while (it.MoveNext())
+                {
+                    items.Add(it.Current);
+                }
+
+                return items;
+            }
+            // get => _treeCombined;
         }
 
         private KdTree<GpsPointItem<Property>> _treeProperties { get; init; } = new KdTree<GpsPointItem<Property>>();
@@ -198,7 +212,7 @@ namespace FRI.AUS2.SP1.Libs
                     .ToList();
         }
 
-        private IList<T> _findItems<T>(GpsPoint point, KdTree<GpsPointItem<T>> tree)
+        private IList<T> _findItems<T>(GpsPoint point, KdTree<GpsPointItem<T>> tree) where T : GeoItem
         {
             var data = tree.Find(new GpsPointItem<T>(point, default))
                             .Where(item => item.Item is not null)
@@ -275,7 +289,7 @@ namespace FRI.AUS2.SP1.Libs
                     // vsetky zo stromu odstran
                     foreach (var itemByGpsPos in itemsByGpsPoint)
                     {
-                        tree.Remove(new GpsPointItem<T>(gpsPoint, itemByGpsPos));
+                        tree.RemoveSpecific(new GpsPointItem<T>(gpsPoint, itemByGpsPos));
                         deletedItems.Add(itemByGpsPos);
                     }
 

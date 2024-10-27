@@ -152,7 +152,6 @@ namespace FRI.AUS2.SP1.GUI
             // setup visibility
             _mng_CombinedItems.ManageButtonsVisibility = Visibility.Collapsed;
 
-
             // setup table columns
             _mng_CombinedItems.AddTableColumn("Pozícia", "Position");
             _mng_CombinedItems.AddTableColumn("Data", "Item.Data");

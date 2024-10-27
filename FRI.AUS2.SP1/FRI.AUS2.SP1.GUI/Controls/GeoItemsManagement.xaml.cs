@@ -71,7 +71,6 @@ namespace FRI.AUS2.SP1.GUI.Controls
                 _grbx_Filter_ByPoint.Visibility = value;
             }
         }
-        
         protected Visibility FilterByRectangleVisibility
         {
             get
@@ -150,11 +149,12 @@ namespace FRI.AUS2.SP1.GUI.Controls
 
         public void RerenderTable()
         {
+            _tbl_GeoItems.ItemsSource = null;
+
             switch ((ItemsViewMode)_cmbx_ViewMode.SelectedValue)
             {
                 case ItemsViewMode.All:
                     // weird but somehow offical way to do it
-                    _tbl_GeoItems.ItemsSource = null;
                     _tbl_GeoItems.ItemsSource = GetTableAllItemsSource();
                     break;
                 case ItemsViewMode.Filtered:
@@ -175,7 +175,7 @@ namespace FRI.AUS2.SP1.GUI.Controls
                     break;
             }
         }
-        
+
         private void _filterByPoint()
         {
             if (GetTableFilteredByPointItemsSource is null)
@@ -221,7 +221,13 @@ namespace FRI.AUS2.SP1.GUI.Controls
         #region  UI Event Handlers
         private void _btn_Filter_Click(object sender, RoutedEventArgs e)
         {
-            TableViewMode = ItemsViewMode.Filtered;
+            if (TableViewMode != ItemsViewMode.Filtered)
+            {
+                TableViewMode = ItemsViewMode.Filtered;
+                return;
+            }
+
+            RerenderTable();
         }
         private void _btn_Insert_Click(object sender, RoutedEventArgs e)
         {

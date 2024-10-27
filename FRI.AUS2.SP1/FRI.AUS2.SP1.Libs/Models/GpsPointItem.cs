@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FRI.AUS2.Libs.Structures.Trees.Interfaces;
+﻿using FRI.AUS2.Libs.Structures.Trees.Interfaces;
 using static FRI.AUS2.Libs.Helpers.DoubleExtension;
 
 namespace FRI.AUS2.SP1.Libs.Models
 {
-    public class GpsPointItem<T> : IKdTreeData
+    public class GpsPointItem<T> : IKdTreeData where T : GeoItem
     {
         /// <summary>
         /// Epsilon for double comparison 
@@ -45,5 +40,23 @@ namespace FRI.AUS2.SP1.Libs.Models
         }
 
         public int GetDiminesionsCount() => 2;
+
+        public bool Equals(IKdTreeData other)
+        {
+            var otherModel = (GpsPointItem<T>) other;
+            if (otherModel is null) {
+                return false;
+            }
+
+            if (otherModel.Item is null) {
+                return Item is null;
+            }
+
+            if(Item is null) {
+                return false;
+            }
+
+            return Item.Id == otherModel.Item.Id;
+        }
     }
 }
