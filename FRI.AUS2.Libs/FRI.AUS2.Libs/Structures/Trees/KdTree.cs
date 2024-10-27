@@ -126,6 +126,11 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
         #region Find
 
+        /// <summary>
+        /// returns data from all nodes thats position (in the tree) is the same as the filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         public IList<T> Find(T filter)
         {
             var data = new List<T>();
@@ -151,6 +156,33 @@ namespace FRI.AUS2.Libs.Structures.Trees
             } while (currentParent is not null);
 
             return data;
+        }
+
+        /// <summary>
+        /// returns nodes with the same position as the filter within the tree from the root parameter
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        private IList<KdTreeNode<T>> _findNodes(KdTreeNode<T> root, T filter)
+        {
+            var nodes = new List<KdTreeNode<T>>();
+
+            var currentParent = root;
+            do
+            {
+                var node = _findConcretNode(currentParent, filter, out _);
+
+                if (node is not null)
+                {
+                    nodes.Add(node);
+                }
+
+                // search also in left subtree
+                currentParent = node?.LeftChild;
+            } while (currentParent is not null);
+
+            return nodes;
         }
 
         /// <summary>
@@ -242,6 +274,80 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
         #region Remove
 
+
+        /// <summary>
+        /// removes all nodes within the position on the given filter 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="throwIfNotFound">whether to throw exception if the filter is not found</param>
+        public void RemoveAll(T filter, bool throwIfNotFound = false)
+        {
+            if (_rootNode is null)
+            {
+                if (throwIfNotFound)
+                {
+                    throw new InvalidOperationException("Tree is empty.");
+                }
+                return;
+            }
+
+            var nodes = _findNodes(_rootNode, filter);
+            foreach (var node in nodes)
+            {
+                try { 
+                    _removeNode(node);
+                }
+                catch (Exception)
+                {
+                    if (throwIfNotFound)
+                    {
+                        throw;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// finds all the nodes with the given filter position (Compare)
+        ///
+        /// and removes only the first one, which also equals to the given filter (Equals)
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="throwIfNotFound">whether to throw exception if the filter is not found</param>
+        public void RemoveSpecific(T filter, bool throwIfNotFound = false)
+        {
+            if (_rootNode is null)
+            {
+                if (throwIfNotFound)
+                {
+                    throw new InvalidOperationException("Tree is empty.");
+                }
+                return;
+            }
+
+            var nodes = _findNodes(_rootNode, filter);
+            foreach (var node in nodes)
+            {
+                if (node.Data.Equals(filter))
+                {
+                    try { 
+                        _removeNode(node);
+                    }
+                    catch (Exception)
+                    {
+                        if (throwIfNotFound)
+                        {
+                            throw;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// deletes the node with the first occurence of the given filter
+        /// /// </summary>
         /// <param name="filter"></param>
         /// <param name="throwIfNotFound">whether to throw exception if the filter is not found</param>
         public void Remove(T filter, bool throwIfNotFound = false)
@@ -256,7 +362,6 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
 
             var node = _findConcretNode(_rootNode, filter, out _);
-
             if (node is null)
             {
                 if (throwIfNotFound)
@@ -266,6 +371,22 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 return;
             }
 
+            try { 
+                _removeNode(node);
+            }
+            catch (Exception)
+            {
+                if (throwIfNotFound)
+                {
+                    throw;
+                }
+
+                return;
+            }
+        }
+
+        private void _removeNode(KdTreeNode<T> node)
+        {
             if (node.IsLeaf)
             {
                 if (node == _rootNode)
@@ -397,7 +518,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
                                 foreach (var nodeWithSameValue in nodesWithSameValueAsMinNode)
                                 {
                                     nodesToBeInsertedAfterRemoveFinished.Add(nodeWithSameValue);
-                                    Remove(nodeWithSameValue.Data); // pozor znovu rekurzive delete podla dat
+                                    _removeNode(nodeWithSameValue); // pozor znovu rekurzive delete
                                 }
 
                                 // return _findReplacementNode(node); // ZBAVIT SA REKURZIE!!!
