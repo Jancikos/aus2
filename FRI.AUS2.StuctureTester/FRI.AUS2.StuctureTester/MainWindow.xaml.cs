@@ -483,6 +483,19 @@ namespace FRI.AUS2.StuctureTester
                 }
             }
 
+            public bool Equals(IKdTreeData other)
+            {
+                for (int i = 0; i < GetDiminesionsCount(); i++)
+                {
+                    if (Compare(i, other) != 0)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
             public int GetDiminesionsCount() => 4;
 
             public override string ToString()
