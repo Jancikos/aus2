@@ -181,7 +181,7 @@ namespace FRI.AUS2.SP1.Libs
             }
         }
 
-        private double _getRandomDouble(Random random, (int min, int max) range, int precision = 6)
+        private double _getRandomDouble(Random random, (int min, int max) range, int precision = 2)
         {
             var precisionFactor = (int)Math.Pow(10, precision);
 
