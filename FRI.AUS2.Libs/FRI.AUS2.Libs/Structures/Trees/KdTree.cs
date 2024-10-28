@@ -517,8 +517,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
                             {
                                 foreach (var nodeWithSameValue in nodesWithSameValueAsMinNode)
                                 {
-                                    nodesToBeInsertedAfterRemoveFinished.Add(nodeWithSameValue);
-                                    _removeNode(nodeWithSameValue); // pozor znovu rekurzive delete
+                                    nodesToBeInsertedAfterRemoveFinished.Add(nodeWithSameValue); 
+                                    _removeNode(nodeWithSameValue); // pozor znovu rekurzive delete // premysliet na to, ze ich je mozne odstrnait aj potom. pozor na to ak sa tvarovo meni ten strom
                                 }
 
                                 // return _findReplacementNode(node); // ZBAVIT SA REKURZIE!!!

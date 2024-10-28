@@ -5,6 +5,7 @@ namespace FRI.AUS2.SP1.Libs
 {
     public class SP1Backend
     {
+        // premysliet, ci tam musia ostat tie struktury zoznamov - ak nemaju ziadny zmysel tak ich odstranit 
         private List<Property> _properties { get; init; } = new List<Property>();
         private List<Parcel> _parcels { get; init; } = new List<Parcel>();
 
