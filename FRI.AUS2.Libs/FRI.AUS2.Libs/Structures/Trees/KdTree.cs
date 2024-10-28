@@ -3,8 +3,9 @@ using FRI.AUS2.Libs.Structures.Trees.Interfaces;
 
 namespace FRI.AUS2.Libs.Structures.Trees
 {
-    public class KdTree<T> where T : class, IKdTreeData
+    public class KdTree<T> : IEnumerable<T> where T : class, IKdTreeData
     {
+        #region Properties
         private KdTreeNode<T>? _rootNode;
         public KdTreeNode<T>? RootNode { get => _rootNode; }
 
@@ -17,17 +18,69 @@ namespace FRI.AUS2.Libs.Structures.Trees
         {
             get => _rootNode?.SubtreeDepth ?? 0;
         }
+        #endregion
 
         public KdTree()
         {
             _rootNode = null;
         }
 
+        #region Basic operations
+
         public void Clear()
         {
             _rootNode = null;
         }
 
+        /// <summary>
+        /// count all nodes in the tree
+        /// </summary>
+        /// <param name="rootNode"></param>
+        /// <returns></returns>
+        private int _countNodes(KdTreeNode<T>? rootNode)
+        {
+            if (rootNode is null)
+            {
+                return 0;
+            }
+
+            var nodesToProcess = new Queue<KdTreeNode<T>>();
+            nodesToProcess.Enqueue(rootNode);
+
+            int count = 0;
+            while (nodesToProcess.Count > 0)
+            {
+                var currentNode = nodesToProcess.Dequeue();
+
+                if (currentNode is null)
+                {
+                    continue;
+                }
+
+                if (currentNode.LeftChild is not null)
+                {
+                    nodesToProcess.Enqueue(currentNode.LeftChild);
+                }
+
+                if (currentNode.RightChild is not null)
+                {
+                    nodesToProcess.Enqueue(currentNode.RightChild);
+                }
+
+                count++;
+            }
+
+            return count;
+        }
+
+        private void _setRootNode(KdTreeNode<T>? newRoot)
+        {
+            _rootNode = newRoot;
+        }
+
+        #endregion
+
+        #region Insert
         public void Insert(T data)
         {
             if (_rootNode is null)
@@ -67,6 +120,69 @@ namespace FRI.AUS2.Libs.Structures.Trees
             {
                 parentNode.RightChild = newNode;
             }
+        }
+
+        #endregion
+
+        #region Find
+
+        /// <summary>
+        /// returns data from all nodes thats position (in the tree) is the same as the filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public IList<T> Find(T filter)
+        {
+            var data = new List<T>();
+
+            if (_rootNode is null)
+            {
+                return data;
+            }
+
+            KdTreeNode<T>? node;
+            var currentParent = _rootNode;
+            do
+            {
+                node = _findConcretNode(currentParent, filter, out _);
+
+                if (node is not null)
+                {
+                    data.Add(node.Data);
+                }
+
+                // search also in left subtree
+                currentParent = node?.LeftChild;
+            } while (currentParent is not null);
+
+            return data;
+        }
+
+        /// <summary>
+        /// returns nodes with the same position as the filter within the tree from the root parameter
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        private IList<KdTreeNode<T>> _findNodes(KdTreeNode<T> root, T filter)
+        {
+            var nodes = new List<KdTreeNode<T>>();
+
+            var currentParent = root;
+            do
+            {
+                var node = _findConcretNode(currentParent, filter, out _);
+
+                if (node is not null)
+                {
+                    nodes.Add(node);
+                }
+
+                // search also in left subtree
+                currentParent = node?.LeftChild;
+            } while (currentParent is not null);
+
+            return nodes;
         }
 
         /// <summary>
@@ -154,73 +270,84 @@ namespace FRI.AUS2.Libs.Structures.Trees
             return node;
         }
 
+        #endregion
+
+        #region Remove
+
+
         /// <summary>
-        /// count all nodes in the tree
+        /// removes all nodes within the position on the given filter 
         /// </summary>
-        /// <param name="rootNode"></param>
-        /// <returns></returns>
-        private int _countNodes(KdTreeNode<T>? rootNode)
+        /// <param name="filter"></param>
+        /// <param name="throwIfNotFound">whether to throw exception if the filter is not found</param>
+        public void RemoveAll(T filter, bool throwIfNotFound = false)
         {
-            if (rootNode is null)
-            {
-                return 0;
-            }
-
-            var nodesToProcess = new Queue<KdTreeNode<T>>();
-            nodesToProcess.Enqueue(rootNode);
-
-            int count = 0;
-            while (nodesToProcess.Count > 0)
-            {
-                var currentNode = nodesToProcess.Dequeue();
-
-                if (currentNode is null)
-                {
-                    continue;
-                }
-
-                if (currentNode.LeftChild is not null)
-                {
-                    nodesToProcess.Enqueue(currentNode.LeftChild);
-                }
-
-                if (currentNode.RightChild is not null)
-                {
-                    nodesToProcess.Enqueue(currentNode.RightChild);
-                }
-
-                count++;
-            }
-
-            return count;
-        }
-        public IList<T> Find(T filter)
-        {
-            var data = new List<T>();
-
             if (_rootNode is null)
             {
-                return data;
+                if (throwIfNotFound)
+                {
+                    throw new InvalidOperationException("Tree is empty.");
+                }
+                return;
             }
 
-            KdTreeNode<T>? node;
-            var currentParent = _rootNode;
-            do
+            var nodes = _findNodes(_rootNode, filter);
+            foreach (var node in nodes)
             {
-                node = _findConcretNode(currentParent, filter, out _);
-
-                if (node is not null)
-                {
-                    data.Add(node.Data);
+                try { 
+                    _removeNode(node);
                 }
-
-                // search also in left subtree
-                currentParent = node?.LeftChild;
-            } while (currentParent is not null);
-
-            return data;
+                catch (Exception)
+                {
+                    if (throwIfNotFound)
+                    {
+                        throw;
+                    }
+                }
+            }
         }
 
+        /// <summary>
+        /// finds all the nodes with the given filter position (Compare)
+        ///
+        /// and removes only the first one, which also equals to the given filter (Equals)
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="throwIfNotFound">whether to throw exception if the filter is not found</param>
+        public void RemoveSpecific(T filter, bool throwIfNotFound = false)
+        {
+            if (_rootNode is null)
+            {
+                if (throwIfNotFound)
+                {
+                    throw new InvalidOperationException("Tree is empty.");
+                }
+                return;
+            }
+
+            var nodes = _findNodes(_rootNode, filter);
+            foreach (var node in nodes)
+            {
+                if (node.Data.Equals(filter))
+                {
+                    try { 
+                        _removeNode(node);
+                    }
+                    catch (Exception)
+                    {
+                        if (throwIfNotFound)
+                        {
+                            throw;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// deletes the node with the first occurence of the given filter
+        /// /// </summary>
         /// <param name="filter"></param>
         /// <param name="throwIfNotFound">whether to throw exception if the filter is not found</param>
         public void Remove(T filter, bool throwIfNotFound = false)
@@ -235,16 +362,31 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
 
             var node = _findConcretNode(_rootNode, filter, out _);
-
             if (node is null)
             {
                 if (throwIfNotFound)
                 {
-                    throw new InvalidOperationException("Node not found.");
+                    throw new InvalidOperationException("Concrete node not found.");
                 }
                 return;
             }
 
+            try { 
+                _removeNode(node);
+            }
+            catch (Exception)
+            {
+                if (throwIfNotFound)
+                {
+                    throw;
+                }
+
+                return;
+            }
+        }
+
+        private void _removeNode(KdTreeNode<T> node)
+        {
             if (node.IsLeaf)
             {
                 if (node == _rootNode)
@@ -276,6 +418,9 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
             bool isLastReplacedNodeLeaf = false;
             // replace nodes from the bottom to the top
+            var lastReplacedNode = nodesToBeReplaced.Peek();
+            var nodesToBeInsertedAfterRemoveFinished = new List<KdTreeNode<T>>();
+
             do
             {
                 KdTreeNode<T>? replacementNode = _findReplacementNode(nodesToBeReplaced.Peek());
@@ -302,77 +447,124 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 _replaceNode(toBeReplaced, acutalLeaf);
                 acutalLeaf = toBeReplaced;
             } while (nodesToBeReplaced.Count > 0);
-        }
 
-        /// <summary>
-        /// finds replacement node for the given node
-        /// 
-        /// replacement node is the that can be used to replace the given node (when the given node wants to be removed)
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        private KdTreeNode<T>? _findReplacementNode(KdTreeNode<T>? node)
-        {
-            KdTreeNode<T>? replacementNode = null;
-
-            // if node has right child
-            // // fid node with minimum value (in the same dimension) in the right subtree
-            if (node?.RightChild is not null)
+            // insert nodes that were removed during the remove process
+            foreach (var nodeToInsert in nodesToBeInsertedAfterRemoveFinished)
             {
-                // find node with minimum value in the right subtree
-                var nodeDimension = node.Dimension;
-                var minNode = node.RightChild;
-                var minDValue = minNode.Data.GetDiminesionValue(nodeDimension);
-
-                // search the whole tree where node.RightChild is root
-                var it = GetInOrderIterator(node.RightChild);
-                while (it.MoveNext())
-                {
-                    var currentNode = it.CurrentNode;
-                    var currentDValue = currentNode?.Data?.GetDiminesionValue(nodeDimension);
-
-                    if (currentDValue is not null && currentDValue < minDValue)
-                    {
-                        // FUTURE - porovnaj levely uzlov a vymemn, len ak je ten novy node leaf
-
-                        minNode = it.CurrentNode;
-                        minDValue = currentDValue.Value;
-                    }
-                }
-
-                replacementNode = minNode;
+                Insert(nodeToInsert.Data);
             }
 
 
-            // if node has no right child, but has left child
-            // // find node with maximum value (in the same dimension) in the left subtree
-            if (replacementNode is null && node?.LeftChild is not null)
+            /// <summary>
+            /// finds replacement node for the given node
+            /// 
+            /// replacement node is the that can be used to replace the given node (when the given node wants to be removed)
+            /// </summary>
+            /// <param name="node"></param>
+            /// <returns></returns>
+            KdTreeNode<T>? _findReplacementNode(KdTreeNode<T>? node)
             {
-                // find node with maximum value in the left subtree
-                var nodeDimension = node.Dimension;
-                var maxNode = node.LeftChild;
-                var maxDValue = maxNode.Data.GetDiminesionValue(nodeDimension);
-
-                // search the whole tree where node.LeftChild is root
-                var it = GetInOrderIterator(node.LeftChild);
-                while (it.MoveNext())
+                do
                 {
-                    var currentNode = it.CurrentNode;
-                    var currentDValue = currentNode?.Data?.GetDiminesionValue(nodeDimension);
+                    KdTreeNode<T>? replacementNode = null;
 
-                    if (currentDValue is not null && currentDValue > maxDValue)
+                    // if node has right child
+                    // // find node with minimum value (in the same dimension) in the right subtree
+                    if (node?.RightChild is not null)
                     {
-                        // FUTURE - porovnaj levely uzlov a vymen, len ak je ten novy node leaf
+                        // find node with minimum value in the right subtree
+                        var nodeDimension = node.Dimension;
+                        var nodeLevel = node.Level;
+                        var minNode = node.RightChild;
+                        var nodesWithSameValueAsMinNode = new List<KdTreeNode<T>>();
 
-                        maxNode = it.CurrentNode;
-                        maxDValue = currentDValue.Value;
+
+                        // search the whole tree where node.RightChild is root
+                        var it = GetIterator<KdTreeLevelOrderIterator<T>>(node.RightChild);
+                        if (it is not null)
+                        {
+                            while (it.MoveNext())
+                            {
+                                var currentNode = it.CurrentNode;
+
+                                if (minNode is null)
+                                {
+                                    throw new InvalidOperationException("Min node cannot be null.");
+                                }
+
+                                if (currentNode is not null)
+                                {
+                                    var currentComparison = currentNode.Data.Compare(nodeLevel, minNode.Data);
+                                    if (currentComparison == 0 && currentNode != node.RightChild)
+                                    {
+                                        nodesWithSameValueAsMinNode.Add(currentNode);
+                                        continue;
+                                    }
+
+                                    if (currentComparison < 0)
+                                    {
+                                        minNode = it.CurrentNode;
+                                        nodesWithSameValueAsMinNode.Clear();
+                                    }
+                                }
+                            }
+                        }
+
+                        if (minNode is not null)
+                        {
+                            // if there are nodes with the same dimension value as minNode, remove them first
+                            if (nodesWithSameValueAsMinNode.Count > 0)
+                            {
+                                foreach (var nodeWithSameValue in nodesWithSameValueAsMinNode)
+                                {
+                                    nodesToBeInsertedAfterRemoveFinished.Add(nodeWithSameValue); 
+                                    _removeNode(nodeWithSameValue); // pozor znovu rekurzive delete // premysliet na to, ze ich je mozne odstrnait aj potom. pozor na to ak sa tvarovo meni ten strom
+                                }
+
+                                // return _findReplacementNode(node); // ZBAVIT SA REKURZIE!!!
+                                continue; // to not use recursion
+                            }
+                        }
+
+                        replacementNode = minNode;
                     }
-                }
 
-                replacementNode = maxNode;
+
+                    // if node has no right child, but has left child
+                    // // find node with maximum value (in the same dimension) in the left subtree
+                    if (replacementNode is null && node?.LeftChild is not null)
+                    {
+                        // find node with maximum value in the left subtree
+                        var nodeLevel = node.Level;
+                        var maxNode = node.LeftChild;
+
+                        // search the whole tree where node.LeftChild is root
+                        var it = GetIterator<KdTreeLevelOrderIterator<T>>(node.LeftChild);
+                        while (it.MoveNext())
+                        {
+                            if (maxNode is null)
+                            {
+                                throw new InvalidOperationException("Max node cannot be null.");
+                            }
+
+                            var currentNode = it.CurrentNode;
+                            if (currentNode is not null)
+                            {
+                                var currentComparison = currentNode.Data.Compare(nodeLevel, maxNode.Data);
+
+                                if (currentComparison > 0)
+                                {
+                                    maxNode = it.CurrentNode;
+                                }
+                            }
+                        }
+
+                        replacementNode = maxNode;
+                    }
+
+                    return replacementNode;
+                } while (true);
             }
-
-            return replacementNode;
         }
 
         /// <summary>
@@ -439,12 +631,26 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
         }
 
-        private void _setRootNode(KdTreeNode<T>? newRoot)
+        /// <summary>
+        /// throws exception if the filter is not found
+        /// </summary>
+        /// <param name="filter"></param>
+        public void RemoveException(T filter)
         {
-            _rootNode = newRoot;
+            Remove(filter, true);
         }
+        #endregion
 
-        public KdTreeInOrderIterator<T>? GetInOrderIterator(T filter)
+        #region Iterators
+
+        // IEnumerable
+        public IEnumerator<T> GetEnumerator()
+        {
+            return GetIterator<KdTreeLevelOrderIterator<T>>();
+        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public TKdTreeIterator? GetIterator<TKdTreeIterator>(T filter) where TKdTreeIterator : KdTreeIterator<T>
         {
             if (_rootNode is null)
             {
@@ -458,25 +664,24 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 return null;
             }
 
-            return GetInOrderIterator(node);
+            return GetIterator<TKdTreeIterator>(node);
         }
 
-
-        public KdTreeInOrderIterator<T> GetInOrderIterator(KdTreeNode<T> rootNode)
+        public TKdTreeIterator GetIterator<TKdTreeIterator>(KdTreeNode<T>? node) where TKdTreeIterator : KdTreeIterator<T>
         {
-            return new KdTreeInOrderIterator<T>(rootNode);
+            // must be created by reflection, because of the generic type 
+            // !!! be aware of possible run time exception, if the iterator does not have a constructor with the node parameter
+            return (TKdTreeIterator)Activator.CreateInstance(typeof(TKdTreeIterator), node)!;
         }
 
-        /// <summary>
-        /// throws exception if the filter is not found
-        /// </summary>
-        /// <param name="filter"></param>
-        public void RemoveException(T filter)
+        public TKdTreeIterator GetIterator<TKdTreeIterator>() where TKdTreeIterator : KdTreeIterator<T>
         {
-            Remove(filter, true);
+            return GetIterator<TKdTreeIterator>(RootNode);
         }
+        #endregion
     }
 
+    #region KdTreeNode
     public class KdTreeNode<T> where T : class, IKdTreeData
     {
         /// <summary>
@@ -587,24 +792,27 @@ namespace FRI.AUS2.Libs.Structures.Trees
             return 1 + System.Math.Max(_getSubtreeDepth(node.LeftChild), _getSubtreeDepth(node.RightChild));
         }
     }
+    #endregion
 
-    public class KdTreeInOrderIterator<T> : IEnumerator<T>
+    #region Iterator classes
+    public abstract class KdTreeIterator<T> : IEnumerator<T>
         where T : class, IKdTreeData
     {
-        private Queue<KdTreeNode<T>> _nodesToProcess;
+        protected Queue<KdTreeNode<T>> _nodesToProcess;
 
-        private KdTreeNode<T>? _root;
-        private KdTreeNode<T>? _current;
+        protected KdTreeNode<T>? _root;
+        protected KdTreeNode<T>? _current;
         public T Current => _current?.Data ?? throw new InvalidOperationException("Current node is not set.");
         internal KdTreeNode<T>? CurrentNode => _current;
 
         object IEnumerator.Current => Current;
 
-        public KdTreeInOrderIterator(KdTreeNode<T> rootNode)
+        public KdTreeIterator(KdTreeNode<T>? rootNode)
         {
-            _nodesToProcess = new Queue<KdTreeNode<T>>();
             _root = rootNode;
-            _processNode(_root);
+            _nodesToProcess = new Queue<KdTreeNode<T>>();
+
+            Reset();
         }
 
         public void Dispose()
@@ -620,25 +828,48 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
 
             _current = _nodesToProcess.Dequeue();
+            _processNode(_current);
             return true;
         }
 
         public void Reset()
         {
             _nodesToProcess.Clear();
-            _processNode(_root);
+
+            _current = null;
+            if (_root is not null)
+            {
+                _nodesToProcess.Enqueue(_root);
+            }
         }
 
-        private void _processNode(KdTreeNode<T>? node)
+        protected abstract void _processNode(KdTreeNode<T>? node);
+    }
+
+    public class KdTreeLevelOrderIterator<T> : KdTreeIterator<T>
+        where T : class, IKdTreeData
+    {
+        public KdTreeLevelOrderIterator(KdTreeNode<T> rootNode) : base(rootNode)
+        {
+        }
+
+        protected override void _processNode(KdTreeNode<T>? node)
         {
             if (node is null)
             {
                 return;
             }
 
-            _processNode(node.LeftChild);
-            _nodesToProcess.Enqueue(node);
-            _processNode(node.RightChild);
+            if (node.LeftChild is not null)
+            {
+                _nodesToProcess.Enqueue(node.LeftChild);
+            }
+
+            if (node.RightChild is not null)
+            {
+                _nodesToProcess.Enqueue(node.RightChild);
+            }
         }
     }
+    #endregion
 }

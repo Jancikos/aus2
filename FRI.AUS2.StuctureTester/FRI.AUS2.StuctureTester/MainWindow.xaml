@@ -4,6 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:FRI.AUS2.StuctureTester"
+    xmlns:uc="clr-namespace:FRI.AUS2.StuctureTester.Controls"
     mc:Ignorable="d"
     Title="AUS2 Structure tester" Height="450" Width="800">
 
@@ -36,31 +37,18 @@
                 <GroupBox Header="Insert node">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" MinWidth="30" />
-                            <ColumnDefinition Width="5" />
-                            <ColumnDefinition Width="*" MinWidth="50" />
+                            <ColumnDefinition Width="auto" MinWidth="80" />
                             <ColumnDefinition Width="5" />
                             <ColumnDefinition Width="auto" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
-                            <RowDefinition Height="2" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="2" />
-                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
                         <!--node form-->
-                        <TextBlock Text="X:" />
-                        <TextBox x:Name="_txtb_X" Grid.Column="2" TextAlignment="Right"/>
+                        <uc:KdDataForm x:Name="_frm_Insert" />
 
-                        <TextBlock Text="Y:" Grid.Row="2" />
-                        <TextBox x:Name="_txtb_Y" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>
-
-                        <TextBlock Text="Data:" Grid.Row="4" />
-                        <TextBox x:Name="_txtb_Data" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
-
-                        <Button x:Name="_btn_Insert" Content="Insert" Grid.Column="4" Grid.Row="1" Grid.RowSpan="3" Margin="0"
+                        <Button x:Name="_btn_Insert" Content="Insert" Grid.Column="2" VerticalAlignment="Center" Margin="0"
                             Click="_btn_ManualInsert_Click" />
                     </Grid>
                 </GroupBox>
@@ -69,40 +57,17 @@
                 <GroupBox Header="Generate nodes">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" MinWidth="30" />
-                            <ColumnDefinition Width="5" />
-                            <ColumnDefinition Width="*" MinWidth="50" />
-                            <ColumnDefinition Width="10" />
-                            <ColumnDefinition Width="*" MinWidth="30" />
-                            <ColumnDefinition Width="5" />
-                            <ColumnDefinition Width="*" MinWidth="50" />
+                            <ColumnDefinition Width="*" MinWidth="80" />
                             <ColumnDefinition Width="5" />
                             <ColumnDefinition Width="auto" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
-                            <RowDefinition Height="2" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="2" />
-                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Text="Min X:" />
-                        <TextBox x:Name="_txtb_MinX" Grid.Column="2" TextAlignment="Right" Text="0" />
-                        <TextBlock Text="Max X:" Grid.Column="4" />
-                        <TextBox x:Name="_txtb_MaxX" Grid.Column="6" TextAlignment="Right" Text="100" />
+                        <uc:KdDataGenerateForm x:Name="_frm_Generate" />
 
-                        <TextBlock Text="Min Y:" Grid.Row="2" />
-                        <TextBox x:Name="_txtb_MinY" Grid.Column="2" Grid.Row="2" TextAlignment="Right" Text="0" />
-                        <TextBlock Text="Max Y:" Grid.Column="4" Grid.Row="2" />
-                        <TextBox x:Name="_txtb_MaxY" Grid.Column="6" Grid.Row="2" TextAlignment="Right" Text="100" />
-
-                        <TextBlock Text="Count:" Grid.Row="4" />
-                        <TextBox x:Name="_txtb_Count" Grid.Column="2" Grid.Row="4" TextAlignment="Right" Text="10" />
-                        <TextBlock Text="Seed:" Grid.Column="4" Grid.Row="4" />
-                        <TextBox x:Name="_txtb_Seed" Grid.Column="6" Grid.Row="4" TextAlignment="Right" Text="0" />
-
-                        <Button x:Name="_btn_GenerateNodes" Content="Generate" Grid.Column="8" Grid.Row="1" Grid.RowSpan="3" Margin="0"
+                        <Button x:Name="_btn_GenerateNodes" Content="Generate" Grid.Column="8" Grid.Row="1" Grid.RowSpan="3" VerticalAlignment="Center" Margin="0"
                             Click="_btn_GenerateNodes_Click" />
                     </Grid>
                 </GroupBox>
@@ -111,9 +76,7 @@
                 <GroupBox Header="Find data">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" MinWidth="30" />
-                            <ColumnDefinition Width="5" />
-                            <ColumnDefinition Width="*" MinWidth="50" />
+                            <ColumnDefinition Width="auto" MinWidth="80" />
                             <ColumnDefinition Width="5" />
                             <ColumnDefinition Width="auto" />
                         </Grid.ColumnDefinitions>
@@ -121,19 +84,15 @@
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="2" />
                             <RowDefinition Height="auto" />
-                            <RowDefinition Height="2" />
-                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Text="X:" />
-                        <TextBox x:Name="_txtb_findX" Grid.Column="2" TextAlignment="Right"/>
 
-                        <TextBlock Text="Y:" Grid.Row="2" />
-                        <TextBox x:Name="_txtb_findY" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>
+                        <!--node form-->
+                        <uc:KdDataForm x:Name="_frm_Find" IsDataVisibile="false" />
 
-                        <TextBlock x:Name="_txt_findResult" Text="" Grid.Row="5" Grid.ColumnSpan="4" />
+                        <TextBlock x:Name="_txt_findResult" Text="" Grid.Row="2" Grid.ColumnSpan="3" />
 
-                        <Button x:Name="_btn_Find" Content="Find" Grid.Column="4" Grid.RowSpan="3" Margin="0"
+                        <Button x:Name="_btn_Find" Content="Find" Grid.Column="2" Margin="0"
                             Click="_btn_ManualFind_Click" VerticalAlignment="Center" />
                     </Grid>
                 </GroupBox>
@@ -142,9 +101,7 @@
                 <GroupBox Header="Delete node">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" MinWidth="30" />
-                            <ColumnDefinition Width="5" />
-                            <ColumnDefinition Width="*" MinWidth="50" />
+                            <ColumnDefinition Width="auto" MinWidth="80" />
                             <ColumnDefinition Width="5" />
                             <ColumnDefinition Width="auto" />
                         </Grid.ColumnDefinitions>
@@ -152,20 +109,16 @@
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="2" />
                             <RowDefinition Height="auto" />
-                            <RowDefinition Height="2" />
-                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Text="X:" />
-                        <TextBox x:Name="_txtb_deleteX" Grid.Column="2" TextAlignment="Right"/>
 
-                        <TextBlock Text="Y:" Grid.Row="2" />
-                        <TextBox x:Name="_txtb_deleteY" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>
+                        <!--node form-->
+                        <uc:KdDataForm x:Name="_frm_Delete" IsDataVisibile="false" />
 
-                        <TextBlock x:Name="_txt_deleteResult" Text="" Grid.Row="5" Grid.ColumnSpan="4" />
+                        <TextBlock x:Name="_txt_deleteResult" Text="" Grid.Row="2" Grid.ColumnSpan="3" />
 
-                        <Button x:Name="_btn_Delete" Content="Delete" Grid.Column="4" Grid.RowSpan="3" Margin="0"
-                            Click="_btn_ManualDelete_Click" VerticalAlignment="Center" />
+                        <Button x:Name="_btn_Delete" Content="Delete" Grid.Column="2" Margin="0"
+         Click="_btn_ManualDelete_Click" VerticalAlignment="Center" />
                     </Grid>
                 </GroupBox>
             </StackPanel>
@@ -196,12 +149,10 @@
                     </Grid>
                 </GroupBox>
                 
-                <GroupBox Header="In order visit">
+                <GroupBox Header="Level order visit">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" MinWidth="30" />
-                            <ColumnDefinition Width="5" />
-                            <ColumnDefinition Width="*" MinWidth="50" />
+                            <ColumnDefinition Width="auto" MinWidth="80" />
                             <ColumnDefinition Width="5" />
                             <ColumnDefinition Width="auto" />
                         </Grid.ColumnDefinitions>
@@ -209,20 +160,16 @@
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="2" />
                             <RowDefinition Height="auto" />
-                            <RowDefinition Height="2" />
-                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Text="X:" />
-                        <TextBox x:Name="_txtb_InOrderX" Grid.Column="2" TextAlignment="Right"/>
 
-                        <TextBlock Text="Y:" Grid.Row="2" />
-                        <TextBox x:Name="_txtb_InOrderY" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>
+                        <!--node form-->
+                        <uc:KdDataForm x:Name="_frm_InOrder" IsDataVisibile="false" />
 
-                        <TextBlock x:Name="_txt_InOrderResult" Text="" Grid.Row="5" Grid.ColumnSpan="4" />
+                        <TextBlock x:Name="_txt_InOrderResult" Text="" Grid.Row="2" Grid.ColumnSpan="3" />
 
-                        <Button x:Name="_btn_InOrder" Content="InOrder" Grid.Column="4" Grid.RowSpan="3" Margin="0"
-                            Click="_btn_ManualInOrder_Click" VerticalAlignment="Center" />
+                        <Button x:Name="_btn_InOrder" Content="Find" Grid.Column="2" Margin="0"
+        Click="_btn_ManualIteratorOrder_Click" VerticalAlignment="Center" />
                     </Grid>
                 </GroupBox>
                 
@@ -265,21 +212,27 @@
                                     <RowDefinition Height="auto" />
                                     <RowDefinition Height="2" />
                                     <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
 
                                 <TextBlock Text="ℹ️Add:" ToolTip="Using values from Generate nodes form (except seed and count)."/>
-                                <TextBox x:Name="_txtb_operationsAdd" Text="3" Grid.Column="2" TextAlignment="Right"/>
+                                <TextBox x:Name="_txtb_operationsAdd" Text="4" Grid.Column="2" TextAlignment="Right"/>
 
-                                <TextBlock Text="Delete:" Grid.Row="2" />
-                                <TextBox x:Name="_txtb_operationsDelete" Text="2" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>
+                                
+                                <TextBlock Text="Add dup.:" Grid.Row="2"/>
+                                <TextBox x:Name="_txtb_operationsAddDuplicate" Text="1" Grid.Row="2" Grid.Column="2" TextAlignment="Right"/>
 
-                                <TextBlock Text="Find:" Grid.Row="4" />
-                                <TextBox x:Name="_txtb_operationsFind" Text="1" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
+                                <TextBlock Text="Delete:" Grid.Row="4" />
+                                <TextBox x:Name="_txtb_operationsDelete" Text="2" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
+
+                                <TextBlock Text="Find:" Grid.Row="6" />
+                                <TextBox x:Name="_txtb_operationsFind" Text="1" Grid.Column="2" Grid.Row="6" TextAlignment="Right"/>
                             </Grid>
                         </GroupBox>
 
                         <TextBlock Text="Seed:" Grid.Row="4" />
-                        <TextBox x:Name="_txtb_testerSeed" Text="1" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
+                        <TextBox x:Name="_txtb_testerSeed" Text="1" Grid.Column="2" Grid.Row="4" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Number"/>
 
                         <GroupBox Header="Logging" Grid.Row="6" Grid.ColumnSpan="3" >
                             <Grid>
@@ -299,7 +252,7 @@
                                 </Grid.RowDefinitions>
 
                                 <TextBlock Text="ℹ️Verbosity:" ToolTip="1 - all, 2 - only operations, 3 - only stats"/>
-                                <TextBox x:Name="_txtb_operationsLogVerbosity" Text="3" Grid.Column="2" TextAlignment="Right"/>
+                                <TextBox x:Name="_txtb_operationsLogVerbosity" Text="1" Grid.Column="2" TextAlignment="Right"/>
 
                                 <TextBlock Text="ℹ️Stats f. :" ToolTip="Sequence stats frequency. Every how many lines the strucute stats should be printed. 0 - off"  Grid.Row="2"/>
                                 <TextBox x:Name="_txtb_operationsLogStatsFreq" Text="0" Grid.Column="2" Grid.Row="2" TextAlignment="Right"/>

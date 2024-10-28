@@ -7,24 +7,27 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Controls\KdDataForm.xaml.cs">
+    <Compile Update="Controls\GeoItemsManagement.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Controls\KdDataGenerateForm.xaml.cs">
+    <Compile Update="Windows\GeoItemFormWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Windows\GeoItemGenerationFormWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Controls\KdDataForm.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Controls\KdDataGenerateForm.xaml">
+    <Page Update="Controls\GeoItemsManagement.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Resources\Dictionary.xaml">
+    <Page Update="Windows\GeoItemFormWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Windows\GeoItemGenerationFormWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
