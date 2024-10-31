@@ -35,7 +35,7 @@
         <TextBox x:Name="_txtb_B" Grid.Column="2" Grid.Row="4" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" />
 
         <TextBlock Text="C (i):" Grid.Row="6" />
-        <TextBox x:Name="_txtb_C" Grid.Column="2" Grid.Row="6" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" />
+        <TextBox x:Name="_txtb_C" Text="0" Grid.Column="2" Grid.Row="6" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" />
 
         <TextBlock Text="D (d):" Grid.Row="8" />
         <TextBox x:Name="_txtb_D" Grid.Column="2" Grid.Row="8" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" />

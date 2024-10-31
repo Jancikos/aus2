@@ -249,7 +249,10 @@ namespace FRI.AUS2.StuctureTester
                 int count = _frm_Generate.Count;
                 int seed = _frm_Generate.Seed;
 
-                const int doublePrecision = 100;
+                int doublePrecision = 
+                    KdExampleData.ModeType == KdExampleData.Mode.KD2 
+                        ? 1 
+                        : 100;
 
                 var random = new Random(seed);
                 int i = 0;
@@ -352,7 +355,10 @@ namespace FRI.AUS2.StuctureTester
 
         private void _btn_testerRunTest_Click(object sender, RoutedEventArgs e)
         {
-            const int doublePrecision = 100;
+            int doublePrecision = 
+                KdExampleData.ModeType == KdExampleData.Mode.KD2 
+                    ? 1 
+                    : 100;
 
             _operationsGenerator = new OperationsGenerator<KdExampleData>(
                 _exampleStructure,
@@ -442,6 +448,14 @@ namespace FRI.AUS2.StuctureTester
         #region KdExampleData
         public class KdExampleData : IKdTreeData
         {
+            public enum Mode 
+            {
+                KD2,
+                KD4
+            }
+
+            public static Mode ModeType = Mode.KD2;
+
             public double A { get; set; }
             public string B { get; set; } = "";
             public int C { get; set; }
@@ -453,28 +467,55 @@ namespace FRI.AUS2.StuctureTester
             public int Compare(int level, IKdTreeData other)
             {
                 var otherModel = (KdExampleData)other;
+                var dimension = level % GetDiminesionsCount();
 
-                switch (level % GetDiminesionsCount())
+                switch (ModeType)
+                {
+                    case Mode.KD2:
+                        return _compareKD2(dimension, otherModel);
+                    case Mode.KD4:
+                        return _compareKD4(dimension, otherModel);
+                    default:
+                        throw new InvalidOperationException("Invalid mode.");
+                }
+            }
+
+            private int _compareKD2(int dimension, KdExampleData other)
+            {
+                switch (dimension)
                 {
                     case 0:
-                        var aCompare = A.CompareToWithE(otherModel.A);
+                        return A.CompareToWithE(other.A);
+                    case 1:
+                        return D.CompareToWithE(other.D);
+                    default:
+                        throw new InvalidOperationException("Invalid level.");
+                }
+            }
+
+            private int _compareKD4(int dimension, KdExampleData other)
+            {
+                switch (dimension)
+                {
+                    case 0:
+                        var aCompare = A.CompareToWithE(other.A);
 
                         if (aCompare == 0)
                         {
-                            return B.CompareTo(otherModel.B);
+                            return B.CompareTo(other.B);
                         }
 
                         return aCompare;
                     case 1:
-                        return C.CompareTo(otherModel.C);
+                        return C.CompareTo(other.C);
                     case 2:
-                        return D.CompareToWithE(otherModel.D);
+                        return D.CompareToWithE(other.D);
                     case 3:
-                        var bCompare = B.CompareTo(otherModel.B);
+                        var bCompare = B.CompareTo(other.B);
 
                         if (bCompare == 0)
                         {
-                            return C.CompareTo(otherModel.C);
+                            return C.CompareTo(other.C);
                         }
 
                         return bCompare;
@@ -496,11 +537,21 @@ namespace FRI.AUS2.StuctureTester
                 return true;
             }
 
-            public int GetDiminesionsCount() => 4;
+            public int GetDiminesionsCount() => ModeType switch
+            {
+                Mode.KD2 => 2,
+                Mode.KD4 => 4,
+                _ => throw new InvalidOperationException("Invalid mode.")
+            };
 
             public override string ToString()
             {
-                return $"[{A}, '{B}', {C}, {D}] - {Data}";
+                return ModeType switch
+                {
+                    Mode.KD2 => $"[{A}; {D}] - {Data}",
+                    Mode.KD4 => $"[{A}; '{B}'; {C}; {D}] - {Data}",
+                    _ => throw new InvalidOperationException("Invalid mode.")
+                };
             }
         }
         #endregion
