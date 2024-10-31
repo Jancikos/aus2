@@ -84,7 +84,9 @@ namespace FRI.AUS2.StuctureTester.Utils
 
             for (int i = 0; i < Count; i++)
             {
-                OperationType operation = _randomOperations[_random.Next(0, randomOperationsCount)];
+                OperationType operation = _structureData.Count == 0 
+                    ? OperationType.Insert
+                    : _randomOperations[_random.Next(0, randomOperationsCount)];
 
                 _beforeOperation(i, operation);
                 _makeOperation(operation);
@@ -250,8 +252,17 @@ namespace FRI.AUS2.StuctureTester.Utils
             {
                 _log($"Deleting: {filter}", 1, 2);
 
+                var nodesCountBefore = Structure.NodesCount;
+
                 Structure.RemoveException(filter);
                 _structureData.Remove(filter);
+
+                var nodesCountAfter = Structure.NodesCount;
+                if (nodesCountBefore - 1 != nodesCountAfter)
+                {
+                    _log($"!!! Nodes count is not correct !!!", 1, 2);
+                    _log($"Before: {nodesCountBefore}, After: {nodesCountAfter}", 2, 2);
+                }
             }
             catch (InvalidOperationException e)
             {
