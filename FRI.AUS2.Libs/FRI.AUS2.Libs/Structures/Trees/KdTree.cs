@@ -294,7 +294,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
             var nodes = _findNodes(_rootNode, filter);
             foreach (var node in nodes)
             {
-                try { 
+                try
+                {
                     _removeNode(node);
                 }
                 catch (Exception)
@@ -330,7 +331,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
             {
                 if (node.Data.Equals(filter))
                 {
-                    try { 
+                    try
+                    {
                         _removeNode(node);
                     }
                     catch (Exception)
@@ -371,7 +373,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 return;
             }
 
-            try { 
+            try
+            {
                 _removeNode(node);
             }
             catch (Exception)
@@ -385,75 +388,85 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
         }
 
-        private void _removeNode(KdTreeNode<T> node)
+        private void _removeNode(KdTreeNode<T> nodeToRemove)
         {
-            if (node.IsLeaf)
-            {
-                if (node == _rootNode)
-                {
-                    // only one node in the tree
-                    _setRootNode(null);
-                    return;
-                }
+            var nodesToRemove = new Queue<KdTreeNode<T>>();
+            nodesToRemove.Enqueue(nodeToRemove);
+            var firstIteration = true;
 
-                // remove leaf node
-                if (node.Parent is not null)
-                {
-                    if (node.IsLeftChild)
+            while (nodesToRemove.Count > 0)
+            {
+                var node = nodesToRemove.Dequeue();
+
+                do {
+                    if (node.IsLeaf)
                     {
-                        node.Parent.LeftChild = null;
+                        if (node == _rootNode)
+                        {
+                            // only one node in the tree
+                            _setRootNode(null);
+                            return;
+                        }
+
+                        // remove leaf node
+                        if (node.Parent is not null)
+                        {
+                            if (node.IsLeftChild)
+                            {
+                                node.Parent.LeftChild = null;
+                            }
+                            if (node.IsRightChild)
+                            {
+                                node.Parent.RightChild = null;
+                            }
+                            node.Parent = null;
+                        }
+
+                        continue; // namiesto GOTO end... 
                     }
-                    if (node.IsRightChild)
+
+                    // nodes stack - nodes will be replaced from the bottom to the top
+                    Stack<KdTreeNode<T>> nodesToBeReplaced = new Stack<KdTreeNode<T>>();
+                    nodesToBeReplaced.Push(node);
+
+                    bool isLastReplacedNodeLeaf = false;
+                    do
                     {
-                        node.Parent.RightChild = null;
-                    }
-                    node.Parent = null;
-                }
-                return;
-            }
+                        KdTreeNode<T>? replacementNode = _findReplacementNode(nodesToBeReplaced.Peek());
 
-            // nodes stack - nodes will be replaced from the bottom to the top
-            Stack<KdTreeNode<T>> nodesToBeReplaced = new Stack<KdTreeNode<T>>();
-            nodesToBeReplaced.Push(node);
+                        if (replacementNode is null)
+                        {
+                            // no replacement node found
+                            throw new InvalidOperationException("No replacement node found.");
+                        }
 
-            bool isLastReplacedNodeLeaf = false;
-            // replace nodes from the bottom to the top
-            var lastReplacedNode = nodesToBeReplaced.Peek();
-            var nodesToBeInsertedAfterRemoveFinished = new List<KdTreeNode<T>>();
+                        nodesToBeReplaced.Push(replacementNode);
 
-            do
-            {
-                KdTreeNode<T>? replacementNode = _findReplacementNode(nodesToBeReplaced.Peek());
+                        if (replacementNode.IsLeaf)
+                        {
+                            isLastReplacedNodeLeaf = true;
+                        }
+                    } while (!isLastReplacedNodeLeaf);
 
-                if (replacementNode is null)
+                    // replace nodes
+                    KdTreeNode<T> acutalLeaf = nodesToBeReplaced.Pop();
+                    do
+                    {
+                        KdTreeNode<T> toBeReplaced = nodesToBeReplaced.Pop();
+                        _replaceNode(toBeReplaced, acutalLeaf);
+                        acutalLeaf = toBeReplaced;
+                    } while (nodesToBeReplaced.Count > 0);
+                } while (false);
+
+                // insert nodes that were removed during the remove process
+                // if it is not the first iteration, insert the node back to the tree (duplicate dimension node from the right subtree)
+                if (!firstIteration)
                 {
-                    // no replacement node found
-                    throw new InvalidOperationException("No replacement node found.");
+                    Insert(node.Data);
                 }
 
-                nodesToBeReplaced.Push(replacementNode);
-
-                if (replacementNode.IsLeaf)
-                {
-                    isLastReplacedNodeLeaf = true;
-                }
-            } while (!isLastReplacedNodeLeaf);
-
-            // replace nodes
-            KdTreeNode<T> acutalLeaf = nodesToBeReplaced.Pop();
-            do
-            {
-                KdTreeNode<T> toBeReplaced = nodesToBeReplaced.Pop();
-                _replaceNode(toBeReplaced, acutalLeaf);
-                acutalLeaf = toBeReplaced;
-            } while (nodesToBeReplaced.Count > 0);
-
-            // insert nodes that were removed during the remove process
-            foreach (var nodeToInsert in nodesToBeInsertedAfterRemoveFinished)
-            {
-                Insert(nodeToInsert.Data);
+                firstIteration = false;
             }
-
 
             /// <summary>
             /// finds replacement node for the given node
@@ -464,106 +477,100 @@ namespace FRI.AUS2.Libs.Structures.Trees
             /// <returns></returns>
             KdTreeNode<T>? _findReplacementNode(KdTreeNode<T>? node)
             {
-                do
+                KdTreeNode<T>? replacementNode = null;
+
+                // if node has right child
+                // // find node with minimum value (in the same dimension) in the right subtree
+                if (node?.RightChild is not null)
                 {
-                    KdTreeNode<T>? replacementNode = null;
+                    // find node with minimum value in the right subtree
+                    var nodeLevel = node.Level;
+                    var minNode = node.RightChild;
+                    var nodesWithSameValueAsMinNode = new List<KdTreeNode<T>>();
 
-                    // if node has right child
-                    // // find node with minimum value (in the same dimension) in the right subtree
-                    if (node?.RightChild is not null)
+                    // search the whole tree where node.RightChild is root
+                    var it = GetIterator<KdTreeLevelOrderIterator<T>>(node.RightChild);
+                    if (it is not null)
                     {
-                        // find node with minimum value in the right subtree
-                        var nodeDimension = node.Dimension;
-                        var nodeLevel = node.Level;
-                        var minNode = node.RightChild;
-                        var nodesWithSameValueAsMinNode = new List<KdTreeNode<T>>();
-
-
-                        // search the whole tree where node.RightChild is root
-                        var it = GetIterator<KdTreeLevelOrderIterator<T>>(node.RightChild);
-                        if (it is not null)
-                        {
-                            while (it.MoveNext())
-                            {
-                                var currentNode = it.CurrentNode;
-
-                                if (minNode is null)
-                                {
-                                    throw new InvalidOperationException("Min node cannot be null.");
-                                }
-
-                                if (currentNode is not null)
-                                {
-                                    var currentComparison = currentNode.Data.Compare(nodeLevel, minNode.Data);
-                                    if (currentComparison == 0 && currentNode != node.RightChild)
-                                    {
-                                        nodesWithSameValueAsMinNode.Add(currentNode);
-                                        continue;
-                                    }
-
-                                    if (currentComparison < 0)
-                                    {
-                                        minNode = it.CurrentNode;
-                                        nodesWithSameValueAsMinNode.Clear();
-                                    }
-                                }
-                            }
-                        }
-
-                        if (minNode is not null)
-                        {
-                            // if there are nodes with the same dimension value as minNode, remove them first
-                            if (nodesWithSameValueAsMinNode.Count > 0)
-                            {
-                                foreach (var nodeWithSameValue in nodesWithSameValueAsMinNode)
-                                {
-                                    nodesToBeInsertedAfterRemoveFinished.Add(nodeWithSameValue); 
-                                    _removeNode(nodeWithSameValue); // pozor znovu rekurzive delete // premysliet na to, ze ich je mozne odstrnait aj potom. pozor na to ak sa tvarovo meni ten strom
-                                }
-
-                                // return _findReplacementNode(node); // ZBAVIT SA REKURZIE!!!
-                                continue; // to not use recursion
-                            }
-                        }
-
-                        replacementNode = minNode;
-                    }
-
-
-                    // if node has no right child, but has left child
-                    // // find node with maximum value (in the same dimension) in the left subtree
-                    if (replacementNode is null && node?.LeftChild is not null)
-                    {
-                        // find node with maximum value in the left subtree
-                        var nodeLevel = node.Level;
-                        var maxNode = node.LeftChild;
-
-                        // search the whole tree where node.LeftChild is root
-                        var it = GetIterator<KdTreeLevelOrderIterator<T>>(node.LeftChild);
                         while (it.MoveNext())
                         {
-                            if (maxNode is null)
+                            var currentNode = it.CurrentNode;
+
+                            if (minNode is null)
                             {
-                                throw new InvalidOperationException("Max node cannot be null.");
+                                throw new InvalidOperationException("Min node cannot be null.");
                             }
 
-                            var currentNode = it.CurrentNode;
                             if (currentNode is not null)
                             {
-                                var currentComparison = currentNode.Data.Compare(nodeLevel, maxNode.Data);
-
-                                if (currentComparison > 0)
+                                var currentComparison = currentNode.Data.Compare(nodeLevel, minNode.Data);
+                                if (currentComparison == 0 && currentNode != node.RightChild)
                                 {
-                                    maxNode = it.CurrentNode;
+                                    nodesWithSameValueAsMinNode.Add(currentNode);
+                                    continue;
+                                }
+
+                                if (currentComparison < 0)
+                                {
+                                    minNode = it.CurrentNode;
+                                    nodesWithSameValueAsMinNode.Clear();
                                 }
                             }
                         }
-
-                        replacementNode = maxNode;
                     }
 
-                    return replacementNode;
-                } while (true);
+                    if (minNode is not null)
+                    {
+                        // if there are nodes with the same dimension value as minNode, remove them first
+                        if (nodesWithSameValueAsMinNode.Count > 0)
+                        {
+                            foreach (var nodeWithSameValue in nodesWithSameValueAsMinNode)
+                            {
+                                // kontrola, ci uz nie je v zasobniku
+                                if (!nodesToRemove.Contains(nodeWithSameValue)) {
+                                    nodesToRemove.Enqueue(nodeWithSameValue);
+                                }
+                            }
+                        }
+                    }
+
+                    replacementNode = minNode;
+                }
+
+
+                // if node has no right child, but has left child
+                // // find node with maximum value (in the same dimension) in the left subtree
+                if (replacementNode is null && node?.LeftChild is not null)
+                {
+                    // find node with maximum value in the left subtree
+                    var nodeLevel = node.Level;
+                    var maxNode = node.LeftChild;
+
+                    // search the whole tree where node.LeftChild is root
+                    var it = GetIterator<KdTreeLevelOrderIterator<T>>(node.LeftChild);
+                    while (it.MoveNext())
+                    {
+                        if (maxNode is null)
+                        {
+                            throw new InvalidOperationException("Max node cannot be null.");
+                        }
+
+                        var currentNode = it.CurrentNode;
+                        if (currentNode is not null)
+                        {
+                            var currentComparison = currentNode.Data.Compare(nodeLevel, maxNode.Data);
+
+                            if (currentComparison > 0)
+                            {
+                                maxNode = it.CurrentNode;
+                            }
+                        }
+                    }
+
+                    replacementNode = maxNode;
+                }
+
+                return replacementNode;
             }
         }
 
