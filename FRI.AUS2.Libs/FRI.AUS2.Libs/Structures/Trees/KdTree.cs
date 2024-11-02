@@ -44,6 +44,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 return 0;
             }
 
+            // TOOD - prerobit na pouzitie iteratora
             var nodesToProcess = new Queue<KdTreeNode<T>>();
             nodesToProcess.Enqueue(rootNode);
 
@@ -76,6 +77,30 @@ namespace FRI.AUS2.Libs.Structures.Trees
         private void _setRootNode(KdTreeNode<T>? newRoot)
         {
             _rootNode = newRoot;
+        }
+
+        /// <summary>
+        /// this method is used to compare all dimensions of the two IKdTreeData objects 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool CompareAllDimensions(IKdTreeData a, IKdTreeData b)
+        {
+            if (a.GetDiminesionsCount() != b.GetDiminesionsCount())
+            {
+                return false;
+            }
+
+            for (int i = 0; i < a.GetDiminesionsCount(); i++)
+            {
+                if (a.Compare(i, b) != 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         #endregion

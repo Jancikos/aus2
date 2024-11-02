@@ -293,13 +293,13 @@ namespace FRI.AUS2.StuctureTester.Utils
             _log(string.Join(", ", result.Select(x => x.ToString())), 2, 2);
 
             // check if all found items are the same as in the list
-            var itemsFromList = _structureData.FindAll(x => x.Equals(result[0]));
+            var itemsFromList = _structureData.FindAll(x => KdTree<T>.CompareAllDimensions(x, filter));
             _log($"Found: {itemsFromList.Count} items in list", 1, 2);
 
             if (itemsFromList.Count != result.Count)
             {
-                _log("Items count in tree and list is not the same !!!", 1, 2);
                 _log(string.Join(", ", itemsFromList.Select(x => x.ToString())), 2, 2);
+                _log("Items count in tree and list is not the same !!!", 1, 2);
 
                 _structureDataWithFindProblems.Add(filter);
             }
