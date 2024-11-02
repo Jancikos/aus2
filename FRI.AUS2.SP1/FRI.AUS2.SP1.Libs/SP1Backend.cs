@@ -131,35 +131,67 @@ namespace FRI.AUS2.SP1.Libs
         #endregion
 
         #region Generating
-        public void GenerateParcels(int count, int seed, string descriptionPrefix, (int min, int max) streetNumber, (int min, int max) posA_X, (int min, int max) posA_Y, (int min, int max) posB_X, (int min, int max) posB_Y)
-        {
-            _generateGeoItems(count, seed, descriptionPrefix, streetNumber, posA_X, posA_Y, posB_X, posB_Y, AddParcel);
-        }
 
-        public void GenerateProperties(int count, int seed, string descriptionPrefix, (int min, int max) streetNumber, (int min, int max) posA_X, (int min, int max) posA_Y, (int min, int max) posB_X, (int min, int max) posB_Y)
+        public void GenerateData(int parcelsCount, int propertiesCount, double propertiesOverlap, int seed, int doublePrecision = 2)
         {
-            _generateGeoItems(count, seed, descriptionPrefix, streetNumber, posA_X, posA_Y, posB_X, posB_Y, AddProperty);
-        }
+            var random = new Random(seed);
+            (int min, int max) posX = (-10, 10);
+            (int min, int max) posY = (-10, 10);
 
-        private void _generateGeoItems(int count, int seed, string descriptionPrefix, (int min, int max) streetNumber, (int min, int max) posA_X, (int min, int max) posA_Y, (int min, int max) posB_X, (int min, int max) posB_Y, Action<int, string, GpsPoint, GpsPoint> addAction)
-        {
-            Random random = new Random(seed);
-
-            for (int i = 0; i < count; i++)
+            // generate parcels
+            var actualParcelsCount = _treeParcels.NodesCount; // sice to je 2x pocet, ale aspon bude cislo jedinecne
+            for (int i = 0; i < parcelsCount; i++)
             {
-                addAction(
-                    random.Next(streetNumber.min, streetNumber.max),
-                    $"{descriptionPrefix} {i + 1}",
-                    new GpsPoint(
-                        _getRandomDouble(random, posA_X),
-                        _getRandomDouble(random, posA_Y)
-                    ),
-                    new GpsPoint(
-                        _getRandomDouble(random, posB_X),
-                        _getRandomDouble(random, posB_Y)
-                    )
+                AddParcel(
+                    actualParcelsCount + i + 1,
+                    Parcel.ParcelTypes[random.Next(0, Parcel.ParcelTypes.Length)],
+                    _getRandomGpsPoint(random, posX, posY, doublePrecision),
+                    _getRandomGpsPoint(random, posX, posY, doublePrecision)
                 );
             }
+
+            // generate properties
+            var actualPropertiesCount = _treeProperties.NodesCount; // sice to je 2x pocet, ale aspon bude cislo jedinecne
+            for (int i = 0; i < propertiesCount; i++)
+            {
+                AddProperty(
+                    actualPropertiesCount + i + 1,
+                    Property.Cities[random.Next(0, Property.Cities.Length)],
+                    random.NextDouble() < propertiesOverlap
+                        ? _getGpsPointFromExistingParcel(random, parcelsCount)
+                        : _getRandomGpsPoint(random, posX, posY, doublePrecision),
+                    random.NextDouble() < propertiesOverlap
+                        ? _getGpsPointFromExistingParcel(random, parcelsCount)
+                        : _getRandomGpsPoint(random, posX, posY, doublePrecision)
+                );
+            }
+        }
+
+        private GpsPoint _getGpsPointFromExistingParcel(Random random, int parcelsCount)
+        {
+            var parcelIndex = random.Next(0, parcelsCount);
+
+            var parcel = _treeParcels
+                            .ElementAt(parcelIndex)
+                            .Item;
+
+            if (parcel is null)
+            {
+                throw new Exception($"Parcel at index {parcelIndex} cant be found");
+            }
+
+            return random.NextDouble() < 0.5
+                ? parcel.PositionA ?? throw new Exception("Parcel must have PositionA")
+                : parcel.PositionB ?? throw new Exception("Parcel must have PositionB")
+            ;
+        }
+
+        private GpsPoint _getRandomGpsPoint(Random random, (int min, int max) posX, (int min, int max) posY, int precision = 2)
+        {
+            return new GpsPoint(
+                _getRandomDouble(random, posX, precision),
+                _getRandomDouble(random, posY, precision)
+            );
         }
 
         private double _getRandomDouble(Random random, (int min, int max) range, int precision = 2)

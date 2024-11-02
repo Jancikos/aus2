@@ -35,7 +35,7 @@ namespace FRI.AUS2.SP1.GUI
 
         private void _initializePropertiesManagment()
         {
-            _initializeGeoItemsManagmentActions(_mng_Properties, _backend.AddProperty, _backend.GenerateProperties, (item) => _backend.DeleteProperty((Property)item));
+            _initializeGeoItemsManagmentActions(_mng_Properties, _backend.AddProperty, (item) => _backend.DeleteProperty((Property)item));
 
             _mng_Properties.EditAction = (item) =>
             {
@@ -89,7 +89,7 @@ namespace FRI.AUS2.SP1.GUI
 
         private void _initializeParcelsManagment()
         {
-            _initializeGeoItemsManagmentActions(_mng_Parcels, _backend.AddParcel, _backend.GenerateParcels, (item) => _backend.DeleteParcel((Parcel)item));
+            _initializeGeoItemsManagmentActions(_mng_Parcels, _backend.AddParcel, (item) => _backend.DeleteParcel((Parcel)item));
 
             _mng_Parcels.EditAction = (item) =>
             {
@@ -157,7 +157,7 @@ namespace FRI.AUS2.SP1.GUI
             _mng_CombinedItems.AddTableColumn("Data", "Item.Data");
         }
         
-        private void _initializeGeoItemsManagmentActions(GeoItemsManagement mngItems, Action<int, string, GpsPoint, GpsPoint> addItemAction, Action<int, int, string, (int, int), (int, int), (int, int), (int, int), (int, int)> generateItemsAction, Action<object> deleteItemAction)
+        private void _initializeGeoItemsManagmentActions(GeoItemsManagement mngItems, Action<int, string, GpsPoint, GpsPoint> addItemAction, Action<object> deleteItemAction)
         {
             mngItems.InsertAction = () =>
             {
@@ -180,37 +180,6 @@ namespace FRI.AUS2.SP1.GUI
                 MessageBox.Show($"{mngItems.Title} pridaná!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
 
                 RerenderTables();
-            };
-
-            mngItems.GenerateAction = () =>
-            {
-                var form = new GeoItemGenerationFormWindow();
-
-                form.ShowDialog();
-
-                if (form.DialogResult == false)
-                {
-                    return;
-                }
-
-                generateItemsAction(
-                    form.Count,
-                    form.Seed,
-                    form.DescriptionPrefix,
-                    form.StreetNumber,
-                    form.PosA_X,
-                    form.PosA_Y,
-                    form.PosB_X,
-                    form.PosB_Y
-                );
-
-                MessageBox.Show($"{mngItems.Title} vygenerované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
-
-                // ask for rerender
-                if (MessageBox.Show("Chcete prekresliť vygenerované tabuľky?", Title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                {
-                    RerenderTables();
-                }
             };
 
             mngItems.DeleteAction = (item) =>
@@ -239,6 +208,24 @@ namespace FRI.AUS2.SP1.GUI
         private void _mnitem_Clear_Click(object sender, RoutedEventArgs e)
         {
             _backend.ClearData();
+            RerenderTables();
+        }
+
+        private void _mnitem_Generate_Click(object sender, RoutedEventArgs e)
+        {
+            var form = new GeoItemsGenerationFormWindow();
+
+            form.ShowDialog();
+
+            if (form.DialogResult == false)
+            {
+                return;
+            }
+
+            _backend.GenerateData(form.ParcelsCount, form.PropertiesCount, form.PropertiesOverlap, form.Seed);
+
+            MessageBox.Show("Data vygenerované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+
             RerenderTables();
         }
     }

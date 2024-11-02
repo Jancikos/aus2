@@ -2,10 +2,12 @@
 {
     public class Property : GeoItem
     {
+        public static string[] Cities = { "Ladzany", "Košice", "Bratislava", "Prešov", "Banská Bystrica", "Žilina", "Trnava", "Nitra", "Trenčín" };
+
         public int StreetNumber { get; set; }
         public string Description { get; set; } = string.Empty;
 
-        public override string Data => $"Property {StreetNumber}. - {Description}";
+        public override string Data => $"N {Description} - {StreetNumber}.";
 
         private IList<Parcel> _parcels = new List<Parcel>();
         public IList<Parcel> Parcels => _parcels;
@@ -24,7 +26,7 @@
 
         public override string ToString()
         {
-            return $"Property {StreetNumber}. - {Description} [{base.ToString()}]";
+            return $"{Data} [{base.ToString()}]";
         }
     }
 }

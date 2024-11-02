@@ -126,7 +126,6 @@
 
             <StackPanel x:Name="_stck_ManageButtons" VerticalAlignment="Center"  Grid.Row="2" Grid.Column="1">
                 <Button x:Name="_btn_Insert" Content="Vložiť" Click="_btn_Insert_Click" />
-                <Button x:Name="_btn_Generate" Content="Generovať" Click="_btn_Generate_Click" />
 
                 <Separator Margin="0 5" />
 

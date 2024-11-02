@@ -95,7 +95,6 @@ namespace FRI.AUS2.SP1.GUI.Controls
             }
         }
 
-        public Action? GenerateAction { get; set; }
         public Action? InsertAction { get; set; }
         public Action<object>? EditAction { get; set; }
         public Action<object>? DeleteAction { get; set; }
@@ -250,16 +249,6 @@ namespace FRI.AUS2.SP1.GUI.Controls
             RerenderTable();
         }
 
-        private void _btn_Generate_Click(object sender, RoutedEventArgs e)
-        {
-            if (GenerateAction is null)
-            {
-                MessageBox.Show("Generate action is not implemented!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            GenerateAction();
-        }
         private void _btn_Delete_Click(object sender, RoutedEventArgs e)
         {
             if (DeleteAction is null)
