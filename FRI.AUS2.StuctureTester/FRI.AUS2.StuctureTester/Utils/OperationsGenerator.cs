@@ -230,12 +230,15 @@ namespace FRI.AUS2.StuctureTester.Utils
         /// <param name="filter">ak je zadany, tak urcuje kluc prvku, ktory bude vlozeny</param>
         private void _makeInsert(T? filter = null)
         {
+            var nodesCountBefore = Structure.NodesCount;
             var t = _craeteRandomT(_random, filter);
 
             _log($"Inserting: {t}" + (filter is not null ? " (DUPLICATE)" : ""), 1, 2);
 
             Structure.Insert(t);
             _structureData.Add(t);
+
+            _checkNodesCount(nodesCountBefore + 1);
         }
 
         private void _makeDelete()
@@ -257,12 +260,7 @@ namespace FRI.AUS2.StuctureTester.Utils
                 Structure.RemoveException(filter);
                 _structureData.Remove(filter);
 
-                var nodesCountAfter = Structure.NodesCount;
-                if (nodesCountBefore - 1 != nodesCountAfter)
-                {
-                    _log($"!!! Nodes count is not correct !!!", 1, 2);
-                    _log($"Before: {nodesCountBefore}, After: {nodesCountAfter}", 2, 2);
-                }
+                _checkNodesCount(nodesCountBefore - 1);
             }
             catch (InvalidOperationException e)
             {
@@ -314,6 +312,15 @@ namespace FRI.AUS2.StuctureTester.Utils
             }
 
             return _structureData[_random.Next(0, _structureData.Count)];
+        }
+
+        private void _checkNodesCount(int expectedNodesCount)
+        {
+            if (expectedNodesCount != Structure.NodesCount)
+            {
+                _log($"!!! Nodes count is not correct !!!", 1, 2);
+                _log($"Expected: {expectedNodesCount}, Actual: {Structure.NodesCount}", 2, 2);
+            }
         }
 
         private void _log(string message, int indentLevel = 0, int verbosityLevel = 0)

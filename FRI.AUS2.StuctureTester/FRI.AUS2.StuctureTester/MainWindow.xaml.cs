@@ -47,7 +47,7 @@ namespace FRI.AUS2.StuctureTester
             _initTreeNodes();
 
             _updateStatistics();
-            IsViewerActivated = true;
+            IsViewerActivated = false;
         }
 
         private void _initTreeNodes()
