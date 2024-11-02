@@ -275,7 +275,8 @@ namespace FRI.AUS2.StuctureTester
                         D = random.Next(
                             _frm_Generate.D.min * doublePrecision,
                             _frm_Generate.D.max * doublePrecision
-                        ) / (double)doublePrecision
+                        ) / (double)doublePrecision,
+                        Data = random.Next(-100, 100)
                     });
                 }
 

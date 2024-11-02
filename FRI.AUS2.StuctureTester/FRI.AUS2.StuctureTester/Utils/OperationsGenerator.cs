@@ -298,7 +298,7 @@ namespace FRI.AUS2.StuctureTester.Utils
 
             if (itemsFromList.Count != result.Count)
             {
-                _log("Items in tree and list are not the same !!!", 1, 2);
+                _log("Items count in tree and list is not the same !!!", 1, 2);
                 _log(string.Join(", ", itemsFromList.Select(x => x.ToString())), 2, 2);
 
                 _structureDataWithFindProblems.Add(filter);
