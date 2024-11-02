@@ -255,13 +255,7 @@ namespace FRI.AUS2.SP1.Libs
 
             // remove from trees
             _removeFromTree(parcel, _treeParcels);
-            _removeFromTree(parcel, _treeCombined); // TODO - chyba pri odstranovani prvkov, ktore maju zhodne suradnice ako iny prvok 
-
-            /// NOTES
-            // remove parcel from the tree
-            // // find and DELETE ALL parcels by the PosA/B
-            // // // from that parcels remove the right parcel (by Parcel reference)
-            // // // // insert the rest of the parcels back to the tree
+            _removeFromTree(parcel, _treeCombined);
         }
 
         public void DeleteProperty(Property property)
@@ -274,7 +268,7 @@ namespace FRI.AUS2.SP1.Libs
 
             // remove from trees
             _removeFromTree(property, _treeProperties);
-            _removeFromTree(property, _treeCombined); // TODO - chyba pri odstranovani prvkov, ktore maju zhodne suradnice ako iny prvok 
+            _removeFromTree(property, _treeCombined);
         }
 
 
