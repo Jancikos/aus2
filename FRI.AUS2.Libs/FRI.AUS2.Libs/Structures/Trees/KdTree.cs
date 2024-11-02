@@ -44,30 +44,10 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 return 0;
             }
 
-            // TOOD - prerobit na pouzitie iteratora
-            var nodesToProcess = new Queue<KdTreeNode<T>>();
-            nodesToProcess.Enqueue(rootNode);
-
             int count = 0;
-            while (nodesToProcess.Count > 0)
+            var it =  GetIterator<KdTreeLevelOrderIterator<T>>();
+            while (it.MoveNext())
             {
-                var currentNode = nodesToProcess.Dequeue();
-
-                if (currentNode is null)
-                {
-                    continue;
-                }
-
-                if (currentNode.LeftChild is not null)
-                {
-                    nodesToProcess.Enqueue(currentNode.LeftChild);
-                }
-
-                if (currentNode.RightChild is not null)
-                {
-                    nodesToProcess.Enqueue(currentNode.RightChild);
-                }
-
                 count++;
             }
 
