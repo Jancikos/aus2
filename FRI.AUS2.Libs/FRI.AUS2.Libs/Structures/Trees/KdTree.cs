@@ -81,6 +81,11 @@ namespace FRI.AUS2.Libs.Structures.Trees
         #endregion
 
         #region Insert
+
+        /// <summary>
+        /// O(log n)
+        /// </summary>
+        /// <param name="data"></param>
         public void Insert(T data)
         {
             if (_rootNode is null)
@@ -127,6 +132,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
         #region Find
 
         /// <summary>
+        /// O(log n)
+        /// 
         /// returns data from all nodes thats position (in the tree) is the same as the filter
         /// </summary>
         /// <param name="filter"></param>
@@ -140,11 +147,10 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 return data;
             }
 
-            KdTreeNode<T>? node;
             var currentParent = _rootNode;
             do
             {
-                node = _findConcretNode(currentParent, filter, out _);
+                var node = _findConcretNode(currentParent, filter, out _);
 
                 if (node is not null)
                 {
@@ -159,6 +165,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
         }
 
         /// <summary>
+        /// O(log n)
+        /// 
         /// returns nodes with the same position as the filter within the tree from the root parameter
         /// </summary>
         /// <param name="root"></param>
@@ -186,12 +194,12 @@ namespace FRI.AUS2.Libs.Structures.Trees
         }
 
         /// <summary>
-        /// 
+        /// O(log n) 
         /// </summary>
         /// <param name="root">root node of hierarchy that will be visited </param>
         /// <param name="data"></param>
         /// <param name="lastVisitedNode">the node, which was visited last before returning value</param>
-        /// <returns> the node where the data lives</returns>
+        /// <returns> the node with the same position (on some dimension) as the data</returns>
         private KdTreeNode<T>? _findNode(KdTreeNode<T> root, T data, out KdTreeNode<T>? lastVisitedNode)
         {
             lastVisitedNode = null;
@@ -228,7 +236,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
         }
 
         /// <summary>
-        /// 
+        /// O(log n)
         /// </summary>
         /// <param name="root"></param>
         /// <param name="filter"></param>
@@ -276,6 +284,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
 
         /// <summary>
+        /// TO DELETE
+        /// 
         /// removes all nodes within the position on the given filter 
         /// </summary>
         /// <param name="filter"></param>
@@ -311,7 +321,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
         /// <summary>
         /// finds all the nodes with the given filter position (Compare)
         ///
-        /// and removes only the first one, which also equals to the given filter (Equals)
+        /// and removes only the ones, which also equals to the given filter (Equals)
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="throwIfNotFound">whether to throw exception if the filter is not found</param>
@@ -326,6 +336,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 return;
             }
 
+            // TODO - toto pozor, tu by sa to dalo zjdenodusit, ze by sa pridal parameter do _findNodes, ktory by urcoval, ci sa ma hladat aj podla Equals
             var nodes = _findNodes(_rootNode, filter);
             foreach (var node in nodes)
             {
@@ -388,6 +399,10 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
         }
 
+        /// <summary>
+        /// O zavisi od zlosti _findReplacementNode (O(n))
+        /// </summary>
+        /// <param name="nodeToRemove"></param>
         private void _removeNode(KdTreeNode<T> nodeToRemove)
         {
             var nodesToRemove = new Queue<KdTreeNode<T>>();
@@ -469,6 +484,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
 
             /// <summary>
+            /// O(n) - kde n je pocet nodov v podstrome vrcholu node
+            ///  
             /// finds replacement node for the given node
             /// 
             /// replacement node is the that can be used to replace the given node (when the given node wants to be removed)
@@ -477,6 +494,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
             /// <returns></returns>
             KdTreeNode<T>? _findReplacementNode(KdTreeNode<T>? node)
             {
+                // TODO - pozor na to, ze tu prehladavam bud cely pravy alebo cely lavy podstrom, co sa vraj da zlepsit
+
                 KdTreeNode<T>? replacementNode = null;
 
                 // if node has right child
@@ -575,6 +594,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
         }
 
         /// <summary>
+        /// O(1)
+        /// 
         /// replaces toBeReplaced node with leaf node
         /// 
         /// leaf node will be moved to the place of toBeReplaced node (in the hierarchy)
