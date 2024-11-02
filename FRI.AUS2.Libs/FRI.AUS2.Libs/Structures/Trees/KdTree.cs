@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Reflection.Metadata.Ecma335;
 using FRI.AUS2.Libs.Structures.Trees.Interfaces;
 
 namespace FRI.AUS2.Libs.Structures.Trees
@@ -176,8 +177,9 @@ namespace FRI.AUS2.Libs.Structures.Trees
         /// </summary>
         /// <param name="root"></param>
         /// <param name="filter"></param>
+        /// <param name="onlyEquals">whether to return only nodes that also fits the Equals method</param>
         /// <returns></returns>
-        private IList<KdTreeNode<T>> _findNodes(KdTreeNode<T> root, T filter)
+        private IList<KdTreeNode<T>> _findNodes(KdTreeNode<T> root, T filter, bool onlyEquals = false)
         {
             var nodes = new List<KdTreeNode<T>>();
 
@@ -188,7 +190,10 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
                 if (node is not null)
                 {
-                    nodes.Add(node);
+                    if (!onlyEquals || node.Data.Equals(filter))
+                    {
+                        nodes.Add(node);
+                    }
                 }
 
                 // search also in left subtree
@@ -287,46 +292,9 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
         #region Remove
 
-
         /// <summary>
-        /// TO DELETE
+        /// finds the nodes with the given filter position by Compare but also by Equals
         /// 
-        /// removes all nodes within the position on the given filter 
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="throwIfNotFound">whether to throw exception if the filter is not found</param>
-        public void RemoveAll(T filter, bool throwIfNotFound = false)
-        {
-            if (_rootNode is null)
-            {
-                if (throwIfNotFound)
-                {
-                    throw new InvalidOperationException("Tree is empty.");
-                }
-                return;
-            }
-
-            var nodes = _findNodes(_rootNode, filter);
-            foreach (var node in nodes)
-            {
-                try
-                {
-                    _removeNode(node);
-                }
-                catch (Exception)
-                {
-                    if (throwIfNotFound)
-                    {
-                        throw;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// finds all the nodes with the given filter position (Compare)
-        ///
-        /// and removes only the ones, which also equals to the given filter (Equals)
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="throwIfNotFound">whether to throw exception if the filter is not found</param>
@@ -341,22 +309,18 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 return;
             }
 
-            // TODO - toto pozor, tu by sa to dalo zjdenodusit, ze by sa pridal parameter do _findNodes, ktory by urcoval, ci sa ma hladat aj podla Equals
-            var nodes = _findNodes(_rootNode, filter);
+            var nodes = _findNodes(_rootNode, filter, true);
             foreach (var node in nodes)
             {
-                if (node.Data.Equals(filter))
+                try
                 {
-                    try
+                    _removeNode(node);
+                }
+                catch (Exception)
+                {
+                    if (throwIfNotFound)
                     {
-                        _removeNode(node);
-                    }
-                    catch (Exception)
-                    {
-                        if (throwIfNotFound)
-                        {
-                            throw;
-                        }
+                        throw;
                     }
                 }
             }
@@ -364,7 +328,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
         }
 
         /// <summary>
-        /// deletes the node with the first occurence of the given filter
+        /// deletes the node with the first occurence of the given filter (by Compare in all dimensions)
         /// /// </summary>
         /// <param name="filter"></param>
         /// <param name="throwIfNotFound">whether to throw exception if the filter is not found</param>
