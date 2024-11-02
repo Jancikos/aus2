@@ -112,7 +112,8 @@ namespace FRI.AUS2.StuctureTester.Utils
                 { OperationType.Insert, 0 },
                 { OperationType.InsertDuplicate, 0 },
                 { OperationType.Delete, 0 },
-                { OperationType.Find, 0 }
+                { OperationType.Find, 0 },
+                { OperationType.FindSpecific, 0 }
             };
             _structureDataWithFindProblems = new List<T>();
 
@@ -203,6 +204,9 @@ namespace FRI.AUS2.StuctureTester.Utils
                 case OperationType.Find:
                     _makeFind();
                     break;
+                case OperationType.FindSpecific:
+                    _makeFind(true);
+                    break;
                 default:
                     throw new NotImplementedException($"{operation} is not implemented");
             }
@@ -269,7 +273,7 @@ namespace FRI.AUS2.StuctureTester.Utils
             }
         }
 
-        private void _makeFind()
+        private void _makeFind(bool specific = false)
         {
             var filter = _getRandomKey();
             if (filter is null)
@@ -278,8 +282,21 @@ namespace FRI.AUS2.StuctureTester.Utils
                 return;
             }
 
-            _log($"Finding: {filter}", 1, 2);
-            var result = Structure.Find(filter);
+            _log($"Finding {(specific ? "specific" : "")}: {filter}", 1, 2);
+
+            // check if all found items are the same as in the list
+            var itemsFromList = _structureData.FindAll(
+                x => KdTree<T>.CompareAllDimensions(x, filter) 
+                    && (specific 
+                        ? x.Equals(filter) 
+                        : true)
+            );
+            _log($"Found: {itemsFromList.Count} items in list", 1, 2);
+            _log(string.Join(", ", itemsFromList.Select(x => x.ToString())), 2, 2);
+
+            var result = specific 
+                ? Structure.FindSpecific(filter) 
+                : Structure.Find(filter);
             if (result.Count == 0)
             {
                 // key not found
@@ -290,16 +307,23 @@ namespace FRI.AUS2.StuctureTester.Utils
             _log($"Found: {result.Count} items in tree", 1, 2);
             _log(string.Join(", ", result.Select(x => x.ToString())), 2, 2);
 
-            // check if all found items are the same as in the list
-            var itemsFromList = _structureData.FindAll(x => KdTree<T>.CompareAllDimensions(x, filter));
-            _log($"Found: {itemsFromList.Count} items in list", 1, 2);
 
             if (itemsFromList.Count != result.Count)
             {
-                _log(string.Join(", ", itemsFromList.Select(x => x.ToString())), 2, 2);
                 _log("Items count in tree and list is not the same !!!", 1, 2);
-
                 _structureDataWithFindProblems.Add(filter);
+            }
+
+            if (specific)
+            {
+                result.ToList().ForEach(x =>
+                {
+                    if (!x.Equals(filter))
+                    {
+                        _log("Found item is not the same as searched item !!!", 1, 2);
+                        _structureDataWithFindProblems.Add(filter);
+                    }
+                });
             }
 
         }
@@ -347,6 +371,7 @@ namespace FRI.AUS2.StuctureTester.Utils
         Insert,
         InsertDuplicate,
         Delete,
-        Find
+        Find,
+        FindSpecific
     }
 }

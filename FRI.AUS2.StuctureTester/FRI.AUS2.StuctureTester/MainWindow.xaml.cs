@@ -317,7 +317,7 @@ namespace FRI.AUS2.StuctureTester
         {
             try
             {
-                var data = _frm_InOrder.IsKdDataModelValid 
+                var data = _frm_InOrder.IsKdDataModelValid
                     ? _frm_InOrder.KdDataModel
                     : _exampleStructure.RootNode?.Data ?? throw new InvalidOperationException("No data in tree.");
 
@@ -374,6 +374,7 @@ namespace FRI.AUS2.StuctureTester
             int.Parse(_txtb_operationsAddDuplicate.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.InsertDuplicate));
             int.Parse(_txtb_operationsDelete.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Delete));
             int.Parse(_txtb_operationsFind.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Find));
+            int.Parse(_txtb_operationsFindSpecific.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.FindSpecific));
 
             // init log settings
             _operationsGenerator.LogsVerbosity = int.Parse(_txtb_operationsLogVerbosity.Text);
@@ -416,6 +417,24 @@ namespace FRI.AUS2.StuctureTester
             txtb.Text = (int.Parse(txtb.Text) + 1).ToString();
         }
 
+        private void _btn_ManualFindSpecific_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var data = _frm_FindSpecific.KdDataModel;
+
+                var found = _exampleStructure.FindSpecific(data);
+
+                _txt_FindSpecificResult.Text = found.Count == 0
+                    ? "Data not found!"
+                    : $"Data: [{string.Join(", ", found.Select(d => d.Data))}]";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         #endregion
 
         #region KdExampleData
@@ -424,7 +443,7 @@ namespace FRI.AUS2.StuctureTester
             public int X { get; set; }
             public int Y { get; set; }
 
-            public string Data { get; set; } = "";	
+            public string Data { get; set; } = "";
 
             public int Compare(int level, IKdTreeData other)
             {
@@ -456,7 +475,7 @@ namespace FRI.AUS2.StuctureTester
 
                 return X == otherModel.X && Y == otherModel.Y;
             }
-            
+
 
             public int GetDiminesionsCount() => 2;
 
@@ -487,6 +506,5 @@ namespace FRI.AUS2.StuctureTester
             }
         }
         #endregion
-
     }
 }

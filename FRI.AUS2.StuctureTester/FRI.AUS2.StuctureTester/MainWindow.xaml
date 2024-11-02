@@ -96,6 +96,31 @@
                             Click="_btn_ManualFind_Click" VerticalAlignment="Center" />
                     </Grid>
                 </GroupBox>
+                
+                <!-- find specific data -->
+                <GroupBox Header="Find specific data">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="80" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="2" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+
+                        <!--node form-->
+                        <uc:KdDataForm x:Name="_frm_FindSpecific" />
+
+                        <TextBlock x:Name="_txt_FindSpecificResult" Text="" Grid.Row="2" Grid.ColumnSpan="3" />
+
+                        <Button x:Name="_btn_FindSpecific" Content="Find" Grid.Column="2" Margin="0"
+                            Click="_btn_ManualFindSpecific_Click" VerticalAlignment="Center" />
+                    </Grid>
+                </GroupBox>
 
                 <!-- delete node -->
                 <GroupBox Header="Delete node">
@@ -214,6 +239,8 @@
                                     <RowDefinition Height="auto" />
                                     <RowDefinition Height="2" />
                                     <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
 
                                 <TextBlock Text="ℹ️Add:" ToolTip="Using values from Generate nodes form (except seed and count)."/>
@@ -228,6 +255,9 @@
 
                                 <TextBlock Text="Find:" Grid.Row="6" />
                                 <TextBox x:Name="_txtb_operationsFind" Text="1" Grid.Column="2" Grid.Row="6" TextAlignment="Right"/>
+
+                                <TextBlock Text="Find specific:" Grid.Row="8" />
+                                <TextBox x:Name="_txtb_operationsFindSpecific" Text="1" Grid.Column="2" Grid.Row="8" TextAlignment="Right"/>
                             </Grid>
                         </GroupBox>
 
