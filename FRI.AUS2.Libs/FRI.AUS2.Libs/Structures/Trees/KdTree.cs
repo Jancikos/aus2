@@ -909,6 +909,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
 
         /// <summary>
         /// paralel queue with _nodesToProcess, where the level of the node is stored
+        /// 
+        /// sensitive to tree changes during the iteration
         /// </summary>
         protected Queue<int> _levels;
 

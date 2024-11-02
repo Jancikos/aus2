@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:FRI.AUS2.StuctureTester"
     xmlns:uc="clr-namespace:FRI.AUS2.StuctureTester.Controls"
     mc:Ignorable="d"
-    Title="AUS2 Structure tester" Height="450" Width="800">
+    Title="AUS2 Structure tester" Height="550" Width="900">
 
     <Window.Resources>
         <ResourceDictionary Source="Resources/Dictionary.xaml" />
@@ -83,7 +83,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="2" />
-                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
 
@@ -108,7 +108,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="2" />
-                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
 
@@ -122,8 +122,8 @@
                     </Grid>
                 </GroupBox>
 
-                <!-- delete node -->
-                <GroupBox Header="Delete node">
+                <!-- delete data -->
+                <GroupBox Header="Delete data">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" MinWidth="80" />
@@ -133,7 +133,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="2" />
-                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
 
