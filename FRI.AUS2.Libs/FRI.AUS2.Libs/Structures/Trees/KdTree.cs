@@ -810,16 +810,31 @@ namespace FRI.AUS2.Libs.Structures.Trees
             return level;
         }
 
-        /// <returns>depth of the subtree</returns>
+        /// <summary>
+        /// get the depth of the subtree where the node is the root
+        /// 
+        /// POZOR zlozitost je O(log n) + 2 * O(log n) = O(log n)
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         private int _getSubtreeDepth(KdTreeNode<T>? node)
         {
-            if (node is null)
+            if (node is null || node.IsLeaf)
             {
                 return 0;
             }
 
-            // POZOR na rekurziu
-            return 1 + System.Math.Max(_getSubtreeDepth(node.LeftChild), _getSubtreeDepth(node.RightChild));
+            var it = new KdTreeLevelOrderIterator<T>(node);
+            var lastVisitedNode = node;
+            while (it.MoveNext())
+            {
+                if (it.CurrentNode is not null)
+                {
+                    lastVisitedNode = it.CurrentNode;
+                }
+            }
+
+            return lastVisitedNode.Level - node.Level;
         }
     }
     #endregion
