@@ -202,7 +202,7 @@ namespace FRI.AUS2.StuctureTester.Utils
                     _makeDelete();
                     break;
                 case OperationType.DeleteSpecific:
-                    _makeDeleteSpecific();
+                    _makeDelete(true);
                     break;
                 case OperationType.Find:
                     _makeFind();
@@ -242,15 +242,15 @@ namespace FRI.AUS2.StuctureTester.Utils
 
             _log($"Inserting: {t}" + (filter is not null ? " (DUPLICATE)" : ""), 1, 2);
 
+            ++_expectedNodesCount;
             Structure.Insert(t);
             _structureData.Add(t);
 
             _checkNodesCount(nodesCountBefore + 1);
 
-            ++_expectedNodesCount;
         }
 
-        private void _makeDelete()
+        private void _makeDelete(bool specific = false)
         {
             var filter = _getRandomKey();
             if (filter is null)
@@ -262,50 +262,22 @@ namespace FRI.AUS2.StuctureTester.Utils
 
             try
             {
-                _log($"Deleting: {filter}", 1, 2);
+                _log($"Deleting {(specific ? "specific" : "all")}: {filter}", 1, 2);
 
                 var nodesCountBefore = Structure.NodesCount;
+                var itemsFromList = _structureData.FindAll(x => KdTree<T>.CompareAllDimensions(x, filter) && (specific ? x.Equals(filter) : true));
+                _log($"Found: {itemsFromList.Count} items in list", 1, 2);
 
-                Structure.RemoveException(filter);
-                _structureData.Remove(filter);
+                _expectedNodesCount -= itemsFromList.Count;
 
-                _checkNodesCount(nodesCountBefore - 1);
-                --_expectedNodesCount;
-            }
-            catch (InvalidOperationException e)
-            {
-                // key not found
-                _log($"Key not found!!! ({e.Message})", 1, 2);
-            }
-        }
-        
-        private void _makeDeleteSpecific()
-        {
-            var filter = _getRandomKey();
-            if (filter is null)
-            {
-                _log("No key to delete", 1, 2);
-                // structure is empty
-                return;
-            }
+                Action<T, bool> removeAction = specific
+                    ? Structure.RemoveSpecific
+                    : Structure.Remove;
+                removeAction(filter, true);
 
-            try
-            {
-                _log($"Deleting specific: {filter}", 1, 2);
-
-                // make found item specific to check if it will be found
-                var itemsFromList = _structureData.FindAll(x => KdTree<T>.CompareAllDimensions(x, filter) && x.Equals(filter));
-                var itemsCount = itemsFromList.Count;
-
-                _log($"Found: {itemsCount} items in list", 1, 2);
-
-                var nodesCountBefore = Structure.NodesCount;
-
-                Structure.RemoveSpecific(filter, true);
                 _structureData.RemoveAll(itemsFromList.Contains);
 
-                _checkNodesCount(nodesCountBefore - itemsCount);
-                _expectedNodesCount -= itemsCount;
+                _checkNodesCount(nodesCountBefore - itemsFromList.Count);
             }
             catch (InvalidOperationException e)
             {

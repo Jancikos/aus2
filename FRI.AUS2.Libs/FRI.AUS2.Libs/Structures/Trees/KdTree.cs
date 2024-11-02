@@ -46,7 +46,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
 
             int count = 0;
-            var it =  GetIterator<KdTreeLevelOrderIterator<T>>();
+            var it = GetIterator<KdTreeLevelOrderIterator<T>>();
             while (it.MoveNext())
             {
                 count++;
@@ -177,12 +177,13 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
 
             _processNodes(_rootNode, filter, node => data.Add(node.Data), onlyEquals);
-            
+
             return data;
         }
 
-        private void _processNodes(KdTreeNode<T> root, T filter, Action<KdTreeNode<T>> action, bool onlyEquals = false)
+        private int _processNodes(KdTreeNode<T> root, T filter, Action<KdTreeNode<T>> action, bool onlyEquals = false)
         {
+            int count = 0;
             var currentParent = root;
             do
             {
@@ -193,12 +194,15 @@ namespace FRI.AUS2.Libs.Structures.Trees
                     if (!onlyEquals || node.Data.Equals(filter))
                     {
                         action(node);
+                        count++;
                     }
                 }
 
                 // search also in left subtree
                 currentParent = node?.LeftChild;
             } while (currentParent is not null);
+
+            return count;
         }
 
         /// <summary>
@@ -314,41 +318,16 @@ namespace FRI.AUS2.Libs.Structures.Trees
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="throwIfNotFound">whether to throw exception if the filter is not found</param>
-        public void RemoveSpecific(T filter, bool throwIfNotFound = false)
-        {
-            if (_rootNode is null)
-            {
-                if (throwIfNotFound)
-                {
-                    throw new InvalidOperationException("Tree is empty.");
-                }
-                return;
-            }
-
-            var nodes = _findNodes(_rootNode, filter, true);
-            foreach (var node in nodes)
-            {
-                try
-                {
-                    _removeNode(node);
-                }
-                catch (Exception)
-                {
-                    if (throwIfNotFound)
-                    {
-                        throw;
-                    }
-                }
-            }
-
-        }
+        public void RemoveSpecific(T filter, bool throwIfNotFound = false) => _removeNodes(filter, throwIfNotFound, true);
 
         /// <summary>
-        /// deletes the node with the first occurence of the given filter (by Compare in all dimensions)
+        /// deletes all nodes with the given filter (by Compare in all dimensions)
         /// /// </summary>
         /// <param name="filter"></param>
         /// <param name="throwIfNotFound">whether to throw exception if the filter is not found</param>
-        public void Remove(T filter, bool throwIfNotFound = false)
+        public void Remove(T filter, bool throwIfNotFound = false) => _removeNodes(filter, throwIfNotFound);
+
+        private void _removeNodes(T filter, bool throwIfNotFound = false, bool onlyEquals = false)
         {
             if (_rootNode is null)
             {
@@ -359,28 +338,20 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 return;
             }
 
-            var node = _findConcretNode(_rootNode, filter, out _);
-            if (node is null)
+            var nodesToBeDeleted = _findNodes(_rootNode, filter, onlyEquals);
+
+            if (nodesToBeDeleted.Count == 0)
             {
                 if (throwIfNotFound)
                 {
-                    throw new InvalidOperationException("Concrete node not found.");
+                    throw new InvalidOperationException("No node found that can be removed.");
                 }
                 return;
             }
 
-            try
+            for (int i = nodesToBeDeleted.Count - 1; i >= 0; i--)
             {
-                _removeNode(node);
-            }
-            catch (Exception)
-            {
-                if (throwIfNotFound)
-                {
-                    throw;
-                }
-
-                return;
+                _removeNode(nodesToBeDeleted[i]);
             }
         }
 
@@ -398,7 +369,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
             {
                 var node = nodesToRemove.Dequeue();
 
-                do {
+                do
+                {
                     if (node.IsLeaf)
                     {
                         if (node == _rootNode)
@@ -528,7 +500,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
                             foreach (var nodeWithSameValue in nodesWithSameValueAsMinNode)
                             {
                                 // kontrola, ci uz nie je v zasobniku
-                                if (!nodesToRemove.Contains(nodeWithSameValue)) {
+                                if (!nodesToRemove.Contains(nodeWithSameValue))
+                                {
                                     nodesToRemove.Enqueue(nodeWithSameValue);
                                 }
                             }
@@ -857,7 +830,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
             return true;
         }
 
-        public void Reset()
+        public virtual void Reset()
         {
             _nodesToProcess.Clear();
 
@@ -904,11 +877,11 @@ namespace FRI.AUS2.Libs.Structures.Trees
         {
         }
 
-        protected override void _enqueueChildrenWithinDimension(KdTreeNode<T> node)
+        protected override void _enqueueChildrenWithinDimension(int nodeLevel, KdTreeNode<T> node)
         {
             if (node.RightChild is not null)
             {
-                _nodesToProcess.Enqueue(node.RightChild);
+                _enqueueNode(nodeLevel, node.RightChild);
             }
         }
     }
@@ -920,11 +893,11 @@ namespace FRI.AUS2.Libs.Structures.Trees
         {
         }
 
-        protected override void _enqueueChildrenWithinDimension(KdTreeNode<T> node)
+        protected override void _enqueueChildrenWithinDimension(int nodeLevel, KdTreeNode<T> node)
         {
             if (node.LeftChild is not null)
             {
-                _nodesToProcess.Enqueue(node.LeftChild);
+                _enqueueNode(nodeLevel, node.LeftChild);
             }
         }
     }
@@ -934,9 +907,35 @@ namespace FRI.AUS2.Libs.Structures.Trees
     {
         private int _dimension;
 
+        /// <summary>
+        /// paralel queue with _nodesToProcess, where the level of the node is stored
+        /// </summary>
+        protected Queue<int> _levels;
+
         public KdTreeOnlyNodesWithThatDimensionIterator(KdTreeNode<T> rootNode, int dimension) : base(rootNode)
         {
             _dimension = dimension;
+
+            if (_levels is null)
+            {
+                _levels = new Queue<int>();
+            }
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+
+            if (_levels is null)
+            {
+                _levels = new Queue<int>();
+            }
+
+            _levels.Clear();
+            if (_root is not null)
+            {
+                _levels.Enqueue(_root.Level);
+            }
         }
 
         protected override void _processNode(KdTreeNode<T>? node)
@@ -946,24 +945,31 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 return;
             }
 
-            // TODO - pozor na tuto operaciu - stale pocita level s O(log n) zlozitostou
-            if (node.Dimension == _dimension)
+            var nodeLevel = _levels.Dequeue();
+
+            if (nodeLevel % node.Data.GetDiminesionsCount() == _dimension)
             {
-                _enqueueChildrenWithinDimension(node);
+                _enqueueChildrenWithinDimension(nodeLevel, node);
                 return;
-            } 
-            
+            }
+
             if (node.LeftChild is not null)
             {
-                _nodesToProcess.Enqueue(node.LeftChild);
+                _enqueueNode(nodeLevel, node.LeftChild);
             }
             if (node.RightChild is not null)
             {
-                _nodesToProcess.Enqueue(node.RightChild);
+                _enqueueNode(nodeLevel, node.RightChild);
             }
         }
 
-        protected abstract void _enqueueChildrenWithinDimension(KdTreeNode<T> node);
+        protected void _enqueueNode(int parentLevel, KdTreeNode<T> node)
+        {
+            _nodesToProcess.Enqueue(node);
+            _levels.Enqueue(parentLevel + 1);
+        }
+
+        protected abstract void _enqueueChildrenWithinDimension(int nodeLevel, KdTreeNode<T> node);
     }
 
     #endregion
