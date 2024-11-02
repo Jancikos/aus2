@@ -373,6 +373,7 @@ namespace FRI.AUS2.StuctureTester
             int.Parse(_txtb_operationsAdd.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Insert));
             int.Parse(_txtb_operationsAddDuplicate.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.InsertDuplicate));
             int.Parse(_txtb_operationsDelete.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Delete));
+            int.Parse(_txtb_operationsDeleteSpecific.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.DeleteSpecific));
             int.Parse(_txtb_operationsFind.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Find));
             int.Parse(_txtb_operationsFindSpecific.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.FindSpecific));
 

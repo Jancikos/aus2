@@ -49,6 +49,7 @@ namespace FRI.AUS2.StuctureTester.Utils
         private List<T> _structureDataWithFindProblems;
         private string? _structureDataStaticticsBefore;
         private int? _structureNodesCountBefore;
+        private int _expectedNodesCount;
         private Dictionary<OperationType, int> _operationStatistics = new Dictionary<OperationType, int>();
 
         public OperationsGenerator(KdTree<T> structure, int count, int seed, Func<Random, T?, T> craeteRandomT)
@@ -104,7 +105,7 @@ namespace FRI.AUS2.StuctureTester.Utils
             // Save structure data before operations
             _structureData.AddRange(Structure);
             _structureDataStaticticsBefore = _getStructureStatictics();
-            _structureNodesCountBefore = Structure.NodesCount;
+            _structureNodesCountBefore = _expectedNodesCount = Structure.NodesCount;
 
             // Initialize operation statistics
             _operationStatistics = new Dictionary<OperationType, int>
@@ -112,6 +113,7 @@ namespace FRI.AUS2.StuctureTester.Utils
                 { OperationType.Insert, 0 },
                 { OperationType.InsertDuplicate, 0 },
                 { OperationType.Delete, 0 },
+                { OperationType.DeleteSpecific, 0 },
                 { OperationType.Find, 0 },
                 { OperationType.FindSpecific, 0 }
             };
@@ -144,12 +146,6 @@ namespace FRI.AUS2.StuctureTester.Utils
         {
             _log("");
             _log("Operations generation finished");
-            _log("");
-            _log("Operation statistics:");
-            foreach (var operation in _operationStatistics)
-            {
-                _log($"{operation.Key}: {operation.Value}", 1);
-            }
 
             _log("Structure statistics:");
             _log("Before:", 1);
@@ -160,12 +156,16 @@ namespace FRI.AUS2.StuctureTester.Utils
 
             _log("Structure test:");
             _log("Before nodes count: " + (_structureNodesCountBefore ?? 0), 1);
-            _log($"Operations done: (+{_operationStatistics[OperationType.Insert] + _operationStatistics[OperationType.InsertDuplicate]}, -{_operationStatistics[OperationType.Delete]})", 1);
+            _log($"Operations done: {Count}", 1);
+            foreach (var operation in _operationStatistics)
+            {
+                _log($"{operation.Key}: {operation.Value}", 2);
+            }
+            _log("");
 
-            int expectedNodesCount = (_structureNodesCountBefore ?? 0) + _operationStatistics[OperationType.Insert] + _operationStatistics[OperationType.InsertDuplicate] - _operationStatistics[OperationType.Delete];
-            _log($"After nodes count should be: {expectedNodesCount}", 1);
+            _log($"After nodes count should be: {_expectedNodesCount}", 1);
             _log("After nodes count is: " + Structure.NodesCount, 1);
-            _log(expectedNodesCount != Structure.NodesCount 
+            _log(_expectedNodesCount != Structure.NodesCount 
                 ? "!!! Nodes count is not correct !!!"
                 : "Nodes count is correct", 
                 2
@@ -200,6 +200,9 @@ namespace FRI.AUS2.StuctureTester.Utils
                     break;
                 case OperationType.Delete:
                     _makeDelete();
+                    break;
+                case OperationType.DeleteSpecific:
+                    _makeDeleteSpecific();
                     break;
                 case OperationType.Find:
                     _makeFind();
@@ -243,6 +246,8 @@ namespace FRI.AUS2.StuctureTester.Utils
             _structureData.Add(t);
 
             _checkNodesCount(nodesCountBefore + 1);
+
+            ++_expectedNodesCount;
         }
 
         private void _makeDelete()
@@ -265,6 +270,42 @@ namespace FRI.AUS2.StuctureTester.Utils
                 _structureData.Remove(filter);
 
                 _checkNodesCount(nodesCountBefore - 1);
+                --_expectedNodesCount;
+            }
+            catch (InvalidOperationException e)
+            {
+                // key not found
+                _log($"Key not found!!! ({e.Message})", 1, 2);
+            }
+        }
+        
+        private void _makeDeleteSpecific()
+        {
+            var filter = _getRandomKey();
+            if (filter is null)
+            {
+                _log("No key to delete", 1, 2);
+                // structure is empty
+                return;
+            }
+
+            try
+            {
+                _log($"Deleting specific: {filter}", 1, 2);
+
+                // make found item specific to check if it will be found
+                var itemsFromList = _structureData.FindAll(x => KdTree<T>.CompareAllDimensions(x, filter) && x.Equals(filter));
+                var itemsCount = itemsFromList.Count;
+
+                _log($"Found: {itemsCount} items in list", 1, 2);
+
+                var nodesCountBefore = Structure.NodesCount;
+
+                Structure.RemoveSpecific(filter, true);
+                _structureData.RemoveAll(itemsFromList.Contains);
+
+                _checkNodesCount(nodesCountBefore - itemsCount);
+                _expectedNodesCount -= itemsCount;
             }
             catch (InvalidOperationException e)
             {
@@ -371,6 +412,7 @@ namespace FRI.AUS2.StuctureTester.Utils
         Insert,
         InsertDuplicate,
         Delete,
+        DeleteSpecific,
         Find,
         FindSpecific
     }

@@ -309,7 +309,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
         #region Remove
 
         /// <summary>
-        /// finds the nodes with the given filter position by Compare but also by Equals
+        /// removes all nodes with the given filter (by Compare in all dimensions and also Equals)
         /// 
         /// </summary>
         /// <param name="filter"></param>

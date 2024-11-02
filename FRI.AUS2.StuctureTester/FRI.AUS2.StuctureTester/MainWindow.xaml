@@ -241,6 +241,8 @@
                                     <RowDefinition Height="auto" />
                                     <RowDefinition Height="2" />
                                     <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
 
                                 <TextBlock Text="ℹ️Add:" ToolTip="Using values from Generate nodes form (except seed and count)."/>
@@ -253,11 +255,14 @@
                                 <TextBlock Text="Delete:" Grid.Row="4" />
                                 <TextBox x:Name="_txtb_operationsDelete" Text="2" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
 
-                                <TextBlock Text="Find:" Grid.Row="6" />
-                                <TextBox x:Name="_txtb_operationsFind" Text="1" Grid.Column="2" Grid.Row="6" TextAlignment="Right"/>
+                                <TextBlock Text="Delete specific:" Grid.Row="6" />
+                                <TextBox x:Name="_txtb_operationsDeleteSpecific" Text="1" Grid.Column="2" Grid.Row="6" TextAlignment="Right"/>
 
-                                <TextBlock Text="Find specific:" Grid.Row="8" />
-                                <TextBox x:Name="_txtb_operationsFindSpecific" Text="1" Grid.Column="2" Grid.Row="8" TextAlignment="Right"/>
+                                <TextBlock Text="Find:" Grid.Row="8" />
+                                <TextBox x:Name="_txtb_operationsFind" Text="1" Grid.Column="2" Grid.Row="8" TextAlignment="Right"/>
+
+                                <TextBlock Text="Find specific:" Grid.Row="10" />
+                                <TextBox x:Name="_txtb_operationsFindSpecific" Text="1" Grid.Column="2" Grid.Row="10" TextAlignment="Right"/>
                             </Grid>
                         </GroupBox>
 
