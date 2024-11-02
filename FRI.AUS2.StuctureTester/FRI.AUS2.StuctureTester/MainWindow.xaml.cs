@@ -249,34 +249,21 @@ namespace FRI.AUS2.StuctureTester
                 int count = _frm_Generate.Count;
                 int seed = _frm_Generate.Seed;
 
-                int doublePrecision = 
-                    KdExampleData.ModeType == KdExampleData.Mode.KD2 
-                        ? 1 
-                        : 100;
-
                 var random = new Random(seed);
                 int i = 0;
                 while (++i <= count)
                 {
                     _exampleStructure.Insert(new KdExampleData()
                     {
-                        A = random.Next(
-                            _frm_Generate.A.min * doublePrecision,
-                            _frm_Generate.A.max * doublePrecision
-                        ) / (double)doublePrecision,
-                        B = random.Next(
-                            _frm_Generate.B.min,
-                            _frm_Generate.B.max
-                        ).ToString(),
-                        C = random.Next(
-                            _frm_Generate.C.min,
-                            _frm_Generate.C.max
+                        X = random.Next(
+                            _frm_Generate.X.min,
+                            _frm_Generate.X.max
                         ),
-                        D = random.Next(
-                            _frm_Generate.D.min * doublePrecision,
-                            _frm_Generate.D.max * doublePrecision
-                        ) / (double)doublePrecision,
-                        Data = random.Next(-100, 100)
+                        Y = random.Next(
+                            _frm_Generate.Y.min,
+                            _frm_Generate.Y.max
+                        ),
+                        Data = KdExampleData.GetRandomData(random)
                     });
                 }
 
@@ -356,11 +343,6 @@ namespace FRI.AUS2.StuctureTester
 
         private void _btn_testerRunTest_Click(object sender, RoutedEventArgs e)
         {
-            int doublePrecision = 
-                KdExampleData.ModeType == KdExampleData.Mode.KD2 
-                    ? 1 
-                    : 100;
-
             _operationsGenerator = new OperationsGenerator<KdExampleData>(
                 _exampleStructure,
                 int.Parse(_txtb_testerOperationsCount.Text),
@@ -369,31 +351,21 @@ namespace FRI.AUS2.StuctureTester
                     filter is null
                      ? new KdExampleData()
                      {
-                         A = random.Next(
-                            _frm_Generate.A.min * doublePrecision,
-                            _frm_Generate.A.max * doublePrecision
-                        ) / (double)doublePrecision,
-                         B = random.Next(
-                            _frm_Generate.B.min,
-                            _frm_Generate.B.max
-                        ).ToString(),
-                         C = random.Next(
-                            _frm_Generate.C.min,
-                            _frm_Generate.C.max
+                         X = random.Next(
+                            _frm_Generate.X.min,
+                            _frm_Generate.X.max
                         ),
-                         D = random.Next(
-                            _frm_Generate.D.min * doublePrecision,
-                            _frm_Generate.D.max * doublePrecision
-                        ) / (double)doublePrecision,
-                         Data = random.Next(-100, 100)
+                         Y = random.Next(
+                            _frm_Generate.Y.min,
+                            _frm_Generate.Y.max
+                        ),
+                         Data = KdExampleData.GetRandomData(random)
                      }
                      : new KdExampleData()
                      {
-                         A = filter.A,
-                         B = filter.B,
-                         C = filter.C,
-                         D = filter.D,
-                         Data = random.Next(-100, 100)
+                         X = filter.X,
+                         Y = filter.Y,
+                         Data = KdExampleData.GetRandomData(random)
                      }
             );
 
@@ -449,110 +421,69 @@ namespace FRI.AUS2.StuctureTester
         #region KdExampleData
         public class KdExampleData : IKdTreeData
         {
-            public enum Mode 
-            {
-                KD2,
-                KD4
-            }
+            public int X { get; set; }
+            public int Y { get; set; }
 
-            public static Mode ModeType = Mode.KD2;
-
-            public double A { get; set; }
-            public string B { get; set; } = "";
-            public int C { get; set; }
-            public double D { get; set; }
-
-
-            public int Data { get; set; }
+            public string Data { get; set; } = "";	
 
             public int Compare(int level, IKdTreeData other)
             {
                 var otherModel = (KdExampleData)other;
                 var dimension = level % GetDiminesionsCount();
 
-                switch (ModeType)
-                {
-                    case Mode.KD2:
-                        return _compareKD2(dimension, otherModel);
-                    case Mode.KD4:
-                        return _compareKD4(dimension, otherModel);
-                    default:
-                        throw new InvalidOperationException("Invalid mode.");
-                }
-            }
-
-            private int _compareKD2(int dimension, KdExampleData other)
-            {
                 switch (dimension)
                 {
                     case 0:
-                        return A.CompareToWithE(other.A);
+                        return X.CompareTo(otherModel.X);
                     case 1:
-                        return D.CompareToWithE(other.D);
+                        return Y.CompareTo(otherModel.Y);
                     default:
                         throw new InvalidOperationException("Invalid level.");
                 }
             }
-
-            private int _compareKD4(int dimension, KdExampleData other)
-            {
-                switch (dimension)
-                {
-                    case 0:
-                        var aCompare = A.CompareToWithE(other.A);
-
-                        if (aCompare == 0)
-                        {
-                            return B.CompareTo(other.B);
-                        }
-
-                        return aCompare;
-                    case 1:
-                        return C.CompareTo(other.C);
-                    case 2:
-                        return D.CompareToWithE(other.D);
-                    case 3:
-                        var bCompare = B.CompareTo(other.B);
-
-                        if (bCompare == 0)
-                        {
-                            return C.CompareTo(other.C);
-                        }
-
-                        return bCompare;
-                    default:
-                        throw new InvalidOperationException("Invalid level.");
-                }
-            }
-
             public bool Equals(IKdTreeData other)
             {
-                for (int i = 0; i < GetDiminesionsCount(); i++)
-                {
-                    if (Compare(i, other) != 0)
-                    {
-                        return false;
-                    }
-                }
+                var otherModel = (KdExampleData)other;
 
-                return true;
+                // return Data == otherModel.Data;
+                // return X == otherModel.X && Y == otherModel.Y;
+                return X == otherModel.X && Y == otherModel.Y && Data == otherModel.Data;
             }
 
-            public int GetDiminesionsCount() => ModeType switch
+            public bool PositionEquals(IKdTreeData other)
             {
-                Mode.KD2 => 2,
-                Mode.KD4 => 4,
-                _ => throw new InvalidOperationException("Invalid mode.")
-            };
+                var otherModel = (KdExampleData)other;
+
+                return X == otherModel.X && Y == otherModel.Y;
+            }
+            
+
+            public int GetDiminesionsCount() => 2;
 
             public override string ToString()
             {
-                return ModeType switch
+                return $"[{X}; {Y}]: {Data}";
+            }
+
+            /// <summary>
+            /// generate random data string with length 10
+            /// </summary>
+            /// <param name="random"></param>
+            /// <returns></returns>
+            public static string GetRandomData(Random random)
+            {
+                const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                var data = new char[10];
+                for (int i = 0; i < data.Length; i++)
                 {
-                    Mode.KD2 => $"[{A}; {D}] - {Data}",
-                    Mode.KD4 => $"[{A}; '{B}'; {C}; {D}] - {Data}",
-                    _ => throw new InvalidOperationException("Invalid mode.")
-                };
+                    data[i] = chars[random.Next(chars.Length)];
+                }
+                return new string(data);
+            }
+
+            public static int GetRandomPosition(Random random)
+            {
+                return random.Next(0, 50);
             }
         }
         #endregion

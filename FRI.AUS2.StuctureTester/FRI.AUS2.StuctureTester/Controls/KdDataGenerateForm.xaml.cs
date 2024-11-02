@@ -20,46 +20,24 @@ namespace FRI.AUS2.StuctureTester.Controls
     /// </summary>
     public partial class KdDataGenerateForm : UserControl
     {
-        public (int min, int max) A
+        public (int min, int max) X
         {
             get
             {
                 return (
-                    (int) _frm_Min.A,
-                    (int) _frm_Max.A
+                    _frm_Min.X,
+                    _frm_Max.X
                 );
             }
         }
 
-        public (int min, int max) B
+        public (int min, int max) Y
         {
             get
             {
                 return (
-                    int.Parse(_frm_Min.B),
-                    int.Parse(_frm_Max.B)
-                );
-            }
-        }
-
-        public (int min, int max) C
-        {
-            get
-            {
-                return (
-                    _frm_Min.C,
-                    _frm_Max.C
-                );
-            }
-        }
-
-        public (int min, int max) D
-        {
-            get
-            {
-                return (
-                    (int) _frm_Min.D,
-                    (int) _frm_Max.D
+                    _frm_Min.Y,
+                    _frm_Max.Y
                 );
             }
         }
@@ -89,25 +67,15 @@ namespace FRI.AUS2.StuctureTester.Controls
 
         private void _initializeValues()
         {
-            _frm_Min.A = 0;
-            _frm_Max.A = 100;
+            _frm_Min.X = _frm_Min.Y = 0;
+            _frm_Max.X = _frm_Max.Y = 50;
 
-            _frm_Min.B = "0";
-            _frm_Max.B = "100";
-
-            _frm_Min.C = 0;
-            _frm_Max.C = 100;
-
-            _frm_Min.D = 0;
-            _frm_Max.D = 100;
-
-            _txtb_Count.Text = "100";
+            _txtb_Count.Text = "1000";
             _txtb_Seed.Text = "0";
         }
 
         private void _txtb_Generate_Radnom_Int(object sender, MouseButtonEventArgs e)
         {
-            // TODO - toto vytiahnut do nejakeho helpera
             var random = new Random();
             var txtb = (TextBox)sender;
 

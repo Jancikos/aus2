@@ -21,51 +21,27 @@ namespace FRI.AUS2.StuctureTester.Controls
     /// </summary>
     public partial class KdDataForm : UserControl
     {
-        public double A
+        public int X
         {
             get
             {
-                return double.Parse(_txtb_A.Text);
+                return int.Parse(_txtb_X.Text);
             }
             set
             {
-                _txtb_A.Text = value.ToString();
+                _txtb_X.Text = value.ToString();
             }
         }
 
-        public string B 
+        public int Y 
         {
             get
             {
-                return _txtb_B.Text;
+                return int.Parse(_txtb_Y.Text);
             }
             set
             {
-                _txtb_B.Text = value;
-            }
-        }
-
-        public int C
-        {
-            get
-            {
-                return int.Parse(_txtb_C.Text);
-            }
-            set
-            {
-                _txtb_C.Text = value.ToString();
-            }
-        }
-
-        public double D
-        {
-            get
-            {
-                return double.Parse(_txtb_D.Text);
-            }
-            set
-            {
-                _txtb_D.Text = value.ToString();
+                _txtb_Y.Text = value.ToString();
             }
         }
 
@@ -84,15 +60,15 @@ namespace FRI.AUS2.StuctureTester.Controls
             }
         }
 
-        public int Data
+        public string Data
         {
             get
             {
-                return int.Parse(_txtb_Data.Text);
+                return _txtb_Data.Text;
             }
             set
             {
-                _txtb_Data.Text = value.ToString();
+                _txtb_Data.Text = value;
             }
         }
 
@@ -102,11 +78,9 @@ namespace FRI.AUS2.StuctureTester.Controls
             {
                 return new KdExampleData()
                 {
-                    A = A,
-                    B = B,
-                    C = C,
-                    D = D,
-                    Data = IsDataVisibile ? Data : 0
+                    X = X,
+                    Y = Y,
+                    Data = IsDataVisibile ? Data : ""
                 };
             }
         }
@@ -136,17 +110,15 @@ namespace FRI.AUS2.StuctureTester.Controls
             var random = new Random();
             var txtb = (TextBox)sender;
 
-            if (txtb.Text == "")
-            {
-                txtb.Text = random.Next(0, 100).ToString();
-                return;
-            }
+            txtb.Text = KdExampleData.GetRandomPosition(random).ToString();
+        }
 
-            if (int.TryParse(txtb.Text, out int result))
-            {
-                txtb.Text = (result + 1).ToString();
-                return;
-            }
+        private void _txtb_Generate_Radnom_String(object sender, MouseButtonEventArgs e)
+        {
+            var random = new Random();
+            var txtb = (TextBox)sender;
+
+            txtb.Text = KdExampleData.GetRandomData(random).ToString();
         }
     }
     #endregion
