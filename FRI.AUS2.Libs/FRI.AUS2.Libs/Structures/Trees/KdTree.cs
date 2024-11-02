@@ -400,7 +400,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
         }
 
         /// <summary>
-        /// O zavisi od zlosti _findReplacementNode (O(n))
+        /// O (log n)
         /// </summary>
         /// <param name="nodeToRemove"></param>
         private void _removeNode(KdTreeNode<T> nodeToRemove)
@@ -484,8 +484,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
 
             /// <summary>
-            /// O(n) - kde n je pocet nodov v podstrome vrcholu node
-            ///  
+            ///   
             /// finds replacement node for the given node
             /// 
             /// replacement node is the that can be used to replace the given node (when the given node wants to be removed)
@@ -494,8 +493,6 @@ namespace FRI.AUS2.Libs.Structures.Trees
             /// <returns></returns>
             KdTreeNode<T>? _findReplacementNode(KdTreeNode<T>? node)
             {
-                // TODO - pozor na to, ze tu prehladavam bud cely pravy alebo cely lavy podstrom, co sa vraj da zlepsit
-
                 KdTreeNode<T>? replacementNode = null;
 
                 // if node has right child
@@ -508,7 +505,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
                     var nodesWithSameValueAsMinNode = new List<KdTreeNode<T>>();
 
                     // search the whole tree where node.RightChild is root
-                    var it = GetIterator<KdTreeLevelOrderIterator<T>>(node.RightChild);
+                    var it = new KdTreeOnlyNodesWithSmallerDimensionIterator<T>(node.RightChild, node.Dimension);
                     if (it is not null)
                     {
                         while (it.MoveNext())
@@ -566,7 +563,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
                     var maxNode = node.LeftChild;
 
                     // search the whole tree where node.LeftChild is root
-                    var it = GetIterator<KdTreeLevelOrderIterator<T>>(node.LeftChild);
+                    var it = new KdTreeOnlyNodesWithBiggerDimensionIterator<T>(node.LeftChild, node.Dimension);
                     while (it.MoveNext())
                     {
                         if (maxNode is null)
@@ -899,5 +896,75 @@ namespace FRI.AUS2.Libs.Structures.Trees
             }
         }
     }
+
+    public class KdTreeOnlyNodesWithBiggerDimensionIterator<T> : KdTreeOnlyNodesWithThatDimensionIterator<T>
+        where T : class, IKdTreeData
+    {
+        public KdTreeOnlyNodesWithBiggerDimensionIterator(KdTreeNode<T> rootNode, int dimension) : base(rootNode, dimension)
+        {
+        }
+
+        protected override void _enqueueChildrenWithinDimension(KdTreeNode<T> node)
+        {
+            if (node.RightChild is not null)
+            {
+                _nodesToProcess.Enqueue(node.RightChild);
+            }
+        }
+    }
+
+    public class KdTreeOnlyNodesWithSmallerDimensionIterator<T> : KdTreeOnlyNodesWithThatDimensionIterator<T>
+        where T : class, IKdTreeData
+    {
+        public KdTreeOnlyNodesWithSmallerDimensionIterator(KdTreeNode<T> rootNode, int dimension) : base(rootNode, dimension)
+        {
+        }
+
+        protected override void _enqueueChildrenWithinDimension(KdTreeNode<T> node)
+        {
+            if (node.LeftChild is not null)
+            {
+                _nodesToProcess.Enqueue(node.LeftChild);
+            }
+        }
+    }
+
+    public abstract class KdTreeOnlyNodesWithThatDimensionIterator<T> : KdTreeIterator<T>
+        where T : class, IKdTreeData
+    {
+        private int _dimension;
+
+        public KdTreeOnlyNodesWithThatDimensionIterator(KdTreeNode<T> rootNode, int dimension) : base(rootNode)
+        {
+            _dimension = dimension;
+        }
+
+        protected override void _processNode(KdTreeNode<T>? node)
+        {
+            if (node is null)
+            {
+                return;
+            }
+
+            // TODO - pozor na tuto operaciu - stale pocita level s O(log n) zlozitostou
+            if (node.Dimension == _dimension)
+            {
+                _enqueueChildrenWithinDimension(node);
+                return;
+            } 
+            
+            if (node.LeftChild is not null)
+            {
+                _nodesToProcess.Enqueue(node.LeftChild);
+            }
+            if (node.RightChild is not null)
+            {
+                _nodesToProcess.Enqueue(node.RightChild);
+            }
+        }
+
+        protected abstract void _enqueueChildrenWithinDimension(KdTreeNode<T> node);
+    }
+
     #endregion
 }
