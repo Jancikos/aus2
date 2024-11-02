@@ -140,11 +140,34 @@ namespace FRI.AUS2.Libs.Structures.Trees
         /// <summary>
         /// O(log n)
         /// 
-        /// returns data from all nodes thats position (in the tree) is the same as the filter
+        /// returns data from all nodes thats position (Compare in all dimensions) is the same as the filter
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
         public IList<T> Find(T filter)
+        {
+            return _findData(filter);
+        }
+
+        /// <summary>
+        /// O(log n)
+        /// 
+        /// returns data from all nodes thats position (Compare in all dimensions) and Equals is the same as the filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public IList<T> FindSpecific(T filter)
+        {
+            return _findData(filter, true);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="onlyEquals"></param>
+        /// <returns></returns>
+        private IList<T> _findData(T filter, bool onlyEquals = false)
         {
             var data = new List<T>();
 
@@ -153,21 +176,29 @@ namespace FRI.AUS2.Libs.Structures.Trees
                 return data;
             }
 
-            var currentParent = _rootNode;
+            _processNodes(_rootNode, filter, node => data.Add(node.Data), onlyEquals);
+            
+            return data;
+        }
+
+        private void _processNodes(KdTreeNode<T> root, T filter, Action<KdTreeNode<T>> action, bool onlyEquals = false)
+        {
+            var currentParent = root;
             do
             {
                 var node = _findConcretNode(currentParent, filter, out _);
 
                 if (node is not null)
                 {
-                    data.Add(node.Data);
+                    if (!onlyEquals || node.Data.Equals(filter))
+                    {
+                        action(node);
+                    }
                 }
 
                 // search also in left subtree
                 currentParent = node?.LeftChild;
             } while (currentParent is not null);
-
-            return data;
         }
 
         /// <summary>
@@ -183,22 +214,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
         {
             var nodes = new List<KdTreeNode<T>>();
 
-            var currentParent = root;
-            do
-            {
-                var node = _findConcretNode(currentParent, filter, out _);
-
-                if (node is not null)
-                {
-                    if (!onlyEquals || node.Data.Equals(filter))
-                    {
-                        nodes.Add(node);
-                    }
-                }
-
-                // search also in left subtree
-                currentParent = node?.LeftChild;
-            } while (currentParent is not null);
+            _processNodes(root, filter, nodes.Add, onlyEquals);
 
             return nodes;
         }
