@@ -231,14 +231,15 @@ namespace FRI.AUS2.SP1.GUI
         }
 
         #region UI Event Handlers
-        private void _mnitem_Test_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show($"Test", Title, MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
         private void _mnitem_Close_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void _mnitem_Clear_Click(object sender, RoutedEventArgs e)
+        {
+            _backend.ClearData();
+            RerenderTables();
         }
     }
     #endregion

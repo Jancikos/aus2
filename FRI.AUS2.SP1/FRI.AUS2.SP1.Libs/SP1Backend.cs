@@ -9,7 +9,8 @@ namespace FRI.AUS2.SP1.Libs
                                                 .Select(item => item.Item ?? throw new Exception("Property cant be null"));
         public IEnumerable<Parcel> Parcels => _treeParcels
                                                 .Select(item => item.Item ?? throw new Exception("Parcel cant be null"));
-        public IEnumerable<GpsPointItem<GeoItem>> Combined => _treeCombined;
+        public IEnumerable<GpsPointItem<GeoItem>> Combined => _treeCombined
+                                                .Select(item => item);
 
         private KdTree<GpsPointItem<Property>> _treeProperties { get; init; } = new KdTree<GpsPointItem<Property>>();
         private KdTree<GpsPointItem<Parcel>> _treeParcels { get; init; } = new KdTree<GpsPointItem<Parcel>>();
@@ -204,6 +205,13 @@ namespace FRI.AUS2.SP1.Libs
         #endregion
 
         #region Deleting
+
+        public void ClearData()
+        {
+            _treeProperties.Clear();
+            _treeParcels.Clear();
+            _treeCombined.Clear();
+        }
 
         public void DeleteParcel(Parcel parcel)
         {
