@@ -5,30 +5,11 @@ namespace FRI.AUS2.SP1.Libs
 {
     public class SP1Backend
     {
-        // premysliet, ci tam musia ostat tie struktury zoznamov - ak nemaju ziadny zmysel tak ich odstranit 
-        private List<Property> _properties { get; init; } = new List<Property>();
-        private List<Parcel> _parcels { get; init; } = new List<Parcel>();
-
-        public IList<Property> Properties => _properties;
-        public IList<Parcel> Parcels => _parcels;
-
-        // public IEnumerable<GpsPointItem<GeoItem>> Combined 
-        public IList<GpsPointItem<GeoItem>> Combined
-        {
-            // TOTO urctie to prerobit na IEnumerable, len nejako dosiahnut aby sa to refresovalo na GUI
-            get 
-            {
-                var items = new List<GpsPointItem<GeoItem>>();
-                var it = _treeCombined.GetIterator<KdTreeLevelOrderIterator<GpsPointItem<GeoItem>>>();
-                while (it.MoveNext())
-                {
-                    items.Add(it.Current);
-                }
-
-                return items;
-            }
-            // get => _treeCombined;
-        }
+        public IEnumerable<Property> Properties => _treeProperties
+                                                .Select(item => item.Item ?? throw new Exception("Property cant be null"));
+        public IEnumerable<Parcel> Parcels => _treeParcels
+                                                .Select(item => item.Item ?? throw new Exception("Parcel cant be null"));
+        public IEnumerable<GpsPointItem<GeoItem>> Combined => _treeCombined;
 
         private KdTree<GpsPointItem<Property>> _treeProperties { get; init; } = new KdTree<GpsPointItem<Property>>();
         private KdTree<GpsPointItem<Parcel>> _treeParcels { get; init; } = new KdTree<GpsPointItem<Parcel>>();
@@ -88,7 +69,6 @@ namespace FRI.AUS2.SP1.Libs
             }
 
             // add parcel to the structures
-            _parcels.Add(parcel);
             _addToTree(parcel, _treeParcels);
             _addToTree(parcel, _treeCombined);
         }
@@ -124,7 +104,6 @@ namespace FRI.AUS2.SP1.Libs
 
 
             // add property to the structures
-            _properties.Add(property);
             _addToTree(property, _treeProperties);
             _addToTree(property, _treeCombined);
         }
@@ -228,14 +207,6 @@ namespace FRI.AUS2.SP1.Libs
 
         public void DeleteParcel(Parcel parcel)
         {
-            // remove parcel from the list
-            var result = _parcels.Remove(parcel);
-            if (!result)
-            {
-                // not found
-                return;
-            }
-
             // remove references from the properties
             foreach (var property in parcel.Properties)
             {
@@ -255,14 +226,6 @@ namespace FRI.AUS2.SP1.Libs
 
         public void DeleteProperty(Property property)
         {
-            // remove property from the list
-            var result = _properties.Remove(property);
-            if (!result)
-            {
-                // not found
-                return;
-            }
-
             // remove references from the parcels
             foreach (var parcel in property.Parcels)
             {
