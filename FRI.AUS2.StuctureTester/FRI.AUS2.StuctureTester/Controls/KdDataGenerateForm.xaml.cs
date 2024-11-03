@@ -70,7 +70,7 @@ namespace FRI.AUS2.StuctureTester.Controls
             _frm_Min.X = _frm_Min.Y = 0;
             _frm_Max.X = _frm_Max.Y = 50;
 
-            _txtb_Count.Text = "1000";
+            _txtb_Count.Text = "20000";
             _txtb_Seed.Text = "0";
         }
 
