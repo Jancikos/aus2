@@ -73,7 +73,7 @@
                 </GroupBox>
 
                 <!-- find data -->
-                <GroupBox Header="Find data">
+                <GroupBox Header="Find all data">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" MinWidth="80" />
@@ -123,7 +123,7 @@
                 </GroupBox>
 
                 <!-- delete data -->
-                <GroupBox Header="Delete data">
+                <GroupBox Header="Remove all data">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" MinWidth="80" />
