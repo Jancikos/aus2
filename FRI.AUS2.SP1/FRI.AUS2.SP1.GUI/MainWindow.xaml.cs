@@ -13,6 +13,7 @@ using FRI.AUS2.SP1.GUI.Controls;
 using FRI.AUS2.SP1.GUI.Windows;
 using FRI.AUS2.SP1.Libs;
 using FRI.AUS2.SP1.Libs.Models;
+using Microsoft.Win32;
 
 namespace FRI.AUS2.SP1.GUI
 {
@@ -22,6 +23,8 @@ namespace FRI.AUS2.SP1.GUI
     public partial class MainWindow : Window
     {
         private SP1Backend _backend;
+
+        private Uri DefaultExportFolder = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\export");
 
         public MainWindow()
         {
@@ -232,18 +235,36 @@ namespace FRI.AUS2.SP1.GUI
 
         private void _mnitem_Export_Click(object sender, RoutedEventArgs e)
         {
-            var (propertiesCsv, parcelsCsv) = _backend.ExportData();
-
-            var saveFolder = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\export");
-
-            if (!Directory.Exists(saveFolder.LocalPath))
+            if (!Directory.Exists(DefaultExportFolder.LocalPath))
             {
-                Directory.CreateDirectory(saveFolder.LocalPath);
+                Directory.CreateDirectory(DefaultExportFolder.LocalPath);
             }
 
+            var folderDialog = new OpenFolderDialog
+            {
+                Title = "Vyberte priečinok pre export dát",
+                InitialDirectory = DefaultExportFolder.LocalPath
+            };
+
+            if (folderDialog.ShowDialog() != true)
+            {
+                MessageBox.Show($"Export dát zrušený!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var saveFolder = new Uri(folderDialog.FolderName);
             var parcelsPath = saveFolder.LocalPath + @"\parcels.csv";
             var propertiesPath = saveFolder.LocalPath + @"\properties.csv";
 
+            if (File.Exists(parcelsPath) || File.Exists(propertiesPath))
+            {
+                if (MessageBoxResult.No == MessageBox.Show($"Aktuálny export prepíše už existujúci export! Chcete pokračovať?", Title, MessageBoxButton.YesNo, MessageBoxImage.Warning))
+                {
+                    return;
+                } 
+            }
+
+            var (propertiesCsv, parcelsCsv) = _backend.ExportData();
             File.WriteAllText(parcelsPath, Parcel.GetCsvHeader() + Environment.NewLine, Encoding.UTF8);
             File.WriteAllText(propertiesPath, Property.GetCsvHeader() + Environment.NewLine , Encoding.UTF8);
 
@@ -255,20 +276,36 @@ namespace FRI.AUS2.SP1.GUI
 
         private void _mnitem_Import_Click(object sender, RoutedEventArgs e)
         {
-            var openFolder = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\export");
-
-            if (!Directory.Exists(openFolder.LocalPath))
+            var importFolderDialog = new OpenFolderDialog
             {
-                MessageBox.Show($"Žiadne exportované dáta naimportovať!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                Title = "Vyberte priečinok s exportovanými dátami",
+                InitialDirectory = DefaultExportFolder.LocalPath
+            };
+
+            if (importFolderDialog.ShowDialog() != true)
+            {
+                MessageBox.Show($"Import dát zrušený!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
-            var parcelsPath = openFolder.LocalPath + @"\parcels.csv";
-            var propertiesPath = openFolder.LocalPath + @"\properties.csv";
-
-            if (!File.Exists(parcelsPath) || !File.Exists(propertiesPath))
+            var importFolder = new Uri(importFolderDialog.FolderName);
+            if (!Directory.Exists(importFolder.LocalPath))
             {
-                MessageBox.Show($"Žiadne dáta na naimportovanie!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Import priečinok neexistuje!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var parcelsPath = importFolder.LocalPath + @"\parcels.csv";
+            var propertiesPath = importFolder.LocalPath + @"\properties.csv";
+
+            if (!File.Exists(parcelsPath))
+            {
+                MessageBox.Show($"Súbor {parcelsPath} neexistuje!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            if (!File.Exists(propertiesPath))
+            {
+                MessageBox.Show($"Súbor {propertiesPath} neexistuje!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
