@@ -18,26 +18,6 @@ namespace FRI.AUS2.SP1.Libs
 
         public SP1Backend()
         {
-            _initializeProperties();
-            _initializeParcels();
-        }
-
-        private void _initializeProperties()
-        {
-            AddProperty(1, "H1", new GpsPoint(1, 2), new GpsPoint(2, 2));
-            AddProperty(2, "H2", new GpsPoint(1, 1), new GpsPoint(-1, -1));
-            AddProperty(3, "H3", new GpsPoint(1, -2), new GpsPoint(0, 0));
-            AddProperty(4, "H4", new GpsPoint(3, 3), new GpsPoint(1, 5));
-            AddProperty(5, "H5", new GpsPoint(-1, 1), new GpsPoint(1, 1));
-        }
-
-
-        private void _initializeParcels()
-        {
-            AddParcel(1, "P1", new GpsPoint(1, 1), new GpsPoint(2, 2));
-            AddParcel(2, "P2", new GpsPoint(1, -1), new GpsPoint(4, 4));
-            AddParcel(3, "P3", new GpsPoint(1, 2), new GpsPoint(2, 2));
-            AddParcel(4, "P4", new GpsPoint(1, 5), new GpsPoint(1, 1));
         }
 
         #region Adding
@@ -203,36 +183,32 @@ namespace FRI.AUS2.SP1.Libs
         #endregion
 
         #region Finding
-        public IList<Parcel> FindParcels(GpsPoint point)
+        public IEnumerable<Parcel> FindParcels(GpsPoint point)
         {
             return _findItems(point, _treeParcels);
         }
 
-        public IList<Property> FindProperties(GpsPoint point)
+        public IEnumerable<Property> FindProperties(GpsPoint point)
         {
             return _findItems(point, _treeProperties);
         }
 
-        public IList<GpsPointItem<GeoItem>> FindCombined(GpsPoint pointA, GpsPoint pointB)
+        public IEnumerable<GpsPointItem<GeoItem>> FindCombined(GpsPoint pointA, GpsPoint pointB)
         {
             var itemsByA = _treeCombined
-                            .Find(new GpsPointItem<GeoItem>(pointA, default));
+                            .Find(new GpsPointItem<GeoItem>(pointA, null));
             var itemsByB = _treeCombined
-                            .Find(new GpsPointItem<GeoItem>(pointB, default));
+                            .Find(new GpsPointItem<GeoItem>(pointB, null));
 
             return itemsByA
-                    .Concat(itemsByB)
-                    .ToList();
+                    .Concat(itemsByB);
         }
 
-        private IList<T> _findItems<T>(GpsPoint point, KdTree<GpsPointItem<T>> tree) where T : GeoItem
+        private IEnumerable<T> _findItems<T>(GpsPoint point, KdTree<GpsPointItem<T>> tree) where T : GeoItem
         {
-            var data = tree.Find(new GpsPointItem<T>(point, default))
-                            .Where(item => item.Item is not null)
-                            .Select(item => item.Item);
-
-            // can use ! because the data is not null
-            return data!.ToList<T>();
+           return tree
+                    .Find(new GpsPointItem<T>(point, null))
+                    .Select(item => item.Item!);
         }
         #endregion
 
