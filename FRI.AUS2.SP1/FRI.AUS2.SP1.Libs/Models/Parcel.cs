@@ -31,11 +31,11 @@
 
         public static string GetCsvHeader()
         {
-            return "Id;PositionA_X;PositionA_Y;PositionB_X;PositionB_Y;Number;Description;Properties";
+            return "PositionA_X;PositionA_Y;PositionB_X;PositionB_Y;Number;Description";
         }
         public string ToCsv()
         {
-            return $"{Id};{PositionA?.ToCsv() ?? ";"};{PositionB?.ToCsv() ?? ";"};{Number};{Description};{string.Join(",", _properties.Select(p => p.Id))}";
+            return $"{PositionA?.ToCsv() ?? ";"};{PositionB?.ToCsv() ?? ";"};{Number};{Description}";
         }
     }
 }

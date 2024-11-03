@@ -357,10 +357,10 @@ namespace FRI.AUS2.SP1.Libs
             {
                 var parcelData = parcel.Split(';');
                 AddParcel(
-                    int.Parse(parcelData[5]),
-                    parcelData[6],
-                    new GpsPoint(double.Parse(parcelData[1]), double.Parse(parcelData[2])),
-                    new GpsPoint(double.Parse(parcelData[3]), double.Parse(parcelData[4]))
+                    int.Parse(parcelData[4]),
+                    parcelData[5],
+                    new GpsPoint(double.Parse(parcelData[0]), double.Parse(parcelData[1])),
+                    new GpsPoint(double.Parse(parcelData[2]), double.Parse(parcelData[3]))
                 );
             }
 
@@ -368,10 +368,10 @@ namespace FRI.AUS2.SP1.Libs
             {
                 var propertyData = property.Split(';');
                 AddProperty(
-                    int.Parse(propertyData[6]),
-                    propertyData[5],
-                    new GpsPoint(double.Parse(propertyData[1]), double.Parse(propertyData[2])),
-                    new GpsPoint(double.Parse(propertyData[3]), double.Parse(propertyData[4]))
+                    int.Parse(propertyData[5]),
+                    propertyData[4],
+                    new GpsPoint(double.Parse(propertyData[0]), double.Parse(propertyData[1])),
+                    new GpsPoint(double.Parse(propertyData[2]), double.Parse(propertyData[3]))
                 );
             }
         }
