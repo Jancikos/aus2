@@ -119,7 +119,7 @@ namespace FRI.AUS2.SP1.Libs
             (int min, int max) posY = (-10, 10);
 
             // generate parcels
-            var actualParcelsCount = _treeParcels.NodesCount; // sice to je 2x pocet, ale aspon bude cislo jedinecne
+            var actualParcelsCount = _treeParcels.NodesCount;
             for (int i = 0; i < parcelsCount; i++)
             {
                 AddParcel(
@@ -131,7 +131,7 @@ namespace FRI.AUS2.SP1.Libs
             }
 
             // generate properties
-            var actualPropertiesCount = _treeProperties.NodesCount; // sice to je 2x pocet, ale aspon bude cislo jedinecne
+            var actualPropertiesCount = _treeProperties.NodesCount;
             for (int i = 0; i < propertiesCount; i++)
             {
                 AddProperty(

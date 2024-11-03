@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Reflection.Metadata.Ecma335;
 using FRI.AUS2.Libs.Structures.Trees.Interfaces;
 
 namespace FRI.AUS2.Libs.Structures.Trees
@@ -499,7 +498,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
                         {
                             foreach (var nodeWithSameValue in nodesWithSameValueAsMinNode)
                             {
-                                // kontrola, ci uz nie je v zasobniku
+                                // check if the node is not already in the queue
                                 if (!nodesToRemove.Contains(nodeWithSameValue))
                                 {
                                     nodesToRemove.Enqueue(nodeWithSameValue);
@@ -911,6 +910,8 @@ namespace FRI.AUS2.Libs.Structures.Trees
         /// paralel queue with _nodesToProcess, where the level of the node is stored
         /// 
         /// sensitive to tree changes during the iteration
+        /// 
+        /// if the level will not be store here, the level of the node will be calculated in each iteration, which will increase the complexity pretty much
         /// </summary>
         protected Queue<int> _levels;
 

@@ -465,8 +465,6 @@ namespace FRI.AUS2.StuctureTester
             {
                 var otherModel = (KdExampleData)other;
 
-                // return Data == otherModel.Data;
-                // return X == otherModel.X && Y == otherModel.Y;
                 return X == otherModel.X && Y == otherModel.Y && Data == otherModel.Data;
             }
 
