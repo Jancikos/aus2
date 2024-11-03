@@ -143,10 +143,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public IList<T> Find(T filter)
-        {
-            return _findData(filter);
-        }
+        public IList<T> Find(T filter) => _findData(filter);
 
         /// <summary>
         /// O(log n)
@@ -155,10 +152,7 @@ namespace FRI.AUS2.Libs.Structures.Trees
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public IList<T> FindSpecific(T filter)
-        {
-            return _findData(filter, true);
-        }
+        public IList<T> FindSpecific(T filter) => _findData(filter, true);
 
         /// <summary>
         /// 
