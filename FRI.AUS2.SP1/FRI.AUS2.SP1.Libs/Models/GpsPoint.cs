@@ -36,5 +36,10 @@ namespace FRI.AUS2.SP1.Libs.Models
             // return $"{Latitude}, {Longitude}";
             return $"{X}, {Y}";
         }
+
+        public string ToCsv()
+        {
+            return $"{X};{Y}";
+        }
     }
 }

@@ -330,5 +330,51 @@ namespace FRI.AUS2.SP1.Libs
         }
 
         #endregion
+
+        #region Export
+        public (string[] properties, string[] parcels) ExportData()
+        {
+            var properties = _treeProperties
+                            .DistinctBy(item => item.Item?.Id)
+                            .Select(item => item.Item?.ToCsv() ?? throw new Exception("Property cant be null"))
+                            .ToArray();
+
+            var parcels = _treeParcels
+                            .DistinctBy(item => item.Item?.Id)
+                            .Select(item => item.Item?.ToCsv() ?? throw new Exception("Parcel cant be null"))
+                            .ToArray();
+
+            return (properties, parcels);
+        }
+        #endregion
+
+        #region Import
+        public void ImportData(string[] properties, string[] parcels)
+        {
+            ClearData();
+
+            foreach (var property in properties)
+            {
+                var propertyData = property.Split(';');
+                AddProperty(
+                    int.Parse(propertyData[5]),
+                    propertyData[6],
+                    new GpsPoint(double.Parse(propertyData[1]), double.Parse(propertyData[2])),
+                    new GpsPoint(double.Parse(propertyData[3]), double.Parse(propertyData[4]))
+                );
+            }
+
+            foreach (var parcel in parcels)
+            {
+                var parcelData = parcel.Split(';');
+                AddParcel(
+                    int.Parse(parcelData[6]),
+                    parcelData[5],
+                    new GpsPoint(double.Parse(parcelData[1]), double.Parse(parcelData[2])),
+                    new GpsPoint(double.Parse(parcelData[3]), double.Parse(parcelData[4]))
+                );
+            }
+        }
+        #endregion
     }
 }

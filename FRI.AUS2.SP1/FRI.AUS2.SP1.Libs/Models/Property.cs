@@ -28,5 +28,14 @@
         {
             return $"{Data} [{base.ToString()}]";
         }
+
+        public static string GetCsvHeader()
+        {
+            return "Id;PositionA_X;PositionA_Y;PositionB_X;PositionB_Y;Description;StreetNumber;Parcels";
+        }
+        public string ToCsv()
+        {
+            return $"{Id};{PositionA?.ToCsv() ?? ";"};{PositionB?.ToCsv() ?? ";"};{Description};{StreetNumber};{string.Join(",", _parcels.Select(p => p.Id))}";
+        }
     }
 }

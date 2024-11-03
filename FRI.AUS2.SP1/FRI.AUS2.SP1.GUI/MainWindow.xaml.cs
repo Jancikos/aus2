@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -225,6 +226,58 @@ namespace FRI.AUS2.SP1.GUI
             _backend.GenerateData(form.ParcelsCount, form.PropertiesCount, form.PropertiesOverlap, form.Seed);
 
             MessageBox.Show("Data vygenerované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+
+            RerenderTables();
+        }
+
+        private void _mnitem_Export_Click(object sender, RoutedEventArgs e)
+        {
+            var (propertiesCsv, parcelsCsv) = _backend.ExportData();
+
+            var saveFolder = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\export");
+
+            if (!Directory.Exists(saveFolder.LocalPath))
+            {
+                Directory.CreateDirectory(saveFolder.LocalPath);
+            }
+
+            var parcelsPath = saveFolder.LocalPath + @"\parcels.csv";
+            var propertiesPath = saveFolder.LocalPath + @"\properties.csv";
+
+            File.WriteAllText(parcelsPath, Parcel.GetCsvHeader() + Environment.NewLine, Encoding.UTF8);
+            File.WriteAllText(propertiesPath, Property.GetCsvHeader() + Environment.NewLine , Encoding.UTF8);
+
+            File.AppendAllLines(parcelsPath, parcelsCsv, Encoding.UTF8);
+            File.AppendAllLines(propertiesPath, propertiesCsv, Encoding.UTF8);
+
+            MessageBox.Show($"Data exportované do {saveFolder.LocalPath}", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void _mnitem_Import_Click(object sender, RoutedEventArgs e)
+        {
+            var openFolder = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\export");
+
+            if (!Directory.Exists(openFolder.LocalPath))
+            {
+                MessageBox.Show($"Žiadne exportované dáta naimportovať!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var parcelsPath = openFolder.LocalPath + @"\parcels.csv";
+            var propertiesPath = openFolder.LocalPath + @"\properties.csv";
+
+            if (!File.Exists(parcelsPath) || !File.Exists(propertiesPath))
+            {
+                MessageBox.Show($"Žiadne dáta na naimportovanie!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var parcelsCsv = File.ReadAllLines(parcelsPath, Encoding.UTF8).Skip(1).ToArray();
+            var propertiesCsv = File.ReadAllLines(propertiesPath, Encoding.UTF8).Skip(1).ToArray();
+
+            _backend.ImportData(propertiesCsv, parcelsCsv);
+
+            MessageBox.Show($"Data importované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
 
             RerenderTables();
         }
