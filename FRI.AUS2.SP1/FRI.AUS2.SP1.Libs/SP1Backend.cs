@@ -149,7 +149,7 @@ namespace FRI.AUS2.SP1.Libs
 
         private GpsPoint _getGpsPointFromExistingParcel(Random random, int parcelsCount)
         {
-            var parcelIndex = random.Next(0, parcelsCount);
+            var parcelIndex = random.Next(0, parcelsCount * 2 -1);
 
             var parcel = _treeParcels
                             .ElementAt(parcelIndex)
