@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FRI.AUS2.StuctureTester", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FRI.AUS2.Libs", "..\FRI.AUS2.Libs\FRI.AUS2.Libs\FRI.AUS2.Libs.csproj", "{AFE7B07D-E6ED-473B-B2A6-B5DCA4BA2998}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FRI.AUS2.StructureTester.HeapFileTester", "FRI.AUS2.StructureTester.HeapFile\FRI.AUS2.StructureTester.HeapFileTester.csproj", "{3935EF75-F6C6-4EC7-89AA-EF8A5262D41F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{AFE7B07D-E6ED-473B-B2A6-B5DCA4BA2998}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFE7B07D-E6ED-473B-B2A6-B5DCA4BA2998}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFE7B07D-E6ED-473B-B2A6-B5DCA4BA2998}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3935EF75-F6C6-4EC7-89AA-EF8A5262D41F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3935EF75-F6C6-4EC7-89AA-EF8A5262D41F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3935EF75-F6C6-4EC7-89AA-EF8A5262D41F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3935EF75-F6C6-4EC7-89AA-EF8A5262D41F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
