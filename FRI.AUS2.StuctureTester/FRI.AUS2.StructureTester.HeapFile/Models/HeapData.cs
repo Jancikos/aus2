@@ -40,7 +40,12 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
         }
 
         public int Id;
-        public int Size => sizeof(int) + _firstnameMax + _lastnameMax;
+
+        /// <summary>
+        /// Id (int) + Firstname (int length + _firstnameMax bytes) + Lastname (int length + _lastnameMax bytes)
+        /// </summary>
+        /// <returns></returns>
+        public int Size => sizeof(int) + sizeof(int) + _firstnameMax + sizeof(int) + _lastnameMax;
 
 
         public byte[] ToBytes()
@@ -48,15 +53,19 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
             byte[] buffer = new byte[Size];
             int offset = 0;
 
-            // Convert Id to bytes (4 bytes)
+            // Id (4 bytes)
             BitConverter.GetBytes(Id).CopyTo(buffer, offset);
             offset += sizeof(int);
 
-            // Convert Firstname to bytes (15 bytes, padded if necessary)
+            // Firstname (4 bytes (length) + 15 bytes)
+            BitConverter.GetBytes(Firstname.Length).CopyTo(buffer, offset);
+            offset += sizeof(int);
             Encoding.ASCII.GetBytes(Firstname.PadRight(_firstnameMax)).CopyTo(buffer, offset);
             offset += _firstnameMax;
 
-            // Convert Lastname to bytes (20 bytes, padded if necessary)
+            // Lastname (4 bytes (length) + 20 bytes)
+            BitConverter.GetBytes(Lastname.Length).CopyTo(buffer, offset);
+            offset += sizeof(int);
             Encoding.ASCII.GetBytes(Lastname.PadRight(_lastnameMax)).CopyTo(buffer, offset);
 
             return buffer;
@@ -66,16 +75,20 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
         {
             int offset = 0;
 
-            // Convert Id from bytes (4 bytes)
+            // Id (4 bytes)
             Id = BitConverter.ToInt32(bytes, offset);
             offset += sizeof(int);
 
-            // Convert Firstname from bytes (15 bytes)
-            Firstname = Encoding.ASCII.GetString(bytes, offset, _firstnameMax).Trim();
+            // Firstname (4 bytes actual length + 15 bytes)
+            int firstnameLength = BitConverter.ToInt32(bytes, offset);
+            offset += sizeof(int);
+            Firstname = Encoding.ASCII.GetString(bytes, offset, _firstnameMax)[..firstnameLength];
             offset += _firstnameMax;
 
-            // Convert Lastname from bytes (20 bytes)
-            Lastname = Encoding.ASCII.GetString(bytes, offset, _lastnameMax).Trim();
+            // Lastname (4 bytes actual length + 20 bytes)
+            int lastnameLength = BitConverter.ToInt32(bytes, offset);
+            offset += sizeof(int);
+            Lastname = Encoding.ASCII.GetString(bytes, offset, _lastnameMax)[..lastnameLength];
         }
     }
 }
