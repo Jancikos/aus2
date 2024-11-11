@@ -47,7 +47,7 @@ namespace FRI.AUS2.StuctureTester
             _initTreeNodes();
 
             _updateStatistics();
-            IsViewerActivated = true;
+            IsViewerActivated = false;
         }
 
         private void _initTreeNodes()
@@ -249,30 +249,21 @@ namespace FRI.AUS2.StuctureTester
                 int count = _frm_Generate.Count;
                 int seed = _frm_Generate.Seed;
 
-                const int doublePrecision = 100;
-
                 var random = new Random(seed);
                 int i = 0;
                 while (++i <= count)
                 {
                     _exampleStructure.Insert(new KdExampleData()
                     {
-                        A = random.Next(
-                            _frm_Generate.A.min * doublePrecision,
-                            _frm_Generate.A.max * doublePrecision
-                        ) / (double)doublePrecision,
-                        B = random.Next(
-                            _frm_Generate.B.min,
-                            _frm_Generate.B.max
-                        ).ToString(),
-                        C = random.Next(
-                            _frm_Generate.C.min,
-                            _frm_Generate.C.max
+                        X = random.Next(
+                            _frm_Generate.X.min,
+                            _frm_Generate.X.max
                         ),
-                        D = random.Next(
-                            _frm_Generate.D.min * doublePrecision,
-                            _frm_Generate.D.max * doublePrecision
-                        ) / (double)doublePrecision
+                        Y = random.Next(
+                            _frm_Generate.Y.min,
+                            _frm_Generate.Y.max
+                        ),
+                        Data = KdExampleData.GetRandomData(random)
                     });
                 }
 
@@ -326,7 +317,7 @@ namespace FRI.AUS2.StuctureTester
         {
             try
             {
-                var data = _frm_InOrder.IsKdDataModelValid 
+                var data = _frm_InOrder.IsKdDataModelValid
                     ? _frm_InOrder.KdDataModel
                     : _exampleStructure.RootNode?.Data ?? throw new InvalidOperationException("No data in tree.");
 
@@ -352,8 +343,6 @@ namespace FRI.AUS2.StuctureTester
 
         private void _btn_testerRunTest_Click(object sender, RoutedEventArgs e)
         {
-            const int doublePrecision = 100;
-
             _operationsGenerator = new OperationsGenerator<KdExampleData>(
                 _exampleStructure,
                 int.Parse(_txtb_testerOperationsCount.Text),
@@ -362,31 +351,21 @@ namespace FRI.AUS2.StuctureTester
                     filter is null
                      ? new KdExampleData()
                      {
-                         A = random.Next(
-                            _frm_Generate.A.min * doublePrecision,
-                            _frm_Generate.A.max * doublePrecision
-                        ) / (double)doublePrecision,
-                         B = random.Next(
-                            _frm_Generate.B.min,
-                            _frm_Generate.B.max
-                        ).ToString(),
-                         C = random.Next(
-                            _frm_Generate.C.min,
-                            _frm_Generate.C.max
+                         X = random.Next(
+                            _frm_Generate.X.min,
+                            _frm_Generate.X.max
                         ),
-                         D = random.Next(
-                            _frm_Generate.D.min * doublePrecision,
-                            _frm_Generate.D.max * doublePrecision
-                        ) / (double)doublePrecision,
-                         Data = random.Next(-100, 100)
+                         Y = random.Next(
+                            _frm_Generate.Y.min,
+                            _frm_Generate.Y.max
+                        ),
+                         Data = KdExampleData.GetRandomData(random)
                      }
                      : new KdExampleData()
                      {
-                         A = filter.A,
-                         B = filter.B,
-                         C = filter.C,
-                         D = filter.D,
-                         Data = random.Next(-100, 100)
+                         X = filter.X,
+                         Y = filter.Y,
+                         Data = KdExampleData.GetRandomData(random)
                      }
             );
 
@@ -394,7 +373,9 @@ namespace FRI.AUS2.StuctureTester
             int.Parse(_txtb_operationsAdd.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Insert));
             int.Parse(_txtb_operationsAddDuplicate.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.InsertDuplicate));
             int.Parse(_txtb_operationsDelete.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Delete));
+            int.Parse(_txtb_operationsDeleteSpecific.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.DeleteSpecific));
             int.Parse(_txtb_operationsFind.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Find));
+            int.Parse(_txtb_operationsFindSpecific.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.FindSpecific));
 
             // init log settings
             _operationsGenerator.LogsVerbosity = int.Parse(_txtb_operationsLogVerbosity.Text);
@@ -437,73 +418,92 @@ namespace FRI.AUS2.StuctureTester
             txtb.Text = (int.Parse(txtb.Text) + 1).ToString();
         }
 
+        private void _btn_ManualFindSpecific_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var data = _frm_FindSpecific.KdDataModel;
+
+                var found = _exampleStructure.FindSpecific(data);
+
+                _txt_FindSpecificResult.Text = found.Count == 0
+                    ? "Data not found!"
+                    : $"Data: [{string.Join(", ", found.Select(d => d.Data))}]";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         #endregion
 
         #region KdExampleData
         public class KdExampleData : IKdTreeData
         {
-            public double A { get; set; }
-            public string B { get; set; } = "";
-            public int C { get; set; }
-            public double D { get; set; }
+            public int X { get; set; }
+            public int Y { get; set; }
 
-
-            public int Data { get; set; }
+            public string Data { get; set; } = "";
 
             public int Compare(int level, IKdTreeData other)
             {
                 var otherModel = (KdExampleData)other;
+                var dimension = level % GetDiminesionsCount();
 
-                switch (level % GetDiminesionsCount())
+                switch (dimension)
                 {
                     case 0:
-                        var aCompare = A.CompareToWithE(otherModel.A);
-
-                        if (aCompare == 0)
-                        {
-                            return B.CompareTo(otherModel.B);
-                        }
-
-                        return aCompare;
+                        return X.CompareTo(otherModel.X);
                     case 1:
-                        return C.CompareTo(otherModel.C);
-                    case 2:
-                        return D.CompareToWithE(otherModel.D);
-                    case 3:
-                        var bCompare = B.CompareTo(otherModel.B);
-
-                        if (bCompare == 0)
-                        {
-                            return C.CompareTo(otherModel.C);
-                        }
-
-                        return bCompare;
+                        return Y.CompareTo(otherModel.Y);
                     default:
                         throw new InvalidOperationException("Invalid level.");
                 }
             }
-
             public bool Equals(IKdTreeData other)
             {
-                for (int i = 0; i < GetDiminesionsCount(); i++)
-                {
-                    if (Compare(i, other) != 0)
-                    {
-                        return false;
-                    }
-                }
+                var otherModel = (KdExampleData)other;
 
-                return true;
+                return X == otherModel.X && Y == otherModel.Y && Data == otherModel.Data;
             }
 
-            public int GetDiminesionsCount() => 4;
+            public bool PositionEquals(IKdTreeData other)
+            {
+                var otherModel = (KdExampleData)other;
+
+                return X == otherModel.X && Y == otherModel.Y;
+            }
+
+
+            public int GetDiminesionsCount() => 2;
 
             public override string ToString()
             {
-                return $"[{A}, '{B}', {C}, {D}] - {Data}";
+                return $"[{X}; {Y}]: {Data}";
+            }
+
+            /// <summary>
+            /// generate random data string with length 10
+            /// </summary>
+            /// <param name="random"></param>
+            /// <returns></returns>
+            public static string GetRandomData(Random random)
+            {
+                const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                var data = new char[10];
+                for (int i = 0; i < data.Length; i++)
+                {
+                    data[i] = chars[random.Next(chars.Length)];
+                }
+                return new string(data);
+            }
+
+            public static int GetRandomPosition(Random random)
+            {
+                return random.Next(0, 50);
             }
         }
         #endregion
-
     }
 }

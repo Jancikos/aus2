@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:FRI.AUS2.StuctureTester"
     xmlns:uc="clr-namespace:FRI.AUS2.StuctureTester.Controls"
     mc:Ignorable="d"
-    Title="AUS2 Structure tester" Height="450" Width="800">
+    Title="AUS2 Structure tester" Height="550" Width="900">
 
     <Window.Resources>
         <ResourceDictionary Source="Resources/Dictionary.xaml" />
@@ -73,7 +73,7 @@
                 </GroupBox>
 
                 <!-- find data -->
-                <GroupBox Header="Find data">
+                <GroupBox Header="Find all data">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" MinWidth="80" />
@@ -83,7 +83,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="2" />
-                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
 
@@ -96,9 +96,9 @@
                             Click="_btn_ManualFind_Click" VerticalAlignment="Center" />
                     </Grid>
                 </GroupBox>
-
-                <!-- delete node -->
-                <GroupBox Header="Delete node">
+                
+                <!-- find specific data -->
+                <GroupBox Header="Find specific data">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" MinWidth="80" />
@@ -108,7 +108,32 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="2" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+
+                        <!--node form-->
+                        <uc:KdDataForm x:Name="_frm_FindSpecific" />
+
+                        <TextBlock x:Name="_txt_FindSpecificResult" Text="" Grid.Row="2" Grid.ColumnSpan="3" />
+
+                        <Button x:Name="_btn_FindSpecific" Content="Find" Grid.Column="2" Margin="0"
+                            Click="_btn_ManualFindSpecific_Click" VerticalAlignment="Center" />
+                    </Grid>
+                </GroupBox>
+
+                <!-- delete data -->
+                <GroupBox Header="Remove all data">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="80" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
+                            <RowDefinition Height="2" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
 
@@ -214,20 +239,30 @@
                                     <RowDefinition Height="auto" />
                                     <RowDefinition Height="2" />
                                     <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
 
                                 <TextBlock Text="ℹ️Add:" ToolTip="Using values from Generate nodes form (except seed and count)."/>
-                                <TextBox x:Name="_txtb_operationsAdd" Text="4" Grid.Column="2" TextAlignment="Right"/>
+                                <TextBox x:Name="_txtb_operationsAdd" Text="1" Grid.Column="2" TextAlignment="Right"/>
 
                                 
                                 <TextBlock Text="Add dup.:" Grid.Row="2"/>
                                 <TextBox x:Name="_txtb_operationsAddDuplicate" Text="1" Grid.Row="2" Grid.Column="2" TextAlignment="Right"/>
 
                                 <TextBlock Text="Delete:" Grid.Row="4" />
-                                <TextBox x:Name="_txtb_operationsDelete" Text="2" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
+                                <TextBox x:Name="_txtb_operationsDelete" Text="1" Grid.Column="2" Grid.Row="4" TextAlignment="Right"/>
 
-                                <TextBlock Text="Find:" Grid.Row="6" />
-                                <TextBox x:Name="_txtb_operationsFind" Text="1" Grid.Column="2" Grid.Row="6" TextAlignment="Right"/>
+                                <TextBlock Text="Delete specific:" Grid.Row="6" />
+                                <TextBox x:Name="_txtb_operationsDeleteSpecific" Text="1" Grid.Column="2" Grid.Row="6" TextAlignment="Right"/>
+
+                                <TextBlock Text="Find:" Grid.Row="8" />
+                                <TextBox x:Name="_txtb_operationsFind" Text="1" Grid.Column="2" Grid.Row="8" TextAlignment="Right"/>
+
+                                <TextBlock Text="Find specific:" Grid.Row="10" />
+                                <TextBox x:Name="_txtb_operationsFindSpecific" Text="1" Grid.Column="2" Grid.Row="10" TextAlignment="Right"/>
                             </Grid>
                         </GroupBox>
 

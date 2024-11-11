@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -12,6 +13,7 @@ using FRI.AUS2.SP1.GUI.Controls;
 using FRI.AUS2.SP1.GUI.Windows;
 using FRI.AUS2.SP1.Libs;
 using FRI.AUS2.SP1.Libs.Models;
+using Microsoft.Win32;
 
 namespace FRI.AUS2.SP1.GUI
 {
@@ -21,6 +23,8 @@ namespace FRI.AUS2.SP1.GUI
     public partial class MainWindow : Window
     {
         private SP1Backend _backend;
+
+        private Uri DefaultExportFolder = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\export");
 
         public MainWindow()
         {
@@ -35,7 +39,7 @@ namespace FRI.AUS2.SP1.GUI
 
         private void _initializePropertiesManagment()
         {
-            _initializeGeoItemsManagmentActions(_mng_Properties, _backend.AddProperty, _backend.GenerateProperties, (item) => _backend.DeleteProperty((Property)item));
+            _initializeGeoItemsManagmentActions(_mng_Properties, _backend.AddProperty, (item) => _backend.DeleteProperty((Property)item));
 
             _mng_Properties.EditAction = (item) =>
             {
@@ -89,7 +93,7 @@ namespace FRI.AUS2.SP1.GUI
 
         private void _initializeParcelsManagment()
         {
-            _initializeGeoItemsManagmentActions(_mng_Parcels, _backend.AddParcel, _backend.GenerateParcels, (item) => _backend.DeleteParcel((Parcel)item));
+            _initializeGeoItemsManagmentActions(_mng_Parcels, _backend.AddParcel, (item) => _backend.DeleteParcel((Parcel)item));
 
             _mng_Parcels.EditAction = (item) =>
             {
@@ -157,7 +161,7 @@ namespace FRI.AUS2.SP1.GUI
             _mng_CombinedItems.AddTableColumn("Data", "Item.Data");
         }
         
-        private void _initializeGeoItemsManagmentActions(GeoItemsManagement mngItems, Action<int, string, GpsPoint, GpsPoint> addItemAction, Action<int, int, string, (int, int), (int, int), (int, int), (int, int), (int, int)> generateItemsAction, Action<object> deleteItemAction)
+        private void _initializeGeoItemsManagmentActions(GeoItemsManagement mngItems, Action<int, string, GpsPoint, GpsPoint> addItemAction, Action<object> deleteItemAction)
         {
             mngItems.InsertAction = () =>
             {
@@ -182,37 +186,6 @@ namespace FRI.AUS2.SP1.GUI
                 RerenderTables();
             };
 
-            mngItems.GenerateAction = () =>
-            {
-                var form = new GeoItemGenerationFormWindow();
-
-                form.ShowDialog();
-
-                if (form.DialogResult == false)
-                {
-                    return;
-                }
-
-                generateItemsAction(
-                    form.Count,
-                    form.Seed,
-                    form.DescriptionPrefix,
-                    form.StreetNumber,
-                    form.PosA_X,
-                    form.PosA_Y,
-                    form.PosB_X,
-                    form.PosB_Y
-                );
-
-                MessageBox.Show($"{mngItems.Title} vygenerované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
-
-                // ask for rerender
-                if (MessageBox.Show("Chcete prekresliť vygenerované tabuľky?", Title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                {
-                    RerenderTables();
-                }
-            };
-
             mngItems.DeleteAction = (item) =>
             {
                 deleteItemAction(item);
@@ -231,14 +204,119 @@ namespace FRI.AUS2.SP1.GUI
         }
 
         #region UI Event Handlers
-        private void _mnitem_Test_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show($"Test", Title, MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
         private void _mnitem_Close_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void _mnitem_Clear_Click(object sender, RoutedEventArgs e)
+        {
+            _backend.ClearData();
+            RerenderTables();
+        }
+
+        private void _mnitem_Generate_Click(object sender, RoutedEventArgs e)
+        {
+            var form = new GeoItemsGenerationFormWindow();
+
+            form.ShowDialog();
+
+            if (form.DialogResult == false)
+            {
+                return;
+            }
+
+            _backend.GenerateData(form.ParcelsCount, form.PropertiesCount, form.PropertiesOverlap, form.Seed, form.DoublePrecision);
+
+            MessageBox.Show("Data vygenerované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+
+            RerenderTables();
+        }
+
+        private void _mnitem_Export_Click(object sender, RoutedEventArgs e)
+        {
+            if (!Directory.Exists(DefaultExportFolder.LocalPath))
+            {
+                Directory.CreateDirectory(DefaultExportFolder.LocalPath);
+            }
+
+            var folderDialog = new OpenFolderDialog
+            {
+                Title = "Vyberte priečinok pre export dát",
+                InitialDirectory = DefaultExportFolder.LocalPath
+            };
+
+            if (folderDialog.ShowDialog() != true)
+            {
+                MessageBox.Show($"Export dát zrušený!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var saveFolder = new Uri(folderDialog.FolderName);
+            var parcelsPath = saveFolder.LocalPath + @"\parcels.csv";
+            var propertiesPath = saveFolder.LocalPath + @"\properties.csv";
+
+            if (File.Exists(parcelsPath) || File.Exists(propertiesPath))
+            {
+                if (MessageBoxResult.No == MessageBox.Show($"Aktuálny export prepíše už existujúci export! Chcete pokračovať?", Title, MessageBoxButton.YesNo, MessageBoxImage.Warning))
+                {
+                    return;
+                } 
+            }
+
+            var (propertiesCsv, parcelsCsv) = _backend.ExportData();
+            File.WriteAllText(parcelsPath, Parcel.GetCsvHeader() + Environment.NewLine, Encoding.UTF8);
+            File.WriteAllText(propertiesPath, Property.GetCsvHeader() + Environment.NewLine , Encoding.UTF8);
+
+            File.AppendAllLines(parcelsPath, parcelsCsv, Encoding.UTF8);
+            File.AppendAllLines(propertiesPath, propertiesCsv, Encoding.UTF8);
+
+            MessageBox.Show($"Data exportované do {saveFolder.LocalPath}", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void _mnitem_Import_Click(object sender, RoutedEventArgs e)
+        {
+            var importFolderDialog = new OpenFolderDialog
+            {
+                Title = "Vyberte priečinok s exportovanými dátami",
+                InitialDirectory = DefaultExportFolder.LocalPath
+            };
+
+            if (importFolderDialog.ShowDialog() != true)
+            {
+                MessageBox.Show($"Import dát zrušený!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var importFolder = new Uri(importFolderDialog.FolderName);
+            if (!Directory.Exists(importFolder.LocalPath))
+            {
+                MessageBox.Show($"Import priečinok neexistuje!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var parcelsPath = importFolder.LocalPath + @"\parcels.csv";
+            var propertiesPath = importFolder.LocalPath + @"\properties.csv";
+
+            if (!File.Exists(parcelsPath))
+            {
+                MessageBox.Show($"Súbor {parcelsPath} neexistuje!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            if (!File.Exists(propertiesPath))
+            {
+                MessageBox.Show($"Súbor {propertiesPath} neexistuje!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var parcelsCsv = File.ReadAllLines(parcelsPath, Encoding.UTF8).Skip(1).ToArray();
+            var propertiesCsv = File.ReadAllLines(propertiesPath, Encoding.UTF8).Skip(1).ToArray();
+
+            _backend.ImportData(propertiesCsv, parcelsCsv);
+
+            MessageBox.Show($"Data importované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+
+            RerenderTables();
         }
     }
     #endregion

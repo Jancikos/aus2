@@ -13,7 +13,7 @@
     <Compile Update="Windows\GeoItemFormWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Windows\GeoItemGenerationFormWindow.xaml.cs">
+    <Compile Update="Windows\GeoItemsGenerationFormWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
@@ -27,7 +27,7 @@
     <Page Update="Windows\GeoItemFormWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Windows\GeoItemGenerationFormWindow.xaml">
+    <Page Update="Windows\GeoItemsGenerationFormWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

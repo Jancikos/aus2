@@ -46,8 +46,10 @@ namespace FRI.AUS2.StuctureTester.Utils
         Func<Random, T?, T> _craeteRandomT;
 
         private List<T> _structureData;
+        private List<T> _structureDataWithFindProblems;
         private string? _structureDataStaticticsBefore;
         private int? _structureNodesCountBefore;
+        private int _expectedNodesCount;
         private Dictionary<OperationType, int> _operationStatistics = new Dictionary<OperationType, int>();
 
         public OperationsGenerator(KdTree<T> structure, int count, int seed, Func<Random, T?, T> craeteRandomT)
@@ -58,6 +60,7 @@ namespace FRI.AUS2.StuctureTester.Utils
             _random = new Random(seed);
             _randomOperations = new List<OperationType>();
             _structureData = new List<T>();
+            _structureDataWithFindProblems = new List<T>();
             _craeteRandomT = craeteRandomT;
         }
 
@@ -82,7 +85,9 @@ namespace FRI.AUS2.StuctureTester.Utils
 
             for (int i = 0; i < Count; i++)
             {
-                OperationType operation = _randomOperations[_random.Next(0, randomOperationsCount)];
+                OperationType operation = _structureData.Count == 0 
+                    ? OperationType.Insert
+                    : _randomOperations[_random.Next(0, randomOperationsCount)];
 
                 _beforeOperation(i, operation);
                 _makeOperation(operation);
@@ -97,19 +102,10 @@ namespace FRI.AUS2.StuctureTester.Utils
             // Get all data from the structure (to be able key all keys)
             _structureData = new List<T>();
 
-            if (Structure?.RootNode?.Data is not null)
-            {
-                var it = Structure.GetIterator<KdTreeLevelOrderIterator<T>>(Structure.RootNode.Data);
-                if (it is not null)
-                {
-                    while (it.MoveNext())
-                    {
-                        _structureData.Add(it.Current);
-                    }
-                    _structureDataStaticticsBefore = _getStructureStatictics();
-                    _structureNodesCountBefore = Structure.NodesCount;
-                }
-            }
+            // Save structure data before operations
+            _structureData.AddRange(Structure);
+            _structureDataStaticticsBefore = _getStructureStatictics();
+            _structureNodesCountBefore = _expectedNodesCount = Structure.NodesCount;
 
             // Initialize operation statistics
             _operationStatistics = new Dictionary<OperationType, int>
@@ -117,8 +113,11 @@ namespace FRI.AUS2.StuctureTester.Utils
                 { OperationType.Insert, 0 },
                 { OperationType.InsertDuplicate, 0 },
                 { OperationType.Delete, 0 },
-                { OperationType.Find, 0 }
+                { OperationType.DeleteSpecific, 0 },
+                { OperationType.Find, 0 },
+                { OperationType.FindSpecific, 0 }
             };
+            _structureDataWithFindProblems = new List<T>();
 
             // Create logs directory if not exists
             if (!System.IO.Directory.Exists(LogsPath.LocalPath))
@@ -147,12 +146,6 @@ namespace FRI.AUS2.StuctureTester.Utils
         {
             _log("");
             _log("Operations generation finished");
-            _log("");
-            _log("Operation statistics:");
-            foreach (var operation in _operationStatistics)
-            {
-                _log($"{operation.Key}: {operation.Value}", 1);
-            }
 
             _log("Structure statistics:");
             _log("Before:", 1);
@@ -163,11 +156,31 @@ namespace FRI.AUS2.StuctureTester.Utils
 
             _log("Structure test:");
             _log("Before nodes count: " + (_structureNodesCountBefore ?? 0), 1);
-            _log($"Operations done: (+{_operationStatistics[OperationType.Insert] + _operationStatistics[OperationType.InsertDuplicate] }, -{_operationStatistics[OperationType.Delete]})", 1);
-            
-            int expectedNodesCount = (_structureNodesCountBefore ?? 0) + _operationStatistics[OperationType.Insert]  + _operationStatistics[OperationType.InsertDuplicate] - _operationStatistics[OperationType.Delete];
-            _log($"After nodes count should be: {expectedNodesCount}", 1);
+            _log($"Operations done: {Count}", 1);
+            foreach (var operation in _operationStatistics)
+            {
+                _log($"{operation.Key}: {operation.Value}", 2);
+            }
+            _log("");
+
+            _log($"After nodes count should be: {_expectedNodesCount}", 1);
             _log("After nodes count is: " + Structure.NodesCount, 1);
+            _log(_expectedNodesCount != Structure.NodesCount 
+                ? "!!! Nodes count is not correct !!!"
+                : "Nodes count is correct", 
+                2
+            );
+
+            if (_structureDataWithFindProblems.Count > 0)
+            {
+                _log("!!! Find problems !!!", 1);
+                _log($"Found {_structureDataWithFindProblems.Count} problems", 2);
+                _log(string.Join(", ", _structureDataWithFindProblems.Select(x => x.ToString())), 2);
+            }
+            else
+            {
+                _log("No find problems detected", 1);
+            }
         }
 
         private void _beforeOperation(int index, OperationType operation)
@@ -188,8 +201,14 @@ namespace FRI.AUS2.StuctureTester.Utils
                 case OperationType.Delete:
                     _makeDelete();
                     break;
+                case OperationType.DeleteSpecific:
+                    _makeDelete(true);
+                    break;
                 case OperationType.Find:
                     _makeFind();
+                    break;
+                case OperationType.FindSpecific:
+                    _makeFind(true);
                     break;
                 default:
                     throw new NotImplementedException($"{operation} is not implemented");
@@ -218,15 +237,20 @@ namespace FRI.AUS2.StuctureTester.Utils
         /// <param name="filter">ak je zadany, tak urcuje kluc prvku, ktory bude vlozeny</param>
         private void _makeInsert(T? filter = null)
         {
+            var nodesCountBefore = Structure.NodesCount;
             var t = _craeteRandomT(_random, filter);
 
             _log($"Inserting: {t}" + (filter is not null ? " (DUPLICATE)" : ""), 1, 2);
 
+            ++_expectedNodesCount;
             Structure.Insert(t);
             _structureData.Add(t);
+
+            _checkNodesCount(nodesCountBefore + 1);
+
         }
 
-        private void _makeDelete()
+        private void _makeDelete(bool specific = false)
         {
             var filter = _getRandomKey();
             if (filter is null)
@@ -238,10 +262,22 @@ namespace FRI.AUS2.StuctureTester.Utils
 
             try
             {
-                _log($"Deleting: {filter}", 1, 2);
+                _log($"Deleting {(specific ? "specific" : "all")}: {filter}", 1, 2);
 
-                Structure.RemoveException(filter);
-                _structureData.Remove(filter);
+                var nodesCountBefore = Structure.NodesCount;
+                var itemsFromList = _structureData.FindAll(x => KdTree<T>.CompareAllDimensions(x, filter) && (specific ? x.Equals(filter) : true));
+                _log($"Found: {itemsFromList.Count} items in list", 1, 2);
+
+                _expectedNodesCount -= itemsFromList.Count;
+
+                Action<T, bool> removeAction = specific
+                    ? Structure.RemoveSpecific
+                    : Structure.Remove;
+                removeAction(filter, true);
+
+                _structureData.RemoveAll(itemsFromList.Contains);
+
+                _checkNodesCount(nodesCountBefore - itemsFromList.Count);
             }
             catch (InvalidOperationException e)
             {
@@ -250,7 +286,7 @@ namespace FRI.AUS2.StuctureTester.Utils
             }
         }
 
-        private void _makeFind()
+        private void _makeFind(bool specific = false)
         {
             var filter = _getRandomKey();
             if (filter is null)
@@ -259,8 +295,21 @@ namespace FRI.AUS2.StuctureTester.Utils
                 return;
             }
 
-            _log($"Finding: {filter}", 1, 2);
-            var result = Structure.Find(filter);
+            _log($"Finding {(specific ? "specific" : "")}: {filter}", 1, 2);
+
+            // check if all found items are the same as in the list
+            var itemsFromList = _structureData.FindAll(
+                x => KdTree<T>.CompareAllDimensions(x, filter) 
+                    && (specific 
+                        ? x.Equals(filter) 
+                        : true)
+            );
+            _log($"Found: {itemsFromList.Count} items in list", 1, 2);
+            _log(string.Join(", ", itemsFromList.Select(x => x.ToString())), 2, 2);
+
+            var result = specific 
+                ? Structure.FindSpecific(filter) 
+                : Structure.Find(filter);
             if (result.Count == 0)
             {
                 // key not found
@@ -268,8 +317,28 @@ namespace FRI.AUS2.StuctureTester.Utils
                 return;
             }
 
-            _log($"Found: {result.Count} items", 1, 2);
+            _log($"Found: {result.Count} items in tree", 1, 2);
             _log(string.Join(", ", result.Select(x => x.ToString())), 2, 2);
+
+
+            if (itemsFromList.Count != result.Count)
+            {
+                _log("Items count in tree and list is not the same !!!", 1, 2);
+                _structureDataWithFindProblems.Add(filter);
+            }
+
+            if (specific)
+            {
+                result.ToList().ForEach(x =>
+                {
+                    if (!x.Equals(filter))
+                    {
+                        _log("Found item is not the same as searched item !!!", 1, 2);
+                        _structureDataWithFindProblems.Add(filter);
+                    }
+                });
+            }
+
         }
 
         private T? _getRandomKey()
@@ -282,15 +351,25 @@ namespace FRI.AUS2.StuctureTester.Utils
             return _structureData[_random.Next(0, _structureData.Count)];
         }
 
+        private void _checkNodesCount(int expectedNodesCount)
+        {
+            if (expectedNodesCount != Structure.NodesCount)
+            {
+                _log($"!!! Nodes count is not correct !!!", 1, 2);
+                _log($"Expected: {expectedNodesCount}, Actual: {Structure.NodesCount}", 2, 2);
+            }
+        }
+
         private void _log(string message, int indentLevel = 0, int verbosityLevel = 0)
         {
             var logMessage = $"{new string(' ', indentLevel * 2)}{message}" + Environment.NewLine;
 
             // premysliet ci to neurobit efektivnejsie (vzhladom na to, ze sa bude casto otvarat a zatvarat subor)
-            if (verbosityLevel >= LogsVerbosity || verbosityLevel == 0) {
+            if (verbosityLevel >= LogsVerbosity || verbosityLevel == 0)
+            {
                 System.IO.File.AppendAllText(LogsFileUri.LocalPath, logMessage);
             }
-            
+
             Debug.WriteLine(logMessage);
         }
 
@@ -305,6 +384,8 @@ namespace FRI.AUS2.StuctureTester.Utils
         Insert,
         InsertDuplicate,
         Delete,
-        Find
+        DeleteSpecific,
+        Find,
+        FindSpecific
     }
 }

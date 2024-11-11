@@ -5,30 +5,12 @@ namespace FRI.AUS2.SP1.Libs
 {
     public class SP1Backend
     {
-        // premysliet, ci tam musia ostat tie struktury zoznamov - ak nemaju ziadny zmysel tak ich odstranit 
-        private List<Property> _properties { get; init; } = new List<Property>();
-        private List<Parcel> _parcels { get; init; } = new List<Parcel>();
-
-        public IList<Property> Properties => _properties;
-        public IList<Parcel> Parcels => _parcels;
-
-        // public IEnumerable<GpsPointItem<GeoItem>> Combined 
-        public IList<GpsPointItem<GeoItem>> Combined
-        {
-            // TOTO urctie to prerobit na IEnumerable, len nejako dosiahnut aby sa to refresovalo na GUI
-            get 
-            {
-                var items = new List<GpsPointItem<GeoItem>>();
-                var it = _treeCombined.GetIterator<KdTreeLevelOrderIterator<GpsPointItem<GeoItem>>>();
-                while (it.MoveNext())
-                {
-                    items.Add(it.Current);
-                }
-
-                return items;
-            }
-            // get => _treeCombined;
-        }
+        public IEnumerable<Property> Properties => _treeProperties
+                                                .Select(item => item.Item ?? throw new Exception("Property cant be null"));
+        public IEnumerable<Parcel> Parcels => _treeParcels
+                                                .Select(item => item.Item ?? throw new Exception("Parcel cant be null"));
+        public IEnumerable<GpsPointItem<GeoItem>> Combined => _treeCombined
+                                                .Select(item => item);
 
         private KdTree<GpsPointItem<Property>> _treeProperties { get; init; } = new KdTree<GpsPointItem<Property>>();
         private KdTree<GpsPointItem<Parcel>> _treeParcels { get; init; } = new KdTree<GpsPointItem<Parcel>>();
@@ -36,26 +18,6 @@ namespace FRI.AUS2.SP1.Libs
 
         public SP1Backend()
         {
-            _initializeProperties();
-            _initializeParcels();
-        }
-
-        private void _initializeProperties()
-        {
-            AddProperty(1, "H1", new GpsPoint(1, 2), new GpsPoint(2, 2));
-            AddProperty(2, "H2", new GpsPoint(1, 1), new GpsPoint(-1, -1));
-            AddProperty(3, "H3", new GpsPoint(1, -2), new GpsPoint(0, 0));
-            AddProperty(4, "H4", new GpsPoint(3, 3), new GpsPoint(1, 5));
-            AddProperty(5, "H5", new GpsPoint(-1, 1), new GpsPoint(1, 1));
-        }
-
-
-        private void _initializeParcels()
-        {
-            AddParcel(1, "P1", new GpsPoint(1, 1), new GpsPoint(2, 2));
-            AddParcel(2, "P2", new GpsPoint(1, -1), new GpsPoint(4, 4));
-            AddParcel(3, "P3", new GpsPoint(1, 2), new GpsPoint(2, 2));
-            AddParcel(4, "P4", new GpsPoint(1, 5), new GpsPoint(1, 1));
         }
 
         #region Adding
@@ -88,7 +50,6 @@ namespace FRI.AUS2.SP1.Libs
             }
 
             // add parcel to the structures
-            _parcels.Add(parcel);
             _addToTree(parcel, _treeParcels);
             _addToTree(parcel, _treeCombined);
         }
@@ -124,7 +85,6 @@ namespace FRI.AUS2.SP1.Libs
 
 
             // add property to the structures
-            _properties.Add(property);
             _addToTree(property, _treeProperties);
             _addToTree(property, _treeCombined);
         }
@@ -151,35 +111,67 @@ namespace FRI.AUS2.SP1.Libs
         #endregion
 
         #region Generating
-        public void GenerateParcels(int count, int seed, string descriptionPrefix, (int min, int max) streetNumber, (int min, int max) posA_X, (int min, int max) posA_Y, (int min, int max) posB_X, (int min, int max) posB_Y)
-        {
-            _generateGeoItems(count, seed, descriptionPrefix, streetNumber, posA_X, posA_Y, posB_X, posB_Y, AddParcel);
-        }
 
-        public void GenerateProperties(int count, int seed, string descriptionPrefix, (int min, int max) streetNumber, (int min, int max) posA_X, (int min, int max) posA_Y, (int min, int max) posB_X, (int min, int max) posB_Y)
+        public void GenerateData(int parcelsCount, int propertiesCount, double propertiesOverlap, int seed, int doublePrecision = 2)
         {
-            _generateGeoItems(count, seed, descriptionPrefix, streetNumber, posA_X, posA_Y, posB_X, posB_Y, AddProperty);
-        }
+            var random = new Random(seed);
+            (int min, int max) posX = (-10, 10);
+            (int min, int max) posY = (-10, 10);
 
-        private void _generateGeoItems(int count, int seed, string descriptionPrefix, (int min, int max) streetNumber, (int min, int max) posA_X, (int min, int max) posA_Y, (int min, int max) posB_X, (int min, int max) posB_Y, Action<int, string, GpsPoint, GpsPoint> addAction)
-        {
-            Random random = new Random(seed);
-
-            for (int i = 0; i < count; i++)
+            // generate parcels
+            var actualParcelsCount = _treeParcels.NodesCount;
+            for (int i = 0; i < parcelsCount; i++)
             {
-                addAction(
-                    random.Next(streetNumber.min, streetNumber.max),
-                    $"{descriptionPrefix} {i + 1}",
-                    new GpsPoint(
-                        _getRandomDouble(random, posA_X),
-                        _getRandomDouble(random, posA_Y)
-                    ),
-                    new GpsPoint(
-                        _getRandomDouble(random, posB_X),
-                        _getRandomDouble(random, posB_Y)
-                    )
+                AddParcel(
+                    actualParcelsCount + i + 1,
+                    Parcel.ParcelTypes[random.Next(0, Parcel.ParcelTypes.Length)],
+                    _getRandomGpsPoint(random, posX, posY, doublePrecision),
+                    _getRandomGpsPoint(random, posX, posY, doublePrecision)
                 );
             }
+
+            // generate properties
+            var actualPropertiesCount = _treeProperties.NodesCount;
+            for (int i = 0; i < propertiesCount; i++)
+            {
+                AddProperty(
+                    actualPropertiesCount + i + 1,
+                    Property.Cities[random.Next(0, Property.Cities.Length)],
+                    random.NextDouble() < propertiesOverlap
+                        ? _getGpsPointFromExistingParcel(random, parcelsCount)
+                        : _getRandomGpsPoint(random, posX, posY, doublePrecision),
+                    random.NextDouble() < propertiesOverlap
+                        ? _getGpsPointFromExistingParcel(random, parcelsCount)
+                        : _getRandomGpsPoint(random, posX, posY, doublePrecision)
+                );
+            }
+        }
+
+        private GpsPoint _getGpsPointFromExistingParcel(Random random, int parcelsCount)
+        {
+            var parcelIndex = random.Next(0, parcelsCount * 2 -1);
+
+            var parcel = _treeParcels
+                            .ElementAt(parcelIndex)
+                            .Item;
+
+            if (parcel is null)
+            {
+                throw new Exception($"Parcel at index {parcelIndex} cant be found");
+            }
+
+            return random.NextDouble() < 0.5
+                ? parcel.PositionA ?? throw new Exception("Parcel must have PositionA")
+                : parcel.PositionB ?? throw new Exception("Parcel must have PositionB")
+            ;
+        }
+
+        private GpsPoint _getRandomGpsPoint(Random random, (int min, int max) posX, (int min, int max) posY, int precision = 2)
+        {
+            return new GpsPoint(
+                _getRandomDouble(random, posX, precision),
+                _getRandomDouble(random, posY, precision)
+            );
         }
 
         private double _getRandomDouble(Random random, (int min, int max) range, int precision = 2)
@@ -191,51 +183,46 @@ namespace FRI.AUS2.SP1.Libs
         #endregion
 
         #region Finding
-        public IList<Parcel> FindParcels(GpsPoint point)
+        public IEnumerable<Parcel> FindParcels(GpsPoint point)
         {
             return _findItems(point, _treeParcels);
         }
 
-        public IList<Property> FindProperties(GpsPoint point)
+        public IEnumerable<Property> FindProperties(GpsPoint point)
         {
             return _findItems(point, _treeProperties);
         }
 
-        public IList<GpsPointItem<GeoItem>> FindCombined(GpsPoint pointA, GpsPoint pointB)
+        public IEnumerable<GpsPointItem<GeoItem>> FindCombined(GpsPoint pointA, GpsPoint pointB)
         {
             var itemsByA = _treeCombined
-                            .Find(new GpsPointItem<GeoItem>(pointA, default));
+                            .Find(new GpsPointItem<GeoItem>(pointA, null));
             var itemsByB = _treeCombined
-                            .Find(new GpsPointItem<GeoItem>(pointB, default));
+                            .Find(new GpsPointItem<GeoItem>(pointB, null));
 
             return itemsByA
-                    .Concat(itemsByB)
-                    .ToList();
+                    .Concat(itemsByB);
         }
 
-        private IList<T> _findItems<T>(GpsPoint point, KdTree<GpsPointItem<T>> tree) where T : GeoItem
+        private IEnumerable<T> _findItems<T>(GpsPoint point, KdTree<GpsPointItem<T>> tree) where T : GeoItem
         {
-            var data = tree.Find(new GpsPointItem<T>(point, default))
-                            .Where(item => item.Item is not null)
-                            .Select(item => item.Item);
-
-            // can use ! because the data is not null
-            return data!.ToList<T>();
+           return tree
+                    .Find(new GpsPointItem<T>(point, null))
+                    .Select(item => item.Item!);
         }
         #endregion
 
         #region Deleting
 
+        public void ClearData()
+        {
+            _treeProperties.Clear();
+            _treeParcels.Clear();
+            _treeCombined.Clear();
+        }
+
         public void DeleteParcel(Parcel parcel)
         {
-            // remove parcel from the list
-            var result = _parcels.Remove(parcel);
-            if (!result)
-            {
-                // not found
-                return;
-            }
-
             // remove references from the properties
             foreach (var property in parcel.Properties)
             {
@@ -244,25 +231,11 @@ namespace FRI.AUS2.SP1.Libs
 
             // remove from trees
             _removeFromTree(parcel, _treeParcels);
-            _removeFromTree(parcel, _treeCombined); // TODO - chyba pri odstranovani prvkov, ktore maju zhodne suradnice ako iny prvok 
-
-            /// NOTES
-            // remove parcel from the tree
-            // // find and DELETE ALL parcels by the PosA/B
-            // // // from that parcels remove the right parcel (by Parcel reference)
-            // // // // insert the rest of the parcels back to the tree
+            _removeFromTree(parcel, _treeCombined);
         }
 
         public void DeleteProperty(Property property)
         {
-            // remove property from the list
-            var result = _properties.Remove(property);
-            if (!result)
-            {
-                // not found
-                return;
-            }
-
             // remove references from the parcels
             foreach (var parcel in property.Parcels)
             {
@@ -271,7 +244,7 @@ namespace FRI.AUS2.SP1.Libs
 
             // remove from trees
             _removeFromTree(property, _treeProperties);
-            _removeFromTree(property, _treeCombined); // TODO - chyba pri odstranovani prvkov, ktore maju zhodne suradnice ako iny prvok 
+            _removeFromTree(property, _treeCombined);
         }
 
 
@@ -356,6 +329,52 @@ namespace FRI.AUS2.SP1.Libs
             AddProperty(updated.StreetNumber, updated.Description, updated.PositionA, updated.PositionB);
         }
 
+        #endregion
+
+        #region Export
+        public (string[] properties, string[] parcels) ExportData()
+        {
+            var properties = _treeProperties
+                            .DistinctBy(item => item.Item?.Id)
+                            .Select(item => item.Item?.ToCsv() ?? throw new Exception("Property cant be null"))
+                            .ToArray();
+
+            var parcels = _treeParcels
+                            .DistinctBy(item => item.Item?.Id)
+                            .Select(item => item.Item?.ToCsv() ?? throw new Exception("Parcel cant be null"))
+                            .ToArray();
+
+            return (properties, parcels);
+        }
+        #endregion
+
+        #region Import
+        public void ImportData(string[] properties, string[] parcels)
+        {
+            ClearData();
+
+            foreach (var parcel in parcels)
+            {
+                var parcelData = parcel.Split(';');
+                AddParcel(
+                    int.Parse(parcelData[4]),
+                    parcelData[5],
+                    new GpsPoint(double.Parse(parcelData[0]), double.Parse(parcelData[1])),
+                    new GpsPoint(double.Parse(parcelData[2]), double.Parse(parcelData[3]))
+                );
+            }
+
+            foreach (var property in properties)
+            {
+                var propertyData = property.Split(';');
+                AddProperty(
+                    int.Parse(propertyData[5]),
+                    propertyData[4],
+                    new GpsPoint(double.Parse(propertyData[0]), double.Parse(propertyData[1])),
+                    new GpsPoint(double.Parse(propertyData[2]), double.Parse(propertyData[3]))
+                );
+            }
+        }
         #endregion
     }
 }

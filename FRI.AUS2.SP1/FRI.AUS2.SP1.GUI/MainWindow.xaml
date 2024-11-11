@@ -24,11 +24,16 @@
 
         <StackPanel>
             <Menu>
-                <MenuItem Header="File">
-                    <MenuItem x:Name="_mnitem_Test" Header="Test" Click="_mnitem_Test_Click" />
+                <MenuItem Header="Data">
+                    <MenuItem x:Name="_mnitem_Clear" Header="Vyčistiť" Click="_mnitem_Clear_Click" />
+                    <Separator />
+                    <MenuItem x:Name="_mnitem_Generate" Header="Generovať" Click="_mnitem_Generate_Click" />
+                    <Separator />
+                    <MenuItem x:Name="_mnitem_Export" Header="Exportovať" Click="_mnitem_Export_Click" /> 
+                    <MenuItem x:Name="_mnitem_Import" Header="Importovať" Click="_mnitem_Import_Click" />
                 </MenuItem>
 
-                <MenuItem x:Name="_mnitem_Close" Header="Close" Click="_mnitem_Close_Click" />
+                <MenuItem x:Name="_mnitem_Close" Header="Zatvoriť" Click="_mnitem_Close_Click" />
             </Menu>
         </StackPanel>
 
