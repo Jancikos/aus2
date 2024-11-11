@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FRI.AUS2.Libs.Helpers;
 using FRI.AUS2.Libs.Structures.Files;
 
 namespace FRI.AUS2.StructureTester.HeapFileTester.Models
@@ -41,12 +42,18 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
 
         public int Id;
 
+        private const int _itemsMax = 5;
+        private List<NesteHeapDataItem> _items = new List<NesteHeapDataItem>(_itemsMax);
+        public List<NesteHeapDataItem> Items
+        {
+            get => _items;
+        }
+
         /// <summary>
-        /// Id (int) + Firstname (int length + _firstnameMax bytes) + Lastname (int length + _lastnameMax bytes)
+        /// Id (int) + Firstname (int length + _firstnameMax bytes) + Lastname (int length + _lastnameMax bytes) + Items (int actualLength + _itemsMax * NesteHeapDataItemSize)
         /// </summary>
         /// <returns></returns>
-        public int Size => sizeof(int) + sizeof(int) + _firstnameMax + sizeof(int) + _lastnameMax;
-
+        public static int Size => sizeof(int) + sizeof(int) + _firstnameMax + sizeof(int) + _lastnameMax + sizeof(int) + _itemsMax * NesteHeapDataItem.Size;
 
         public byte[] ToBytes()
         {
@@ -67,6 +74,23 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
             BitConverter.GetBytes(Lastname.Length).CopyTo(buffer, offset);
             offset += sizeof(int);
             Encoding.ASCII.GetBytes(Lastname.PadRight(_lastnameMax)).CopyTo(buffer, offset);
+            offset += _lastnameMax;
+
+            // Items (4 bytes actual length + 5 * NesteHeapDataItemSize)
+            int actualItemsLength = Items.Count;
+            BitConverter.GetBytes(actualItemsLength).CopyTo(buffer, offset);
+            offset += sizeof(int);
+
+            for (int i = 0; i < _itemsMax; i++)
+            {
+                if (i < actualItemsLength)
+                {
+                    var item = Items[i];
+                    item.ToBytes().CopyTo(buffer, offset);
+                }
+
+                offset += NesteHeapDataItem.Size;
+            }
 
             return buffer;
         }
@@ -89,6 +113,91 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
             int lastnameLength = BitConverter.ToInt32(bytes, offset);
             offset += sizeof(int);
             Lastname = Encoding.ASCII.GetString(bytes, offset, _lastnameMax)[..lastnameLength];
+            offset += _lastnameMax;
+
+            // Items (4 bytes actual length + 5 * NesteHeapDataItemSize)
+            int actualItemsLength = BitConverter.ToInt32(bytes, offset);
+            offset += sizeof(int);
+
+            Items.Clear();
+            for (int i = 0; i < _itemsMax; i++)
+            {
+                if (i < actualItemsLength)
+                {
+                    var item = new NesteHeapDataItem();
+                    item.FromBytes(bytes[offset..(offset + NesteHeapDataItem.Size)]);
+                    Items.Add(item);
+                }
+
+                offset += NesteHeapDataItem.Size;
+            }
+        }
+    }
+
+    public class NesteHeapDataItem : IBinaryData
+    {
+        public DateOnly Date { get; set; }
+        public double Price { get; set; }
+
+        private const int _descriptionMax = 20;
+        private string _description = "";
+
+        public string Description
+        {
+            get => _description;
+            set
+            {
+                if (value.Length > _descriptionMax)
+                {
+                    throw new ArgumentException($"Description is max {_descriptionMax} characters long");
+                }
+                _description = value;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static int Size => sizeof(int) + sizeof(double) + sizeof(int) + _descriptionMax;
+
+        public byte[] ToBytes()
+        {
+            byte[] buffer = new byte[Size];
+            int offset = 0;
+
+            // Date (4 bytes)
+            Date.ToBytes().CopyTo(buffer, offset);
+            offset += Date.Size();
+
+            // Price (8 bytes)
+            BitConverter.GetBytes(Price).CopyTo(buffer, offset);
+            offset += sizeof(double);
+
+            // Description (4 bytes (length) + 20 bytes)
+            BitConverter.GetBytes(Description.Length).CopyTo(buffer, offset);
+            offset += sizeof(int);
+            Encoding.ASCII.GetBytes(Description.PadRight(_descriptionMax)).CopyTo(buffer, offset);
+
+            return buffer;
+        }
+
+        public void FromBytes(byte[] bytes)
+        {
+            int offset = 0;
+
+            // Date (4 bytes)
+            Date = DateOnlyExtension.FromBytes(bytes);
+            offset += Date.Size();
+
+            // Price (8 bytes)
+            Price = BitConverter.ToDouble(bytes, offset);
+            offset += sizeof(double);
+
+            // Description (4 bytes actual length + 20 bytes)
+            int descriptionLength = BitConverter.ToInt32(bytes, offset);
+            offset += sizeof(int);
+            Description = Encoding.ASCII.GetString(bytes, offset, _descriptionMax)[..descriptionLength];
         }
     }
 }

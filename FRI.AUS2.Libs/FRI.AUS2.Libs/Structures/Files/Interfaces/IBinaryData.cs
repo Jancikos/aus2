@@ -8,7 +8,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 {
     public interface IBinaryData
     {
-        int Size { get; }
+        public static abstract int Size { get; }
         byte[] ToBytes();
         void FromBytes(byte[] bytes);
     }
