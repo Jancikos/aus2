@@ -21,10 +21,6 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
     /// </summary>
     public partial class HeapDataForm : UserControl
     {
-        public HeapDataForm()
-        {
-            InitializeComponent();
-        }
         public int Id
         {
             get { return int.Parse(_txtb_Id.Text); }
@@ -43,11 +39,11 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
             set { _txtb_Lastname.Text = value; }
         }
 
-        public HeapDataForm HeapData
+        public HeapData HeapData
         {
             get
             {
-                return new HeapDataForm
+                return new HeapData
                 {
                     Id = Id,
                     Firstname = Firstname,
@@ -60,6 +56,20 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
                 Firstname = value.Firstname;
                 Lastname = value.Lastname;
             }
+        }
+        
+        public HeapDataForm()
+        {
+            InitializeComponent();
+
+            _initilizeDefaultValues();
+        }
+
+        private void _initilizeDefaultValues()
+        {
+            Id = 1;
+            Firstname = "Janko";
+            Lastname = "Polienko";
         }
 
         private void _txtb_Generate_Radnom_Int(object sender, MouseButtonEventArgs e)

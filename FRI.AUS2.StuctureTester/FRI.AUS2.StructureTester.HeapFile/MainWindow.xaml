@@ -8,9 +8,9 @@
     mc:Ignorable="d"
     Title="AUS2 Structure tester - HeapFile" Height="550" Width="900">
 
-    <!-- <Window.Resources>
-        <ResourceDictionary Source="Resources/Dictionary.xaml" />
-    </Window.Resources> -->
+    <Window.Resources>
+        <ResourceDictionary Source="/Dictionary.xaml" />
+    </Window.Resources>
     
     <Grid>
         <Grid.ColumnDefinitions>
@@ -43,13 +43,18 @@
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
                         <!--node form-->
                         <uc:HeapDataForm x:Name="_frm_Insert" />
 
-                        <Button x:Name="_btn_ManualInsert" Content="Insert" Grid.Column="2" VerticalAlignment="Center" Margin="0"
-                            Click="_btn_ManualInsert_Click" />
+                        <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_ManualInsert" Content="Insert" Margin="0" Click="_btn_ManualInsert_Click" />
+
+                        <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+                            <Button x:Name="_btn_ManualByteSave" Content="Save Bytes" Click="_btn_ManualByteSave_Click" />
+                            <Button x:Name="_btn_ManualByteLoad" Content="Load Bytes" Click="_btn_ManualByteLoad_Click" />
+                        </StackPanel>
                     </Grid>
                 </GroupBox>
             </StackPanel>
