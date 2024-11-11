@@ -27,6 +27,8 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             _strucute = new HeapFile();
         }
 
+        #region UI Events
+
         private void _mnitem_FileClear_Click(object sender, RoutedEventArgs e)
         {
             // Clear the file
@@ -38,5 +40,12 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             // Close the application
             Close();
         }
+
+        private void _btn_ManualInsert_Click(object sender, RoutedEventArgs e)
+        {
+            // Insert a new record
+            MessageBox.Show("Inserting a new record", Title);
+        }
     }
+    #endregion
 }

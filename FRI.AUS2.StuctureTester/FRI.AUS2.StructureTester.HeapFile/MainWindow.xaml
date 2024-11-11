@@ -4,6 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:FRI.AUS2.StructureTester.HeapFileTester"
+    xmlns:uc="clr-namespace:FRI.AUS2.StructureTester.HeapFileTester.Controls"
     mc:Ignorable="d"
     Title="AUS2 Structure tester - HeapFile" Height="550" Width="900">
 
@@ -31,7 +32,27 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Vertical" Margin="5">
-            
+            <StackPanel Orientation="Horizontal">
+                <!-- manual data insert -->
+                <GroupBox Header="Insert data">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="80" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <!--node form-->
+                        <uc:HeapDataForm x:Name="_frm_Insert" />
+
+                        <Button x:Name="_btn_ManualInsert" Content="Insert" Grid.Column="2" VerticalAlignment="Center" Margin="0"
+                            Click="_btn_ManualInsert_Click" />
+                    </Grid>
+                </GroupBox>
+            </StackPanel>
         </StackPanel>
 
     </Grid>
