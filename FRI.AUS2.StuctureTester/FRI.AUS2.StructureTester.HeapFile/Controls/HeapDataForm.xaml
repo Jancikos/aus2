@@ -37,6 +37,10 @@
     
             <TextBlock Text="Lastname:" Grid.Row="6" />
             <TextBox x:Name="_txtb_Lastname" Grid.Column="2" Grid.Row="6" TextAlignment="Right" />
+
+            <GroupBox Grid.Row="8" Grid.ColumnSpan="3" Header="Items" MouseDoubleClick="_grbx_Items_MouseDoubleClick">
+                <ListView x:Name="_lview_Items"></ListView>
+            </GroupBox>
         </Grid>
     </Grid>
 </UserControl>

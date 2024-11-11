@@ -42,18 +42,26 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
 
         public int Id;
 
-        private const int _itemsMax = 5;
-        private List<NesteHeapDataItem> _items = new List<NesteHeapDataItem>(_itemsMax);
+        public const int ItemsMaxCount = 5;
+        private List<NesteHeapDataItem> _items = new List<NesteHeapDataItem>(ItemsMaxCount);
         public List<NesteHeapDataItem> Items
         {
             get => _items;
+            set
+            {
+                if (value.Count > ItemsMaxCount)
+                {
+                    throw new ArgumentException($"Items count is max {ItemsMaxCount}");
+                }
+                _items = value;
+            }
         }
 
         /// <summary>
         /// Id (int) + Firstname (int length + _firstnameMax bytes) + Lastname (int length + _lastnameMax bytes) + Items (int actualLength + _itemsMax * NesteHeapDataItemSize)
         /// </summary>
         /// <returns></returns>
-        public static int Size => sizeof(int) + sizeof(int) + _firstnameMax + sizeof(int) + _lastnameMax + sizeof(int) + _itemsMax * NesteHeapDataItem.Size;
+        public static int Size => sizeof(int) + sizeof(int) + _firstnameMax + sizeof(int) + _lastnameMax + sizeof(int) + ItemsMaxCount * NesteHeapDataItem.Size;
 
         public byte[] ToBytes()
         {
@@ -81,7 +89,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
             BitConverter.GetBytes(actualItemsLength).CopyTo(buffer, offset);
             offset += sizeof(int);
 
-            for (int i = 0; i < _itemsMax; i++)
+            for (int i = 0; i < ItemsMaxCount; i++)
             {
                 if (i < actualItemsLength)
                 {
@@ -120,7 +128,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
             offset += sizeof(int);
 
             Items.Clear();
-            for (int i = 0; i < _itemsMax; i++)
+            for (int i = 0; i < ItemsMaxCount; i++)
             {
                 if (i < actualItemsLength)
                 {
@@ -131,6 +139,26 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
 
                 offset += NesteHeapDataItem.Size;
             }
+        }
+
+        public static List<NesteHeapDataItem> GenerateRandomItems()
+        {
+            var descriptions = new string[] { "Olej", "Filtre", "Brzdy", "Výfuk", "Pneumatiky", "Baterie", "Interiér", "Elektronika" };
+            var items = new List<NesteHeapDataItem>();
+            Random random = new Random();
+
+            var itemsCount = random.Next(ItemsMaxCount);
+            for (int i = 0; i < itemsCount; i++)
+            {
+                items.Add(new NesteHeapDataItem
+                {
+                    Date = DateOnly.FromDateTime(DateTime.Now.AddDays(random.Next(-1000, 1000))),
+                    Price = random.Next(10000) / (double)100,
+                    Description = descriptions[random.Next(descriptions.Length)]
+                });
+            }
+
+            return items;
         }
     }
 

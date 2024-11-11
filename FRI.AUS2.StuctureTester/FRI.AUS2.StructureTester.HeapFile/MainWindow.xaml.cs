@@ -61,7 +61,10 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             string filePath = System.IO.Path.Combine(DefaultFilesFolder.LocalPath, fileName);
 
             // Save the file
-            var bytes = _frm_Insert.HeapData.ToBytes();
+            var data = _frm_Insert.HeapData;
+            var bytes = data.ToBytes();
+
+            // var bytes = _frm_Insert.HeapData.ToBytes();
             System.IO.File.WriteAllBytes(filePath, bytes);
 
             MessageBox.Show($"Data saved to {filePath}", Title);

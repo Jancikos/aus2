@@ -47,7 +47,8 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
                 {
                     Id = Id,
                     Firstname = Firstname,
-                    Lastname = Lastname
+                    Lastname = Lastname,
+                    Items = Items
                 };
             }
             set
@@ -55,6 +56,19 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
                 Id = value.Id;
                 Firstname = value.Firstname;
                 Lastname = value.Lastname;
+                Items = value.Items;
+            }
+        }
+
+        private List<NesteHeapDataItem> _items = new List<NesteHeapDataItem>(HeapData.ItemsMaxCount);
+        public List<NesteHeapDataItem> Items
+        {
+            get => _items;
+            set
+            {
+                _items = value;
+                _lview_Items.Items.Clear();
+                _items.ForEach(item => _lview_Items.Items.Add($"{item.Date} - {item.Price}e ({item.Description})"));
             }
         }
         
@@ -70,6 +84,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
             Id = 1;
             Firstname = "Janko";
             Lastname = "Polienko";
+            Items = HeapData.GenerateRandomItems();
         }
 
         private void _txtb_Generate_Radnom_Int(object sender, MouseButtonEventArgs e)
@@ -88,6 +103,11 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
                 txtb.Text = (result + 1).ToString();
                 return;
             }
+        }
+
+        private void _grbx_Items_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Items = HeapData.GenerateRandomItems();
         }
     }
 }
