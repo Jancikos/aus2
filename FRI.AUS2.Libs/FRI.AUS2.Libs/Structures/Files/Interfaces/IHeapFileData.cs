@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace FRI.AUS2.Libs.Structures.Files
 {
-    public interface IBinaryData
+    public interface IHeapFileData : IBinaryData
     {
-        public int Size { get; }
-        byte[] ToBytes();
-        void FromBytes(byte[] bytes);
+        public bool Equals(IHeapFileData other);
     }
 
 }
