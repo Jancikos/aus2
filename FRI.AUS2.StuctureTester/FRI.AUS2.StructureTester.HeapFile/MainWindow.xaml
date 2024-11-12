@@ -46,7 +46,7 @@
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
-                        <!--node form-->
+                        <!--data form-->
                         <uc:HeapDataForm x:Name="_frm_Insert" />
 
                         <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_ManualInsert" Content="Insert" Margin="0" Click="_btn_ManualInsert_Click" />
@@ -57,6 +57,36 @@
                         </StackPanel>
                     </Grid>
                 </GroupBox>
+
+                <!-- manual data find -->
+                 <GroupBox Header="Find data">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="80" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        
+                        <GroupBox Header="Filter">
+                            <StackPanel Orientation="Vertical">
+                                <uc:InlineTextBox x:Name="_txtbx_FindBlockAddress" Title="Address" Value="1024" />
+                                <uc:InlineTextBox x:Name="_txtbx_FindDataId" Title="Id" Value="1" />
+                            </StackPanel>
+                        </GroupBox>
+
+                        <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_Find" Content="Find" Margin="0" Click="_btn_Find_Click" />
+
+                        <!--data form-->
+                        <GroupBox Grid.Row="1" Grid.ColumnSpan="3" Header="Result">
+                            <uc:HeapDataForm x:Name="_frm_FindResult" />
+                        </GroupBox>
+
+                    </Grid>
+                 </GroupBox>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">

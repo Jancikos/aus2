@@ -34,6 +34,8 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             {
                 System.IO.Directory.CreateDirectory(DefaultFilesFolder.LocalPath);
             }
+
+            _frm_Insert.InitilizeDefaultValues();
         }
 
         public void UpdateStructureStatistics()
@@ -108,6 +110,24 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             _frm_Insert.HeapData = heapData;
 
             MessageBox.Show($"Data loaded from {filePath}", Title);
+        }
+
+        private void _btn_Find_Click(object sender, RoutedEventArgs e)
+        {
+            var data = _structure.Find(
+                int.Parse(_txtbx_FindBlockAddress.Value),
+                new HeapData()
+                {
+                    Id = int.Parse(_txtbx_FindDataId.Value)
+                }
+            );
+
+            if (data is null) {
+                MessageBox.Show("Data not found", Title);
+                data = new HeapData();
+            }
+
+            _frm_FindResult.HeapData = data;
         }
     }
         #endregion

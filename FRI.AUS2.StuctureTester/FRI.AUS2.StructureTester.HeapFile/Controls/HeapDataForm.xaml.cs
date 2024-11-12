@@ -75,11 +75,9 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
         public HeapDataForm()
         {
             InitializeComponent();
-
-            _initilizeDefaultValues();
         }
 
-        private void _initilizeDefaultValues()
+        public void InitilizeDefaultValues()
         {
             Id = 1;
             Firstname = "Janko";

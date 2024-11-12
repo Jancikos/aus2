@@ -46,6 +46,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             var (address, addressType) = _findAddressOfNextFreeBlock();
 
+            
             _loadActiveBlock(address);
 
             ActiveBlock.AddItem(data);

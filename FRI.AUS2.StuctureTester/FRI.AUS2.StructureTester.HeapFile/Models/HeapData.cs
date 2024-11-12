@@ -144,7 +144,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
 
         public bool Equals(IHeapFileData other)
         {
-            throw new NotImplementedException();
+            return Id == (other as HeapData).Id;
         }
 
         public static List<NesteHeapDataItem> GenerateRandomItems()
