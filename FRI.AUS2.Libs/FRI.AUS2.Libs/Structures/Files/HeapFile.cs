@@ -24,31 +24,25 @@ namespace FRI.AUS2.Libs.Structures.Files
     public class HeapFileBlock<TData> : IBinaryData where TData : IHeapFileData, new()
     {
         /// <summary>
-        /// size of the whole block in bytes
-        /// </summary>
-        /// <value></value>
-        public int BlockSize { get; private init; }
-
-        /// <summary>
         /// count of items that can be stored in the block
         /// </summary>
         /// <value></value>
         public int BlockFactor
         {
-            get => BlockSize / (TDataSize + 1);
+            get => Size / (TDataSize + 1);
         }
 
         /// <summary>
         /// number of valid items in the block (from the beginning of the block)
         /// </summary>
         /// <value></value>
-        public int ValidCount { get; protected set; }
+        public int ValidCount { get;  set; }
 
         /// <summary>
         /// items stored in the block
         /// </summary>
         /// <value></value>
-        protected TData[] Items { get; set; }
+        public TData[] Items { get; set; }
 
         public int? PreviousBlock { get; protected set; }
         public int? NextBlock { get; protected set; }
@@ -56,13 +50,19 @@ namespace FRI.AUS2.Libs.Structures.Files
         public int MetedataSize => 3 * sizeof(int);
         public int TDataSize =>  (new TData()).Size;
         public int DataSize => BlockFactor * TDataSize;
-        public int Size => BlockSize;
+
+        private int _blockSize;
+        /// <summary>
+        /// size of the whole block in bytes
+        /// </summary>
+        /// <value></value>
+        public int Size => _blockSize;
 
         public HeapFileBlock(int blockSize)
         {
-            BlockSize = blockSize;
+            _blockSize = blockSize;
 
-            ResetBlock();
+            Items = new TData[BlockFactor];
         }
 
         public void ResetBlock()
@@ -75,12 +75,63 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         public byte[] ToBytes()
         {
-            throw new NotImplementedException();
+            byte[] buffer = new byte[Size];
+            int offset = 0;
+
+            // metadata
+            BitConverter.GetBytes(ValidCount).CopyTo(buffer, offset);
+            offset += sizeof(int);
+
+            BitConverter.GetBytes(PreviousBlock ?? -1).CopyTo(buffer, offset);
+            offset += sizeof(int);
+
+            BitConverter.GetBytes(NextBlock ?? -1).CopyTo(buffer, offset);
+            offset += sizeof(int);
+
+            // data
+            for (int i = 0; i < ValidCount; i++)
+            {
+                Items[i].ToBytes().CopyTo(buffer, offset);
+
+                // if (i < ValidCount)
+                // {
+                //     Items[i].ToBytes().CopyTo(buffer, offset);
+                // }
+                // else
+                // {
+                //     new TData().ToBytes().CopyTo(buffer, offset);
+                // }
+
+                offset += TDataSize;
+            }
+
+            return buffer;
         }
 
         public void FromBytes(byte[] bytes)
         {
-            throw new NotImplementedException();
+            ResetBlock();
+            int offset = 0;
+
+            // metadata
+            ValidCount = BitConverter.ToInt32(bytes, offset);
+            offset += sizeof(int);
+
+            PreviousBlock = BitConverter.ToInt32(bytes, offset);
+            offset += sizeof(int);
+
+            NextBlock = BitConverter.ToInt32(bytes, offset);
+            offset += sizeof(int);
+
+            // data
+            for (int i = 0; i < ValidCount; i++)
+            {
+                TData item = new();
+                item.FromBytes(bytes[offset..(offset + TDataSize)]);
+                Items[i] = item;
+
+                offset += TDataSize;
+            }
         }
     }
 }
