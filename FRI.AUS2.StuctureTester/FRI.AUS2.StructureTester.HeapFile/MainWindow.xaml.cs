@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -62,7 +62,11 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
         private void _btn_ManualInsert_Click(object sender, RoutedEventArgs e)
         {
             // Insert a new record
-            MessageBox.Show("Inserting a new record", Title);
+            var data = _frm_Insert.HeapData;
+
+            var address = _structure.Insert(data);
+
+            MessageBox.Show($"Data inserted at address {address}", Title);
         }
 
         private void _btn_ManualByteSave_Click(object sender, RoutedEventArgs e)

@@ -15,6 +15,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         protected int? NextFreeBlock { get; set; } = null;
         protected int? NextEmptyBlock { get; set; } = null;
 
+        protected int ActiveBlockAddress { get; set; }
         public HeapFileBlock<TData> ActiveBlock { get; protected set; }
 
         public int Size => _fileManager.Length;
@@ -28,7 +29,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
             if (!file.Exists || _fileManager.Length == 0) {
                 // init structure metadata
-                _fileManager.WriteBytes(0, ToBytes());
+                _saveMetadata();
             } else {
                 // load metadata from first file block
                 FromBytes(_fileManager.ReadBytes(0, BlockSize));
@@ -43,11 +44,111 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// <returns>address of the block where the data was inserted</returns>
         public int Insert(TData data)
         {
-            throw new NotImplementedException();
+            var (address, addressType) = _findAddressOfNextFreeBlock();
+
+            _loadActiveBlock(address);
+
+            ActiveBlock.AddItem(data);
+
+            switch (addressType)
+            {
+                case BlockAdressType.NextFreeBlock:
+                    if (ActiveBlock.IsFull)
+                    {
+                        _dequeNextFreeBlock();
+                        _saveMetadata();
+                    }
+                    break;
+                case BlockAdressType.NextEmptyBlock:
+                    if (!ActiveBlock.IsEmpty)
+                    {
+                        _dequeNextEmptyBlock();
+                        _saveMetadata();
+                    }
+                    break;
+                case BlockAdressType.NewBlock:
+                    if (!ActiveBlock.IsFull)
+                    {
+                        _enqueNextFreeBlock();
+                        _saveMetadata();
+                    }
+                    break;
+            }
+
+            _saveActiveBlock();
+
+            return address;
         }
+
+        #endregion
+
+        #region Blocks management
+
+        private void _enqueNextFreeBlock()
+        {
+            ActiveBlock.NextBlock = NextFreeBlock;
+            NextFreeBlock = ActiveBlockAddress;
+        }
+
+        private void _dequeNextFreeBlock()
+        {
+            NextFreeBlock = ActiveBlock.NextBlock;
+            ActiveBlock.NextBlock = null;
+        }
+
+        private void _enqueNextEmptyBlock()
+        {
+            ActiveBlock.NextBlock = NextEmptyBlock;
+            NextEmptyBlock = ActiveBlockAddress;
+        }
+
+        private void _dequeNextEmptyBlock()
+        {
+            NextEmptyBlock = ActiveBlock.NextBlock;
+            ActiveBlock.NextBlock = null;
+        }
+
+        private void _loadActiveBlock(int address)
+        {
+            if (ActiveBlockAddress == address)
+            {
+                return;
+            }
+
+            ActiveBlock.FromBytes(_fileManager.ReadBytes(address, BlockSize));
+            ActiveBlockAddress = address;
+        }
+
+        private void _saveActiveBlock()
+        {
+            _fileManager.WriteBytes(ActiveBlockAddress, ActiveBlock.ToBytes());
+        }
+
+        private (int address, BlockAdressType adressType) _findAddressOfNextFreeBlock()
+        {
+            if (NextFreeBlock is not null)
+            {
+                return (NextFreeBlock.Value, BlockAdressType.NextFreeBlock);
+            }
+
+            if (NextEmptyBlock is not null)
+            {
+                return (NextEmptyBlock.Value, BlockAdressType.NextEmptyBlock);
+            }
+
+            return (_fileManager.Length, BlockAdressType.NewBlock);
+        }
+
+
         #endregion
 
         #region Bytes conversion
+
+        protected void _saveMetadata()
+        {
+            _fileManager.WriteBytes(0, ToBytes());
+        }
+
         /// <summary>
         /// saves metadata to the bytes array
         /// </summary>
@@ -82,6 +183,14 @@ namespace FRI.AUS2.Libs.Structures.Files
     }
 
     #region HeapFileBlock
+
+    public enum BlockAdressType
+    {
+        NextFreeBlock,
+        NextEmptyBlock,
+        NewBlock
+    }
+
     public class HeapFileBlock<TData> : IBinaryData where TData : IHeapFileData, new()
     {
         /// <summary>
@@ -105,8 +214,8 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// <value></value>
         public TData[] Items { get; set; }
 
-        public int? PreviousBlock { get; protected set; }
-        public int? NextBlock { get; protected set; }
+        public int? PreviousBlock { get; set; }
+        public int? NextBlock { get; set; }
 
         public int MetedataSize => 3 * sizeof(int);
         public int TDataSize =>  (new TData()).Size;
@@ -133,6 +242,41 @@ namespace FRI.AUS2.Libs.Structures.Files
             PreviousBlock = null;
             NextBlock = null;
         }
+
+        #region Items
+
+        public bool IsFull => ValidCount >= BlockFactor;
+        public bool IsEmpty => ValidCount == 0;
+
+        public void AddItem(TData item)
+        {
+            if (ValidCount >= BlockFactor)
+            {
+                throw new InvalidOperationException("Block is full");
+            }
+
+            Items[ValidCount++] = item;
+        }
+
+        public void RemoveItem(int index)
+        {
+            if (index < 0 || index >= ValidCount)
+            {
+                throw new IndexOutOfRangeException("Index out of range");
+            }
+
+            for (int i = index; i < ValidCount - 1; i++)
+            {
+                Items[i] = Items[i + 1];
+            }
+
+            ValidCount--;
+        }
+
+
+        #endregion
+
+        #region Bytes conversion
 
         public byte[] ToBytes()
         {
@@ -194,6 +338,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                 offset += TDataSize;
             }
         }
+        #endregion
     }
     #endregion
 }
