@@ -32,11 +32,16 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
                 System.IO.Directory.CreateDirectory(DefaultFilesFolder.LocalPath);
             }
 
-            _structure = new(1024, new(DefaultFilesFolder.LocalPath + "HeapData.bin"));
-            UpdateStructureStatistics();
-            RerenderAllBlocks();
+            _structure = new(500, new(DefaultFilesFolder.LocalPath + "HeapData.bin"));
+            _rerenderAllStats();
 
             _frm_Insert.InitilizeDefaultValues();
+        }
+
+        private void _rerenderAllStats()
+        {
+            UpdateStructureStatistics();
+            RerenderAllBlocks();
         }
 
         public void UpdateStructureStatistics()
@@ -45,7 +50,12 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             _txt_BlockFactor.Value = _structure.ActiveBlock.BlockFactor.ToString();
             _txt_TDataSize.Value = _structure.ActiveBlock.TDataSize.ToString();
             _txt_BlockMetaSize.Value = _structure.ActiveBlock.MetedataSize.ToString();
+
             _txt_BlockDataSize.Value = _structure.ActiveBlock.DataSize.ToString();
+            _txt_BlockCount.Value = _structure.BlocksCount.ToString();
+
+            _txt_NextFreeBlock.Value = _structure.NextFreeBlock?.ToString() ?? "?";
+            _txt_NextEmptyBlock.Value = _structure.NextEmptyBlock?.ToString() ?? "?";
         }
 
         public void RerenderAllBlocks()
@@ -57,7 +67,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             {
                 var blockItem = new TreeViewItem()
                 {
-                    Header = $"#{i}. block [{block.ValidCount}]",
+                    Header = $"{i + 1}. block [{block.ValidCount}]",
                     IsExpanded = true
                 };
 
@@ -109,7 +119,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             var address = _structure.Insert(data);
 
             MessageBox.Show($"Data inserted at address {address}", Title);
-            RerenderAllBlocks();
+            _rerenderAllStats();
         }
 
         private void _btn_ManualByteSave_Click(object sender, RoutedEventArgs e)

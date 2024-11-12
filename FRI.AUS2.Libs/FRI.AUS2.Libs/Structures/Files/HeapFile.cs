@@ -13,8 +13,8 @@ namespace FRI.AUS2.Libs.Structures.Files
         public int BlockSize { get; private set; }
         public int BlocksCount => _fileManager.Length / BlockSize;
 
-        protected int? NextFreeBlock { get; set; } = null;
-        protected int? NextEmptyBlock { get; set; } = null;
+        public int? NextFreeBlock { get; set; } = null;
+        public int? NextEmptyBlock { get; set; } = null;
 
         protected int ActiveBlockAddress { get; set; }
         public HeapFileBlock<TData> ActiveBlock { get; protected set; }
@@ -325,7 +325,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             // metadata
             BitConverter.GetBytes(ValidCount).CopyTo(buffer, offset);
             offset += sizeof(int);
-
+                        
             BitConverter.GetBytes(PreviousBlock ?? -1).CopyTo(buffer, offset);
             offset += sizeof(int);
 

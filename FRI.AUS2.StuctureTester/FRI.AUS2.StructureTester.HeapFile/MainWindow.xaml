@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:FRI.AUS2.StructureTester.HeapFileTester"
     xmlns:uc="clr-namespace:FRI.AUS2.StructureTester.HeapFileTester.Controls"
     mc:Ignorable="d"
-    Title="AUS2 Structure tester - HeapFile" Height="550" Width="900">
+    Title="AUS2 Structure tester - HeapFile" Height="650" Width="800">
 
     <Window.Resources>
         <ResourceDictionary Source="/Dictionary.xaml" />
@@ -73,7 +73,7 @@
                         
                         <GroupBox Header="Filter">
                             <StackPanel Orientation="Vertical">
-                                <uc:InlineTextBox x:Name="_txtbx_FindBlockAddress" Title="Address" Value="1024" />
+                                <uc:InlineTextBox x:Name="_txtbx_FindBlockAddress" Title="Address" Value="500" />
                                 <uc:InlineTextBox x:Name="_txtbx_FindDataId" Title="Id" Value="1" />
                             </StackPanel>
                         </GroupBox>
@@ -89,7 +89,7 @@
                  </GroupBox>
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal" MaxHeight="300">
                 <!-- statictics  -->
                 <GroupBox Header="Structure statistics">
                     <StackPanel Orientation="Vertical">
@@ -98,12 +98,21 @@
                         <uc:InlineText x:Name="_txt_BlockDataSize" Title="BlockDataSize" Value="" />
                         <uc:InlineText x:Name="_txt_TDataSize" Title="TDataSize" Value="" />
                         <uc:InlineText x:Name="_txt_BlockFactor" Title="BlockFactor" Value="" />
+
+                        <uc:InlineText x:Name="_txt_BlockCount" Title="BlocksCount" Value="" Margin="0,4,0,0" />
+                        <!-- todo - mozno vhodne implementoat -->
+                        <!-- <uc:InlineText x:Name="_txt_BlockFreeCount" Title="BlockFreeCount" Value="" />
+                        <uc:InlineText x:Name="_txt_BlockEmptyCount" Title="BlockEmptyCount" Value="" /> -->
+                        <uc:InlineText x:Name="_txt_NextFreeBlock" Title="NextFreeBlock" Value="" />
+                        <uc:InlineText x:Name="_txt_NextEmptyBlock" Title="NextEmptyBlock" Value="" />
                     </StackPanel>
                 </GroupBox>
 
                 <!-- all blocks -->
-                <GroupBox Header="All blocks" MinWidth="200" MinHeight="250">
-                    <TreeView x:Name="_treeView_Blocks" />
+                <GroupBox Header="All blocks" MinWidth="250" MinHeight="300">
+                    <ScrollViewer>
+                        <TreeView x:Name="_treeView_Blocks" />
+                    </ScrollViewer>
                 </GroupBox>
             </StackPanel>
         </StackPanel>
