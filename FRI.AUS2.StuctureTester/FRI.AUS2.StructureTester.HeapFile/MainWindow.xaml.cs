@@ -20,19 +20,29 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
     {
         private Uri DefaultFilesFolder = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\HeapFileTester\");
 
-        private HeapFile _strucute;
+        private HeapFile<HeapData> _structure;
 
 
         public MainWindow()
         {
             InitializeComponent();
 
-            _strucute = new HeapFile();
+            _structure = new(2048);
+            UpdateStructureStatistics();
 
             if (!System.IO.Directory.Exists(DefaultFilesFolder.LocalPath))
             {
                 System.IO.Directory.CreateDirectory(DefaultFilesFolder.LocalPath);
             }
+        }
+
+        public void UpdateStructureStatistics()
+        {
+            _txt_BlockSize.Value = _structure.BlockSize.ToString();
+            _txt_BlockFactor.Value = _structure.ActiveBlock.BlockFactor.ToString();
+            _txt_TDataSize.Value = _structure.ActiveBlock.TDataSize.ToString();
+            _txt_BlockMetaSize.Value = _structure.ActiveBlock.MetedataSize.ToString();
+            _txt_BlockDataSize.Value = _structure.ActiveBlock.DataSize.ToString();
         }
 
         #region UI Events

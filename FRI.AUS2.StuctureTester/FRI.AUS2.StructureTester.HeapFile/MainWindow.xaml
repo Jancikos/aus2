@@ -58,6 +58,19 @@
                     </Grid>
                 </GroupBox>
             </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <!-- statictics  -->
+                <GroupBox Header="Structure statistics">
+                    <StackPanel Orientation="Vertical">
+                        <uc:InlineText x:Name="_txt_BlockSize" Title="BlockSize" Value="" />
+                        <uc:InlineText x:Name="_txt_BlockMetaSize" Title="BlockMetaSize" Value="" />
+                        <uc:InlineText x:Name="_txt_BlockDataSize" Title="BlockDataSize" Value="" />
+                        <uc:InlineText x:Name="_txt_TDataSize" Title="TDataSize" Value="" />
+                        <uc:InlineText x:Name="_txt_BlockFactor" Title="BlockFactor" Value="" />
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
         </StackPanel>
 
     </Grid>

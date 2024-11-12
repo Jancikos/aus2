@@ -10,9 +10,15 @@
     <Compile Update="Controls\HeapDataForm.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Controls\InlineText.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Controls\HeapDataForm.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Controls\InlineText.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Dictionary.xaml">

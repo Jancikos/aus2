@@ -8,7 +8,7 @@ using FRI.AUS2.Libs.Structures.Files;
 
 namespace FRI.AUS2.StructureTester.HeapFileTester.Models
 {
-    public class HeapData : IBinaryData
+    public class HeapData : IHeapFileData
     {
         private const int _firstnameMax = 15;
         private string _firstname = "";
@@ -61,7 +61,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
         /// Id (int) + Firstname (int length + _firstnameMax bytes) + Lastname (int length + _lastnameMax bytes) + Items (int actualLength + _itemsMax * NesteHeapDataItemSize)
         /// </summary>
         /// <returns></returns>
-        public static int Size => sizeof(int) + sizeof(int) + _firstnameMax + sizeof(int) + _lastnameMax + sizeof(int) + ItemsMaxCount * NesteHeapDataItem.Size;
+        public int Size => sizeof(int) + sizeof(int) + _firstnameMax + sizeof(int) + _lastnameMax + sizeof(int) + ItemsMaxCount * (new NesteHeapDataItem()).Size;
 
         public byte[] ToBytes()
         {
@@ -97,7 +97,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
                     item.ToBytes().CopyTo(buffer, offset);
                 }
 
-                offset += NesteHeapDataItem.Size;
+                offset += (new NesteHeapDataItem()).Size;
             }
 
             return buffer;
@@ -128,17 +128,23 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
             offset += sizeof(int);
 
             Items.Clear();
+            var itemSize = (new NesteHeapDataItem()).Size;
             for (int i = 0; i < ItemsMaxCount; i++)
             {
                 if (i < actualItemsLength)
                 {
                     var item = new NesteHeapDataItem();
-                    item.FromBytes(bytes[offset..(offset + NesteHeapDataItem.Size)]);
+                    item.FromBytes(bytes[offset..(offset + itemSize)]);
                     Items.Add(item);
                 }
 
-                offset += NesteHeapDataItem.Size;
+                offset += itemSize;
             }
+        }
+
+        public bool Equals(IHeapFileData other)
+        {
+            throw new NotImplementedException();
         }
 
         public static List<NesteHeapDataItem> GenerateRandomItems()
@@ -187,7 +193,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
         /// 
         /// </summary>
         /// <returns></returns>
-        public static int Size => sizeof(int) + sizeof(double) + sizeof(int) + _descriptionMax;
+        public int Size => sizeof(int) + sizeof(double) + sizeof(int) + _descriptionMax;
 
         public byte[] ToBytes()
         {
