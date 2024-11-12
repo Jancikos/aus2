@@ -79,12 +79,11 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
                 };
 
                 var dataItems = new TreeViewItem() { Header = "Data [" + block.ValidCount + "]" };
-                foreach (var data in block.Items)
+                
+                for (int j = 0; j < block.ValidCount; j++)
                 {
-                    if (data is null)
-                    {
-                        continue;
-                    }
+                    var data = block.Items[j];
+
                     dataItems.Items.Add(new TreeViewItem() { Header = data.ToString() });
                 }
                 items.Add(dataItems);
@@ -193,6 +192,28 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             }
 
             MessageBox.Show($"Generated {dataCount} records", Title);
+            _rerenderAllStats();
+        }
+
+        private void _btn_Delete_Click(object sender, RoutedEventArgs e)
+        {
+            var data = new HeapData()
+            {
+                Id = int.Parse(_txtbx_DeleteDataId.Value)
+            };
+
+            string result = "Data deleted";
+            try {
+                _structure.Delete(
+                    int.Parse(_txtbx_DeleteBlockAddress.Value),
+                    data
+                );
+            } catch (Exception ex) {
+                result = ex.Message;
+            }
+
+            MessageBox.Show(result, Title);
+            _txt_DeleteResult.Text = result;
             _rerenderAllStats();
         }
     }
