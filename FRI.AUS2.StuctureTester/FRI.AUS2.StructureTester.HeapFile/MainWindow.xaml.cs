@@ -10,6 +10,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using FRI.AUS2.Libs.Structures.Files;
 using FRI.AUS2.StructureTester.HeapFileTester.Models;
+using FRI.AUS2.StructureTester.HeapFileTester.Utils;
 
 namespace FRI.AUS2.StructureTester.HeapFileTester
 {
@@ -179,6 +180,20 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             }
 
             _frm_FindResult.HeapData = data;
+        }
+
+        private void _btn_Generate_Click(object sender, RoutedEventArgs e)
+        {
+            var dataGenerator = new HeapDataGenerator(int.Parse(_txtbx_GenerateSeed.Value));
+            var dataCount = int.Parse(_txtbx_GenerateCount.Value);
+
+            for (int i = 0; i < dataCount; i++)
+            {
+                _structure.Insert(dataGenerator.GenerateItem());
+            }
+
+            MessageBox.Show($"Generated {dataCount} records", Title);
+            _rerenderAllStats();
         }
     }
         #endregion

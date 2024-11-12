@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using FRI.AUS2.StructureTester.HeapFileTester.Models;
+using FRI.AUS2.StructureTester.HeapFileTester.Utils;
 
 namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
 {
@@ -79,10 +80,8 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
 
         public void InitilizeDefaultValues()
         {
-            Id = 1;
-            Firstname = "Janko";
-            Lastname = "Polienko";
-            Items = HeapData.GenerateRandomItems();
+            var genarator = new HeapDataGenerator();
+            HeapData = genarator.GenerateItem();
         }
 
         private void _txtb_Generate_Radnom_Int(object sender, MouseButtonEventArgs e)
@@ -105,7 +104,8 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
 
         private void _grbx_Items_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            Items = HeapData.GenerateRandomItems();
+            var genarator = new HeapDataGenerator();
+            Items = genarator.GenerateNestedItems();
         }
     }
 }

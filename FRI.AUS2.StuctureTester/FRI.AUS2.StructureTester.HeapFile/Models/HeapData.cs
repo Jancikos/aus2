@@ -144,32 +144,18 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
 
         public bool Equals(IHeapFileData other)
         {
-            return Id == (other as HeapData).Id;
+            var otherData = other as HeapData;
+            if (otherData is null)
+            {
+                return false;
+            }
+
+            return Id == otherData.Id;
         }
 
         public override string ToString()
         {
             return $"{Id} - {Firstname} {Lastname} [{Items.Count}]";
-        }
-
-        public static List<NesteHeapDataItem> GenerateRandomItems()
-        {
-            var descriptions = new string[] { "Olej", "Filtre", "Brzdy", "Výfuk", "Pneumatiky", "Baterie", "Interiér", "Elektronika" };
-            var items = new List<NesteHeapDataItem>();
-            Random random = new Random();
-
-            var itemsCount = random.Next(ItemsMaxCount);
-            for (int i = 0; i < itemsCount; i++)
-            {
-                items.Add(new NesteHeapDataItem
-                {
-                    Date = DateOnly.FromDateTime(DateTime.Now.AddDays(random.Next(-1000, 1000))),
-                    Price = random.Next(10000) / (double)100,
-                    Description = descriptions[random.Next(descriptions.Length)]
-                });
-            }
-
-            return items;
         }
     }
 
