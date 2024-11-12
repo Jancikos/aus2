@@ -7,7 +7,7 @@ using FRI.AUS2.Libs.Helpers;
 
 namespace FRI.AUS2.Libs.Structures.Files
 {
-    public class HeapFile<TData> : IBinaryData where TData : IHeapFileData, new()
+    public class HeapFile<TData> : IBinaryData where TData : class, IHeapFileData, new()
     {
         protected BinaryFileManager _fileManager;
         public int BlockSize { get; private set; }
@@ -78,6 +78,17 @@ namespace FRI.AUS2.Libs.Structures.Files
             _saveActiveBlock();
 
             return address;
+        }
+
+        #endregion
+
+        #region Find
+
+        public TData? Find(int address, TData filter)
+        {
+            _loadActiveBlock(address);
+
+            return ActiveBlock.GetItem(filter);
         }
 
         #endregion
@@ -191,7 +202,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         NewBlock
     }
 
-    public class HeapFileBlock<TData> : IBinaryData where TData : IHeapFileData, new()
+    public class HeapFileBlock<TData> : IBinaryData where TData : class, IHeapFileData, new()
     {
         /// <summary>
         /// count of items that can be stored in the block
@@ -256,6 +267,19 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
 
             Items[ValidCount++] = item;
+        }
+
+        public TData? GetItem(TData filter)
+        {
+            for (int i = 0; i < ValidCount; i++)
+            {
+                if (filter.Equals(Items[i]))
+                {
+                    return Items[i];
+                }
+            }
+
+            return null;
         }
 
         public void RemoveItem(int index)
