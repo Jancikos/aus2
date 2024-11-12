@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -27,7 +27,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
         {
             InitializeComponent();
 
-            _structure = new(2048);
+            _structure = new(1024, new(DefaultFilesFolder.LocalPath + "HeapData.bin"));
             UpdateStructureStatistics();
 
             if (!System.IO.Directory.Exists(DefaultFilesFolder.LocalPath))

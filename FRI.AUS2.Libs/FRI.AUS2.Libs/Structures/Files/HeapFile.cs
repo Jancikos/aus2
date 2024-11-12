@@ -3,24 +3,85 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FRI.AUS2.Libs.Helpers;
 
 namespace FRI.AUS2.Libs.Structures.Files
 {
-    public class HeapFile<TData> where TData : IHeapFileData, new()
+    public class HeapFile<TData> : IBinaryData where TData : IHeapFileData, new()
     {
+        protected BinaryFileManager _fileManager;
         public int BlockSize { get; private set; }
+
+        protected int? NextFreeBlock { get; set; } = null;
+        protected int? NextEmptyBlock { get; set; } = null;
 
         public HeapFileBlock<TData> ActiveBlock { get; protected set; }
 
-        public HeapFile(int blockSize)
+        public int Size => _fileManager.Length;
+
+        public HeapFile(int blockSize, FileInfo file)
         {
+            _fileManager = new BinaryFileManager(file);
             BlockSize = blockSize;
 
             ActiveBlock = new HeapFileBlock<TData>(BlockSize);
+
+            if (!file.Exists || _fileManager.Length == 0) {
+                // init structure metadata
+                _fileManager.WriteBytes(0, ToBytes());
+            } else {
+                // load metadata from first file block
+                FromBytes(_fileManager.ReadBytes(0, BlockSize));
+            }
         }
 
+        #region Insert
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns>address of the block where the data was inserted</returns>
+        public int Insert(TData data)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
+        #region Bytes conversion
+        /// <summary>
+        /// saves metadata to the bytes array
+        /// </summary>
+        /// <returns></returns>
+        public byte[] ToBytes()
+        {
+            byte[] buffer = new byte[BlockSize];
+            int offset = 0;
+
+            BitConverter.GetBytes(NextFreeBlock ?? -1).CopyTo(buffer, offset);
+            offset += sizeof(int);
+
+            BitConverter.GetBytes(NextEmptyBlock ?? -1).CopyTo(buffer, offset);
+            offset += sizeof(int);
+
+            return buffer;
+        }
+
+        public void FromBytes(byte[] bytes)
+        {
+            int offset = 0;
+
+            int nextFreeBlock = BitConverter.ToInt32(bytes, offset);
+            NextFreeBlock = nextFreeBlock == -1 ? null : nextFreeBlock;
+            offset += sizeof(int);
+
+            int nextEmptyBlock = BitConverter.ToInt32(bytes, offset);
+            NextEmptyBlock = nextEmptyBlock == -1 ? null : nextEmptyBlock;
+            offset += sizeof(int);
+        }
+        #endregion
     }
 
+    #region HeapFileBlock
     public class HeapFileBlock<TData> : IBinaryData where TData : IHeapFileData, new()
     {
         /// <summary>
@@ -134,4 +195,5 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
         }
     }
+    #endregion
 }
