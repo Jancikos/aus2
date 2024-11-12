@@ -100,6 +100,11 @@
                         <uc:InlineText x:Name="_txt_BlockFactor" Title="BlockFactor" Value="" />
                     </StackPanel>
                 </GroupBox>
+
+                <!-- all blocks -->
+                <GroupBox Header="All blocks" MinWidth="200" MinHeight="250">
+                    <TreeView x:Name="_treeView_Blocks" />
+                </GroupBox>
             </StackPanel>
         </StackPanel>
 

@@ -147,6 +147,11 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
             return Id == (other as HeapData).Id;
         }
 
+        public override string ToString()
+        {
+            return $"{Id} - {Firstname} {Lastname} [{Items.Count}]";
+        }
+
         public static List<NesteHeapDataItem> GenerateRandomItems()
         {
             var descriptions = new string[] { "Olej", "Filtre", "Brzdy", "Výfuk", "Pneumatiky", "Baterie", "Interiér", "Elektronika" };

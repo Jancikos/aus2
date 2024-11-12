@@ -27,13 +27,14 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
         {
             InitializeComponent();
 
-            _structure = new(1024, new(DefaultFilesFolder.LocalPath + "HeapData.bin"));
-            UpdateStructureStatistics();
-
             if (!System.IO.Directory.Exists(DefaultFilesFolder.LocalPath))
             {
                 System.IO.Directory.CreateDirectory(DefaultFilesFolder.LocalPath);
             }
+
+            _structure = new(1024, new(DefaultFilesFolder.LocalPath + "HeapData.bin"));
+            UpdateStructureStatistics();
+            RerenderAllBlocks();
 
             _frm_Insert.InitilizeDefaultValues();
         }
@@ -45,6 +46,45 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             _txt_TDataSize.Value = _structure.ActiveBlock.TDataSize.ToString();
             _txt_BlockMetaSize.Value = _structure.ActiveBlock.MetedataSize.ToString();
             _txt_BlockDataSize.Value = _structure.ActiveBlock.DataSize.ToString();
+        }
+
+        public void RerenderAllBlocks()
+        {
+            _treeView_Blocks.Items.Clear();
+
+            int i = 0;
+            foreach (var block in _structure.GetAllDataBlocks())
+            {
+                var blockItem = new TreeViewItem()
+                {
+                    Header = $"#{i}. block [{block.ValidCount}]",
+                    IsExpanded = true
+                };
+
+                var items = new List<TreeViewItem>() 
+                {
+                    new TreeViewItem() { Header = $"Address: {(i+1) * _structure.BlockSize}" },
+                    new TreeViewItem() { Header = $"Prev: {block.PreviousBlock?.ToString() ?? "?"}, Next: {block.NextBlock?.ToString() ?? "?"}" }
+                };
+
+                var dataItems = new TreeViewItem() { Header = "Data [" + block.ValidCount + "]" };
+                foreach (var data in block.Items)
+                {
+                    if (data is null)
+                    {
+                        continue;
+                    }
+                    dataItems.Items.Add(new TreeViewItem() { Header = data.ToString() });
+                }
+                items.Add(dataItems);
+
+
+                blockItem.ItemsSource = items;
+                _treeView_Blocks.Items.Add(blockItem);
+
+                ++i;
+            }
+
         }
 
         #region UI Events
@@ -69,6 +109,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             var address = _structure.Insert(data);
 
             MessageBox.Show($"Data inserted at address {address}", Title);
+            RerenderAllBlocks();
         }
 
         private void _btn_ManualByteSave_Click(object sender, RoutedEventArgs e)

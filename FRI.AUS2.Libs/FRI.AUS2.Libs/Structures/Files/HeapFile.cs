@@ -11,6 +11,7 @@ namespace FRI.AUS2.Libs.Structures.Files
     {
         protected BinaryFileManager _fileManager;
         public int BlockSize { get; private set; }
+        public int BlocksCount => _fileManager.Length / BlockSize;
 
         protected int? NextFreeBlock { get; set; } = null;
         protected int? NextEmptyBlock { get; set; } = null;
@@ -46,7 +47,6 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             var (address, addressType) = _findAddressOfNextFreeBlock();
 
-            
             _loadActiveBlock(address);
 
             ActiveBlock.AddItem(data);
@@ -95,6 +95,20 @@ namespace FRI.AUS2.Libs.Structures.Files
         #endregion
 
         #region Blocks management
+
+        public List<HeapFileBlock<TData>> GetAllDataBlocks()
+        {
+            List<HeapFileBlock<TData>> blocks = new();
+
+            for (int i = 1; i < BlocksCount; i++)
+            {
+                HeapFileBlock<TData> block = new(BlockSize);
+                block.FromBytes(_fileManager.ReadBytes(i * BlockSize, BlockSize));
+                blocks.Add(block);
+            }
+
+            return blocks;
+        }
 
         private void _enqueNextFreeBlock()
         {
@@ -184,11 +198,11 @@ namespace FRI.AUS2.Libs.Structures.Files
             int offset = 0;
 
             int nextFreeBlock = BitConverter.ToInt32(bytes, offset);
-            NextFreeBlock = nextFreeBlock == -1 ? null : nextFreeBlock;
+            NextFreeBlock = (nextFreeBlock == -1 || nextFreeBlock ==  0) ? null : nextFreeBlock;
             offset += sizeof(int);
 
             int nextEmptyBlock = BitConverter.ToInt32(bytes, offset);
-            NextEmptyBlock = nextEmptyBlock == -1 ? null : nextEmptyBlock;
+            NextEmptyBlock = (nextEmptyBlock == -1 || nextEmptyBlock ==  0) ? null : nextEmptyBlock;
             offset += sizeof(int);
         }
         #endregion
@@ -347,10 +361,12 @@ namespace FRI.AUS2.Libs.Structures.Files
             ValidCount = BitConverter.ToInt32(bytes, offset);
             offset += sizeof(int);
 
-            PreviousBlock = BitConverter.ToInt32(bytes, offset);
+            var prevBlock = BitConverter.ToInt32(bytes, offset);
+            PreviousBlock = (prevBlock == -1 || prevBlock == 0) ? null : prevBlock;
             offset += sizeof(int);
 
-            NextBlock = BitConverter.ToInt32(bytes, offset);
+            var nextBlock = BitConverter.ToInt32(bytes, offset);
+            NextBlock = (nextBlock == -1 || nextBlock == 0) ? null : nextBlock;
             offset += sizeof(int);
 
             // data
