@@ -80,21 +80,23 @@ namespace FRI.AUS2.Libs.Structures.Files
                     if (ActiveBlock.IsFull)
                     {
                         _dequeNextFreeBlock();
-                        _saveMetadata();
                     }
                     break;
                 case BlockAdressType.NextEmptyBlock:
                     if (!ActiveBlock.IsEmpty)
                     {
                         _dequeNextEmptyBlock();
-                        _saveMetadata();
+                    }
+
+                    if (!ActiveBlock.IsFull)
+                    {
+                        _enqueNextFreeBlock();
                     }
                     break;
                 case BlockAdressType.NewBlock:
                     if (!ActiveBlock.IsFull)
                     {
                         _enqueNextFreeBlock();
-                        _saveMetadata();
                     }
                     break;
             }
@@ -233,6 +235,12 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         private void _enqueActiveBlock(ref int? queueStartAddress)
         {
+            if (ActiveBlock.IsInStack)
+            {
+                throw new InvalidOperationException("Cannot enqueue block that is already in stack");
+            }
+
+
             // enquing block
             ActiveBlock.NextBlock = queueStartAddress;
             ActiveBlock.PreviousBlock = null;
@@ -268,19 +276,18 @@ namespace FRI.AUS2.Libs.Structures.Files
             {
                 prevBlock.NextBlock = ActiveBlock.NextBlock;
                 _saveBlock(ActiveBlock.PreviousBlock!.Value, prevBlock);
-
-                ActiveBlock.PreviousBlock = null;
             }
             if (nextBlock is not null)
             {
                 nextBlock.PreviousBlock = ActiveBlock.PreviousBlock;
                 _saveBlock(ActiveBlock.NextBlock!.Value, nextBlock);
-
-                ActiveBlock.NextBlock = null;
             }
 
             if (prevBlock is not null || nextBlock is not null)
             {
+                ActiveBlock.PreviousBlock = null;
+                ActiveBlock.NextBlock = null;
+
                 _saveActiveBlock();
             }
         }
@@ -438,6 +445,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         public int? PreviousBlock { get; set; }
         public int? NextBlock { get; set; }
+        public bool IsInStack => PreviousBlock is not null || NextBlock is not null;
 
         public int MetedataSize => 3 * sizeof(int);
         public int TDataSize =>  (new TData()).Size;
