@@ -55,8 +55,8 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             _txt_BlockDataSize.Value = _structure.ActiveBlock.DataSize.ToString();
             _txt_BlockCount.Value = _structure.BlocksCount.ToString();
 
-            _txt_NextFreeBlock.Value = _structure.NextFreeBlock?.ToString() ?? "?";
-            _txt_NextEmptyBlock.Value = _structure.NextEmptyBlock?.ToString() ?? "?";
+            _txt_NextFreeBlock.Value = (_structure.NextFreeBlock?.ToString() ?? "?") + $" [{_structure.FreeBlocksCount}]";
+            _txt_NextEmptyBlock.Value = (_structure.NextEmptyBlock?.ToString() ?? "?") + $" [{_structure.EmptyBlocksCount}]";
         }
 
         public void RerenderAllBlocks()

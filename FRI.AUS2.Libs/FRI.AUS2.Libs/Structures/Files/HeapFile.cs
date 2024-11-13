@@ -15,9 +15,17 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         private int? _nextFreeBlock = null;
         public int? NextFreeBlock { get => _nextFreeBlock; protected set => _nextFreeBlock = value; }
+        public int FreeBlocksCount
+        {
+            get => _countStackItems(NextFreeBlock);
+        }
 
         private int? _nextEmptyBlock = null;
         public int? NextEmptyBlock { get => _nextEmptyBlock; protected set => _nextEmptyBlock = value; }
+        public int EmptyBlocksCount
+        {
+            get => _countStackItems(NextEmptyBlock);
+        }
 
         protected int ActiveBlockAddress { get; set; }
         public HeapFileBlock<TData> ActiveBlock { get; protected set; }
@@ -209,8 +217,20 @@ namespace FRI.AUS2.Libs.Structures.Files
             _fileManager.Truncate(lastDeletedBlockAddress);
         }
 
+        private int _countStackItems(int? startAddress)
+        {
+            int count = 0;
 
-        
+            int? nextBlockAddress = startAddress;
+            while (nextBlockAddress is not null)
+            {
+                count++;
+                nextBlockAddress = _loadBlock(nextBlockAddress.Value).NextBlock;
+            }
+
+            return count;
+        }
+
         private void _enqueActiveBlock(ref int? queueStartAddress)
         {
             // enquing block
