@@ -37,5 +37,10 @@
             _fileStream.Write(buffer, 0, buffer.Length);
             _fileStream.Flush();
         }
+
+        public void Truncate(int length)
+        {
+            _fileStream.SetLength(length);
+        }
     }
 }

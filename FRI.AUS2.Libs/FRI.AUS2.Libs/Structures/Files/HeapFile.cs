@@ -140,10 +140,12 @@ namespace FRI.AUS2.Libs.Structures.Files
                 // zaradime ho do zoznamu prazdnych blokov
                 _enqueNextEmptyBlock();
 
-                // todo: deleting blocks from the end of the file
+                // ak je to posledny blok, tak spustime proces mazania blokov od konca
+                if (address == _getAddressByBlockIndex(BlocksCount - 1))
+                {
+                    _deleteEmptyBlocksFromEnd();
+                }
             }
-
-            _saveActiveBlock();
         }
 
 
@@ -163,6 +165,38 @@ namespace FRI.AUS2.Libs.Structures.Files
 
             return blocks;
         }
+
+        private void _deleteEmptyBlocksFromEnd()
+        {
+            int lastBlockIndex = BlocksCount - 1;
+            int lastBlockAddress = _getAddressByBlockIndex(lastBlockIndex);
+            int lastDeletedBlockAddress = lastBlockAddress;
+
+            while (lastBlockIndex > 0)
+            {
+                _loadActiveBlock(lastBlockAddress);
+
+                if (!ActiveBlock.IsEmpty)
+                {
+                    break;
+                }
+
+                _dequeNextEmptyBlock();
+                lastDeletedBlockAddress = lastBlockAddress;
+
+                lastBlockIndex--;
+                lastBlockAddress = _getAddressByBlockIndex(lastBlockIndex);
+            }
+
+            // if (lastDeletedBlockAddress == lastBlockAddress)
+            // {
+            //     // no empty blocks from end found
+            //     return;
+            // }
+
+            _fileManager.Truncate(lastDeletedBlockAddress);
+        }
+
 
         
         private void _enqueActiveBlock(ref int? queueStartAddress)
@@ -288,6 +322,11 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
 
             return (_fileManager.Length, BlockAdressType.NewBlock);
+        }
+
+        private int _getAddressByBlockIndex(int index)
+        {
+            return index * BlockSize;
         }
 
 
