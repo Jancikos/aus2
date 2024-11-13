@@ -41,6 +41,7 @@
         public void Truncate(int length)
         {
             _fileStream.SetLength(length);
+            _fileStream.Flush();
         }
     }
 }

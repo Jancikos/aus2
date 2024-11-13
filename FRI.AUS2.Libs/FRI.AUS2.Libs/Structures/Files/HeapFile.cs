@@ -40,6 +40,18 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
         }
 
+        public void Clear()
+        {
+            ActiveBlockAddress = 0;
+            ActiveBlock.ResetBlock();
+
+            NextFreeBlock = null;
+            NextEmptyBlock = null;
+
+            _saveMetadata();
+            _fileManager.Truncate(BlockSize);
+        }
+
         #region Insert
         /// <summary>
         /// 

@@ -109,7 +109,10 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
         private void _mnitem_FileClear_Click(object sender, RoutedEventArgs e)
         {
             // Clear the file
-            MessageBox.Show("Clearing the file", Title);
+            _structure.Clear();
+            
+            MessageBox.Show("Structure cleared!", Title);
+            _rerenderAllStats();
         }
 
         private void _mnitem_Close_Click(object sender, RoutedEventArgs e)
