@@ -72,10 +72,7 @@
                         </Grid.RowDefinitions>
                         
                         <GroupBox Header="Filter">
-                            <StackPanel Orientation="Vertical">
-                                <uc:InlineTextBox x:Name="_txtbx_FindBlockAddress" Title="Address" Value="500" />
-                                <uc:InlineTextBox x:Name="_txtbx_FindDataId" Title="Id" Value="1" />
-                            </StackPanel>
+                            <uc:HeapFindDataForm x:Name="_frm_FindFilter" />
                         </GroupBox>
 
                         <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_Find" Content="Find" Margin="0" Click="_btn_Find_Click" />
@@ -122,10 +119,7 @@
                         </Grid.RowDefinitions>
                         
                         <GroupBox Header="Filter">
-                            <StackPanel Orientation="Vertical">
-                                <uc:InlineTextBox x:Name="_txtbx_DeleteBlockAddress" Title="Address" Value="500" />
-                                <uc:InlineTextBox x:Name="_txtbx_DeleteDataId" Title="Id" Value="1" />
-                            </StackPanel>
+                            <uc:HeapFindDataForm x:Name="_frm_DeleteFilter" />
                         </GroupBox>
 
                         <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_Delete" Content="Delete" Margin="0" Click="_btn_Delete_Click" />
@@ -162,7 +156,13 @@
                 <!-- all blocks -->
                 <GroupBox Header="All blocks" MinWidth="250" MinHeight="300">
                     <ScrollViewer>
-                        <TreeView x:Name="_treeView_Blocks" />
+                        <TreeView x:Name="_treeView_Blocks">
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="{x:Type TreeViewItem}">
+                                    <EventSetter Event="MouseDoubleClick" Handler="_treeView_Blocks_OnItemDoubleClicked" />
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                        </TreeView>
                     </ScrollViewer>
                 </GroupBox>
             </StackPanel>
