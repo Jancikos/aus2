@@ -101,7 +101,13 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
 
                 ++i;
             }
+        }
 
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            _structure.Dispose();
+
+            base.OnClosing(e);
         }
 
         #region UI Events

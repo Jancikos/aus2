@@ -7,7 +7,11 @@ using FRI.AUS2.Libs.Helpers;
 
 namespace FRI.AUS2.Libs.Structures.Files
 {
-    public class HeapFile<TData> : IBinaryData where TData : class, IHeapFileData, new()
+    /// <summary>
+    /// O(r, w) - pocet pristupov danych operacii ku blokom v subore
+    /// </summary>
+    /// <typeparam name="TData"></typeparam>
+    public class HeapFile<TData> : IBinaryData, IDisposable where TData : class, IHeapFileData, new()
     {
         protected BinaryFileManager _fileManager;
         public int BlockSize { get; private set; }
@@ -29,6 +33,10 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         protected int ActiveBlockAddress { get; set; }
         public HeapFileBlock<TData> ActiveBlock { get; protected set; }
+        /// <summary>
+        /// if true, than method _saveActiveBlock will not do anything
+        /// </summary>
+        private bool _saveActiveBlockDisabled = false;
 
         public int Size => _fileManager.Length;
 
@@ -62,7 +70,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         #region Insert
         /// <summary>
-        /// 
+        /// O(1, 1) + operacie nad zasobnikmi
         /// </summary>
         /// <param name="data"></param>
         /// <returns>address of the block where the data was inserted</returns>
@@ -74,6 +82,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
             ActiveBlock.AddItem(data);
 
+            _saveActiveBlockDisabled = true;
             switch (addressType)
             {
                 case BlockAdressType.NextFreeBlock:
@@ -101,7 +110,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                     break;
             }
 
-            _saveActiveBlock();
+            _saveActiveBlock(true);
 
             return address;
         }
@@ -109,7 +118,12 @@ namespace FRI.AUS2.Libs.Structures.Files
         #endregion
 
         #region Find
-
+        /// <summary>
+        /// O(1, 0)
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         public TData? Find(int address, TData filter)
         {
             _loadActiveBlock(address);
@@ -120,12 +134,17 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         #region Delete
 
+        /// <summary>
+        /// O(1, 1) + operacie nad zasobnikmi + mazanie prazdnych blokov na konci suboru
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="filter"></param>
         public void Delete(int address, TData filter)
         {
             _loadActiveBlock(address);
 
             // to znamena ze bol v zozname volnych blokov
-            bool wasInFreeBlockStack = !ActiveBlock.IsFull; 
+            bool wasInFreeBlockStack = ActiveBlock.IsInStack; 
 
             bool itemDeleted = ActiveBlock.RemoveItem(filter);
             if (!itemDeleted)
@@ -140,6 +159,8 @@ namespace FRI.AUS2.Libs.Structures.Files
                 throw new InvalidOperationException("Block cannot be full after deletion");
             }
 
+            _saveActiveBlockDisabled = true;
+
             // ak je ciastocne naplneny
             if (!ActiveBlock.IsEmpty) 
             {
@@ -148,6 +169,8 @@ namespace FRI.AUS2.Libs.Structures.Files
                 {
                     _enqueNextFreeBlock();
                 }
+
+                _saveActiveBlock(true);
             }
 
             // ak je prazdny
@@ -159,14 +182,17 @@ namespace FRI.AUS2.Libs.Structures.Files
                     _dequeNextFreeBlock();
                 }
 
-                // zaradime ho do zoznamu prazdnych blokov
-                _enqueNextEmptyBlock();
-
                 // ak je to posledny blok, tak spustime proces mazania blokov od konca
                 if (address == _getAddressByBlockIndex(BlocksCount - 1))
                 {
                     _deleteEmptyBlocksFromEnd();
-                }
+                    return;
+                } 
+
+                // zaradime ho do zoznamu prazdnych blokov
+                _enqueNextEmptyBlock();
+
+                _saveActiveBlock(true);
             }
         }
 
@@ -188,6 +214,9 @@ namespace FRI.AUS2.Libs.Structures.Files
             return blocks;
         }
 
+        /// <summary>
+        /// O(n , 1) + operacie nad zasobnikmi, kde n je pocet prazdnych blokov na konci suboru
+        /// </summary>
         private void _deleteEmptyBlocksFromEnd()
         {
             int lastBlockIndex = BlocksCount - 1;
@@ -233,13 +262,17 @@ namespace FRI.AUS2.Libs.Structures.Files
             return count;
         }
 
+        /// <summary>
+        /// O(0, 1) - v pripade prazdneho zasobnika
+        /// O(1, 2) - v pripade neprazdneho zasobnika
+        /// </summary>
+        /// <param name="queueStartAddress"></param>
         private void _enqueActiveBlock(ref int? queueStartAddress)
         {
             if (ActiveBlock.IsInStack)
             {
                 throw new InvalidOperationException("Cannot enqueue block that is already in stack");
             }
-
 
             // enquing block
             ActiveBlock.NextBlock = queueStartAddress;
@@ -256,9 +289,15 @@ namespace FRI.AUS2.Libs.Structures.Files
 
             // setting new next free block
             queueStartAddress = ActiveBlockAddress;
-            _saveMetadata();
+            // _saveMetadata();
         }
 
+        /// <summary>
+        /// O(2, 3) - v pripade ze ma aktivny blok predchadzajuci a nasledujuci blok
+        /// O(1, 2) - v pripade ze ma aktivny blok len predchadzajuci/nasledujuci blok
+        /// O(0, 1) - v pripade ze nema aktivny blok predchadzajuci/nasledujuci blok
+        /// </summary>
+        /// <param name="queueStartAddress"></param>
         private void _dequeActiveBlock(ref int? queueStartAddress)
         {
             var prevBlock = _loadBlock(ActiveBlock.PreviousBlock);
@@ -268,7 +307,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             if (queueStartAddress == ActiveBlockAddress)
             {
                 queueStartAddress = ActiveBlock.NextBlock;
-                _saveMetadata();
+                // _saveMetadata();
             }
 
             // dequeing block
@@ -343,8 +382,20 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             _fileManager.WriteBytes(address, block.ToBytes());
         }
-        private void _saveActiveBlock()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="force">saves even _saveActiveBlockDisabled is true, also sets _saveActiveBlockDisabled to false</param>
+        private void _saveActiveBlock(bool force = false)
         {
+            if (_saveActiveBlockDisabled) 
+            {
+                if (!force) {
+                    return; // do not save if disabled
+                }
+                _saveActiveBlockDisabled = false;
+            }
+
             _saveBlock(ActiveBlockAddress, ActiveBlock);
         }
 
@@ -407,6 +458,11 @@ namespace FRI.AUS2.Libs.Structures.Files
             int nextEmptyBlock = BitConverter.ToInt32(bytes, offset);
             NextEmptyBlock = (nextEmptyBlock == -1 || nextEmptyBlock ==  0) ? null : nextEmptyBlock;
             offset += sizeof(int);
+        }
+
+        public void Dispose()
+        {
+            _saveMetadata();
         }
         #endregion
     }
