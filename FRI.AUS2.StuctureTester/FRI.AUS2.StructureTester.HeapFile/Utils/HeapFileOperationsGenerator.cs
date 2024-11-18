@@ -5,34 +5,37 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FRI.AUS2.Libs.Structures.Files;
+using FRI.AUS2.StructureTester.HeapFileTester.Models;
+using FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator;
 
-namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
+namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
 {
-    public class HeapFileOperationsGenerator<T> : OperationsGenerator<T> where T : class, IHeapFileData, new()
+    public class HeapFileOperationsGenerator : OperationsGenerator<HeapData>
     {
 
-        public HeapFile<T> HeapFile { get; init; }
-
-        private Func<Random, T?, T> _craeteRandomT;
+        public HeapFile<HeapData> HeapFile { get; init; }
 
         public override int StructureItemsCount => HeapFile.ValidItemsCount;
 
         public override string LogsFileNamePrefix => "heapfile";
 
+        // toto prerobit na tabulku, kde bude HeapData.ID => adresa, objekt
         protected IList<int> _structureDataAddresses = new List<int>();
+        // private Dictionary<int, (int address, T data)> _structureDataDict = new Dictionary<int, (int address, T data)>();
+        
 
-        public HeapFileOperationsGenerator(HeapFile<T> structure, Func<Random, T?, T> craeteRandomT) : base()
+        public HeapFileOperationsGenerator(HeapFile<HeapData> structure) : base()
         {
             HeapFile = structure;
-            _craeteRandomT = craeteRandomT;
         }
 
-        protected override T _createRandomT(Random random, T? filter)
+        protected override HeapData _createRandomT(Random random, HeapData? filter)
         {
-            return _craeteRandomT(random, filter);
+            var generator = new HeapDataGenerator(random);
+            return generator.GenerateItem();
         }
 
-        protected override IList<T> _findAllData(T filter, bool specific = false)
+        protected override IList<HeapData> _findAllData(HeapData filter, bool specific = false)
         {
             return _structureData.FindAll(x => x.Equals(filter));
         }
@@ -61,38 +64,38 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
             Debug.WriteLine($"Data count: {_structureData.Count}");
         }
 
-        protected override IList<T> _structureFind(T filter)
+        protected override IList<HeapData> _structureFind(HeapData filter)
         {
             return HeapFile.AllData.Where(x => x.Equals(filter)).ToList();
         }
 
-        protected override IList<T> _structureFindSpecific(T filter)
+        protected override IList<HeapData> _structureFindSpecific(HeapData filter)
         {
             throw new NotImplementedException();
         }
 
-        protected override void _structureInsert(T t)
+        protected override void _structureInsert(HeapData t)
         {
             var address = HeapFile.Insert(t);
             _structureDataAddresses.Add(address);
         }
 
-        protected override void _structureRemove(T filter)
+        protected override void _structureRemove(HeapData filter)
         {
             var address = _popAddressByData(filter);
             HeapFile.Delete(address, filter);
         }
 
-        protected override void _structureRemoveSpecific(T filter)
+        protected override void _structureRemoveSpecific(HeapData filter)
         {
             throw new NotImplementedException();
         }
 
-        protected int _getAddressByData(T data)
+        protected int _getAddressByData(HeapData data)
         {
             return _structureDataAddresses[_structureData.IndexOf(data)];
         }
-        protected int _popAddressByData(T data)
+        protected int _popAddressByData(HeapData data)
         {
             var index = _structureData.IndexOf(data);
             var address = _structureDataAddresses[index];
