@@ -48,27 +48,16 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             _frm_OperationsGenerator.OpereationRatioFindSpecific = 0;
             _frm_OperationsGenerator.OpereationRatioDeleteSpecific = 0;
 
-            _frm_OperationsGenerator.InitializeForm(_createHeapFileOperationsGenerator());
+            _frm_OperationsGenerator.InitializeForm(new HeapFileOperationsGenerator(_structure));
             _frm_OperationsGenerator.RunTest += (sender, e) => {
-                var generator = _createHeapFileOperationsGenerator();
+                var operatiosnGenerator = new HeapFileOperationsGenerator(_structure);
 
-                _frm_OperationsGenerator.InitializeGenerator(generator);
+                _frm_OperationsGenerator.InitializeGenerator(operatiosnGenerator);
 
-                generator.Generate();
+                operatiosnGenerator.Generate();
 
                 _rerenderAllStats();
             };
-        }
-
-        private HeapFileOperationsGenerator<HeapData> _createHeapFileOperationsGenerator()
-        {
-            return new HeapFileOperationsGenerator<HeapData>(
-                _structure,
-                (random, filter) => {
-                    var generator = new HeapDataGenerator(random);
-                    return generator.GenerateItem();
-                }
-            );
         }
 
         private void _rerenderAllStats()

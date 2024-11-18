@@ -526,6 +526,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// </summary>
         /// <value></value>
         public TData[] Items { get; set; }
+        public TData[] ValidItems => Items.Take(ValidCount).ToArray();
 
         public int? PreviousBlock { get; set; }
         public int? NextBlock { get; set; }

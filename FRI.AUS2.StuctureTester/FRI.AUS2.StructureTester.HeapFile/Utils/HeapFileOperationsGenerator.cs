@@ -19,10 +19,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
 
         public override string LogsFileNamePrefix => "heapfile";
 
-        // toto prerobit na tabulku, kde bude HeapData.ID => adresa, objekt
-        protected IList<int> _structureDataAddresses = new List<int>();
-        // private Dictionary<int, (int address, T data)> _structureDataDict = new Dictionary<int, (int address, T data)>();
-        
+        private Dictionary<int, (int address, HeapData data)> _structureDataDict = new Dictionary<int, (int address, HeapData data)>();
 
         public HeapFileOperationsGenerator(HeapFile<HeapData> structure) : base()
         {
@@ -48,20 +45,18 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
         protected override void _initializeStructureData()
         {
             _structureData.Clear();
-            _structureDataAddresses.Clear();
+            _structureDataDict.Clear();
 
             var i = 1;
             foreach (var block in HeapFile.GetAllDataBlocks())
             {
-                foreach (var item in block.Items)
+                foreach (var item in block.ValidItems)
                 {
                     _structureData.Add(item);
-                    _structureDataAddresses.Add(HeapFile._getAddressByBlockIndex(i));
+                    _structureDataDict.Add(item.Id, (HeapFile._getAddressByBlockIndex(i), item));
                 }
                 i++;
             }
-
-            Debug.WriteLine($"Data count: {_structureData.Count}");
         }
 
         protected override IList<HeapData> _structureFind(HeapData filter)
@@ -77,30 +72,19 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
         protected override void _structureInsert(HeapData t)
         {
             var address = HeapFile.Insert(t);
-            _structureDataAddresses.Add(address);
+            _structureDataDict.Add(t.Id, (address, t));
         }
 
         protected override void _structureRemove(HeapData filter)
         {
-            var address = _popAddressByData(filter);
+            var address = _structureDataDict[filter.Id].address;
             HeapFile.Delete(address, filter);
+            _structureDataDict.Remove(filter.Id);
         }
 
         protected override void _structureRemoveSpecific(HeapData filter)
         {
             throw new NotImplementedException();
-        }
-
-        protected int _getAddressByData(HeapData data)
-        {
-            return _structureDataAddresses[_structureData.IndexOf(data)];
-        }
-        protected int _popAddressByData(HeapData data)
-        {
-            var index = _structureData.IndexOf(data);
-            var address = _structureDataAddresses[index];
-            _structureDataAddresses.RemoveAt(index);
-            return address;
         }
     }
 }
