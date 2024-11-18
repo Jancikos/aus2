@@ -1,7 +1,7 @@
 ﻿using FRI.AUS2.Libs.Helpers;
 using FRI.AUS2.Libs.Structures.Trees;
 using FRI.AUS2.Libs.Structures.Trees.Interfaces;
-using FRI.AUS2.StuctureTester.Utils;
+using FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,7 +16,7 @@ namespace FRI.AUS2.StuctureTester
     public partial class MainWindow : Window
     {
         private KdTree<KdExampleData> _exampleStructure;
-        private OperationsGenerator<KdExampleData>? _operationsGenerator;
+        private KdTreeOperationsGenerator<KdExampleData>? _operationsGenerator;
 
         // viewer
         private bool _isViewerActivated;
@@ -343,7 +343,7 @@ namespace FRI.AUS2.StuctureTester
 
         private void _btn_testerRunTest_Click(object sender, RoutedEventArgs e)
         {
-            _operationsGenerator = new OperationsGenerator<KdExampleData>(
+            _operationsGenerator = new KdTreeOperationsGenerator<KdExampleData>(
                 _exampleStructure,
                 int.Parse(_txtb_testerOperationsCount.Text),
                 int.Parse(_txtb_testerSeed.Text),
