@@ -4,11 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FRI.AUS2.StructureTester.HeapFileTester.Controls"
-            xmlns:uc="clr-namespace:FRI.AUS2.StructureTester.HeapFileTester.Controls"
+             xmlns:libsuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls;assembly=FRI.AUS2.StructureTester.Libs"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel Orientation="Vertical">
-        <uc:InlineTextBox x:Name="_txtbx_BlockAddress" Title="Address" Value="500" />
-        <uc:InlineTextBox x:Name="_txtbx_DataId" Title="Id" Value="1" />
+        <libsuc:InlineTextBox x:Name="_txtbx_BlockAddress" Title="Address" Value="500" />
+        <libsuc:InlineTextBox x:Name="_txtbx_DataId" Title="Id" Value="1" />
     </StackPanel>
 </UserControl>
