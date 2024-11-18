@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="FRI.AUS2.StructureTester.Libs.Controls.OperationsGeneratorForm"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls"
+             xmlns:uc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" Width="250">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="50" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="1" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="2" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="2" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="2" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <uc:InlineTextBox x:Name="_txtbx_Count" Title="Count" Value="100" />
+
+        <GroupBox Header="Ratios" Grid.Row="2">
+            <StackPanel Orientation="Vertical">
+                <uc:InlineTextBox x:Name="_txtbx_operationsAdd" Title="ℹ️Add" Value="1" ToolTip="Using values from Generate nodes form (except seed and count)." />
+
+                <uc:InlineTextBox x:Name="_txtbx_operationsAddDuplicate" Title="Add dup." Value="1" />
+
+                <uc:InlineTextBox x:Name="_txtbx_operationsDelete" Title="Delete" Value="1" />
+                <uc:InlineTextBox x:Name="_txtbx_operationsDeleteSpecific" Title="Delete specific" Value="1" />
+
+                <uc:InlineTextBox x:Name="_txtbx_operationsFind" Title="Find" Value="1" />
+                <uc:InlineTextBox x:Name="_txtbx_operationsFindSpecific" Title="Find specific" Value="1" />
+            </StackPanel>
+        </GroupBox>
+
+        <uc:InlineTextBox x:Name="_txtbx_Seed" Title="Seed" Value="1" Grid.Row="4" />
+
+        <GroupBox Header="Logging" Grid.Row="6" Grid.ColumnSpan="3" >
+            <StackPanel Orientation="Vertical">
+                <uc:InlineTextBox x:Name="_txtbx_logVerbosity" Title="ℹ️Verbosity" Value="1" ToolTip="1 - all, 2 - only operations, 3 - only stats" />
+
+                <uc:InlineTextBox x:Name="_txtbx_logStatsFreq" Title="ℹ️Stats f. :" Value="0" ToolTip="Sequence stats frequency. Every how many lines the strucute stats should be printed. 0 - off" />
+            </StackPanel>
+        </GroupBox>
+
+        <StackPanel Grid.Column="2" Grid.RowSpan="6" VerticalAlignment="Center" >
+            <Button x:Name="_btn_testerRunTest" Content="Generate" Margin="0"
+                Click="_btn_testerRunTest_Click" VerticalAlignment="Center" />
+            <Button x:Name="_btn_testerLog" Content="Log file" ToolTip="Opens tester log file" Margin="0 2"
+                Click="_btn_testerLog_Click" VerticalAlignment="Center" />
+        </StackPanel>
+    </Grid>
+</UserControl>

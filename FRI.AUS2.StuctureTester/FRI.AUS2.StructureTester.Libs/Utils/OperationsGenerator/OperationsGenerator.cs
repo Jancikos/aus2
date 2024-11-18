@@ -13,7 +13,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
         /// total count of operations
         /// </summary>
         /// <value></value>
-        public int Count { get; init; }
+        public int Count { get; set; }
 
         public abstract int StructureItemsCount { get; }
 
@@ -24,7 +24,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
             {
                 return _seed;
             }
-            init
+            set
             {
                 _seed = value;
                 _random = new Random(value);
@@ -48,11 +48,11 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
         private int _expectedNodesCount;
         private Dictionary<OperationType, int> _operationStatistics = new Dictionary<OperationType, int>();
 
-        public OperationsGenerator(int count, int seed)
+        public OperationsGenerator()
         {
-            Count = count;
-            Seed = seed;
-            _random = new Random(seed);
+            Count = 10;
+            Seed = 0;
+            _random = new Random(Seed);
             _randomOperations = new List<OperationType>();
             _structureData = new List<T>();
             _structureDataWithFindProblems = new List<T>();

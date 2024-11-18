@@ -46,8 +46,16 @@ namespace FRI.AUS2.StuctureTester
             _exampleStructure = new KdTree<KdExampleData>();
             _initTreeNodes();
 
+            _initOperationsGenerator();
+
             _updateStatistics();
             IsViewerActivated = false;
+        }
+
+        private void _initOperationsGenerator()
+        {
+            _frm_OperationsGenerator.InitializeForm(_createKdTreeOperationGenerator());
+            _frm_OperationsGenerator.RunTest += _frm_OperationsGenerator_RunTest;
         }
 
         private void _initTreeNodes()
@@ -341,45 +349,12 @@ namespace FRI.AUS2.StuctureTester
             }
         }
 
-        private void _btn_testerRunTest_Click(object sender, RoutedEventArgs e)
+        private void _frm_OperationsGenerator_RunTest(object? sender, EventArgs e)
         {
-            _operationsGenerator = new KdTreeOperationsGenerator<KdExampleData>(
-                _exampleStructure,
-                int.Parse(_txtb_testerOperationsCount.Text),
-                int.Parse(_txtb_testerSeed.Text),
-                (Random random, KdExampleData? filter) =>
-                    filter is null
-                     ? new KdExampleData()
-                     {
-                         X = random.Next(
-                            _frm_Generate.X.min,
-                            _frm_Generate.X.max
-                        ),
-                         Y = random.Next(
-                            _frm_Generate.Y.min,
-                            _frm_Generate.Y.max
-                        ),
-                         Data = KdExampleData.GetRandomData(random)
-                     }
-                     : new KdExampleData()
-                     {
-                         X = filter.X,
-                         Y = filter.Y,
-                         Data = KdExampleData.GetRandomData(random)
-                     }
-            );
+            _operationsGenerator = _createKdTreeOperationGenerator();
 
-            // init ratio of operations
-            int.Parse(_txtb_operationsAdd.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Insert));
-            int.Parse(_txtb_operationsAddDuplicate.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.InsertDuplicate));
-            int.Parse(_txtb_operationsDelete.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Delete));
-            int.Parse(_txtb_operationsDeleteSpecific.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.DeleteSpecific));
-            int.Parse(_txtb_operationsFind.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.Find));
-            int.Parse(_txtb_operationsFindSpecific.Text).Repeat(() => _operationsGenerator.AddOperation(OperationType.FindSpecific));
-
-            // init log settings
-            _operationsGenerator.LogsVerbosity = int.Parse(_txtb_operationsLogVerbosity.Text);
-            _operationsGenerator.LogsStatsFrequency = int.Parse(_txtb_operationsLogStatsFreq.Text);
+            // initialize generator
+            _frm_OperationsGenerator.InitializeGenerator(_operationsGenerator);
 
             _operationsGenerator.Generate();
 
@@ -389,19 +364,31 @@ namespace FRI.AUS2.StuctureTester
             MessageBox.Show("Test was runned.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void _btn_testerLog_Click(object sender, RoutedEventArgs e)
+        private KdTreeOperationsGenerator<KdExampleData> _createKdTreeOperationGenerator()
         {
-            if (_operationsGenerator is null)
-            {
-                MessageBox.Show("No test was runned yet.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            var logUri = _operationsGenerator.LogsFileUri;
-            // copy the path to clipboard
-            Clipboard.SetText(logUri.AbsolutePath);
-
-            MessageBox.Show($"Log file path was copied to clipboard: {logUri}", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            return new KdTreeOperationsGenerator<KdExampleData>(
+                            _exampleStructure,
+                            (Random random, KdExampleData? filter) =>
+                                filter is null
+                                 ? new KdExampleData()
+                                 {
+                                     X = random.Next(
+                                        _frm_Generate.X.min,
+                                        _frm_Generate.X.max
+                                    ),
+                                     Y = random.Next(
+                                        _frm_Generate.Y.min,
+                                        _frm_Generate.Y.max
+                                    ),
+                                     Data = KdExampleData.GetRandomData(random)
+                                 }
+                                 : new KdExampleData()
+                                 {
+                                     X = filter.X,
+                                     Y = filter.Y,
+                                     Data = KdExampleData.GetRandomData(random)
+                                 }
+                        );
         }
 
         private void _txtb_Generate_Radnom_Number(object sender, System.Windows.Input.MouseButtonEventArgs e)

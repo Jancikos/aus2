@@ -18,7 +18,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
 
         private Func<Random, T?, T> _craeteRandomT;
 
-        public KdTreeOperationsGenerator(KdTree<T> structure, int count, int seed, Func<Random, T?, T> craeteRandomT) : base(count, seed)
+        public KdTreeOperationsGenerator(KdTree<T> structure, Func<Random, T?, T> craeteRandomT) : base()
         {
             KdTree = structure;
             _craeteRandomT = craeteRandomT;
