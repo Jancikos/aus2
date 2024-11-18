@@ -71,6 +71,11 @@ namespace FRI.AUS2.Libs.Structures.Files
         #region Insert
         /// <summary>
         /// O(1, 1) + operacie nad zasobnikmi
+        /// do dokumentacie rozpisat zlozitosti podla jednotlivych operacii
+        /// - do noveho bloku
+        /// - do ciastocne volneho bloku
+        ///    -  kt. sa naplni 
+        ///    -  kt. sa nenaplni 
         /// </summary>
         /// <param name="data"></param>
         /// <returns>address of the block where the data was inserted</returns>
@@ -103,6 +108,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                     }
                     break;
                 case BlockAdressType.NewBlock:
+                    // iba jeden zapis
                     if (!ActiveBlock.IsFull)
                     {
                         _enqueNextFreeBlock();
@@ -136,7 +142,13 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         /// <summary>
         /// O(1, 1) + operacie nad zasobnikmi + mazanie prazdnych blokov na konci suboru
-        /// </summary>
+        /// 
+        /// pozor na mazanie poslednych blokov
+        ///   - pri mazani viacerych volnych blokov, ich mozem nacitat viacej 
+        ///       - potom ich spracovat v ramke
+        ///       - a naraz to zapisat
+        ///   - nebude chyba to zapisovat aj na viac razy
+        /// 
         /// <param name="address"></param>
         /// <param name="filter"></param>
         public void Delete(int address, TData filter)
