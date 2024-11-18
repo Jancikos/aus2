@@ -16,6 +16,22 @@ namespace FRI.AUS2.Libs.Structures.Files
         protected BinaryFileManager _fileManager;
         public int BlockSize { get; private set; }
         public int BlocksCount => _fileManager.Length / BlockSize;
+        public int ValidItemsCount => GetAllDataBlocks().Sum(b => b.ValidCount);
+
+        public IList<TData> AllData
+        {
+            get
+            {
+                List<TData> data = new();
+
+                foreach (var block in GetAllDataBlocks())
+                {
+                    data.AddRange(block.Items.Take(block.ValidCount));
+                }
+
+                return data;
+            }
+        }
 
         private int? _nextFreeBlock = null;
         public int? NextFreeBlock { get => _nextFreeBlock; protected set => _nextFreeBlock = value; }
@@ -426,7 +442,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             return (_fileManager.Length, BlockAdressType.NewBlock);
         }
 
-        private int _getAddressByBlockIndex(int index)
+        public int _getAddressByBlockIndex(int index)
         {
             return index * BlockSize;
         }

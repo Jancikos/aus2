@@ -24,6 +24,7 @@ namespace FRI.AUS2.StructureTester.Libs.Controls
     {
         public string? _logFilePath {get; set;} = null;
 
+        #region OperationsRatioUI
         Dictionary<OperationType, int> OperationsRatios
         {
             get
@@ -39,6 +40,43 @@ namespace FRI.AUS2.StructureTester.Libs.Controls
                 };
             }
         }
+
+        public int OpereationRatioInsert 
+        {
+            get => int.Parse(_txtbx_operationsAdd.Value);
+            set => _txtbx_operationsAdd.Value = value.ToString();
+        }
+
+        public int OpereationRatioInsertDuplicate
+        {
+            get => int.Parse(_txtbx_operationsAddDuplicate.Value);
+            set => _txtbx_operationsAddDuplicate.Value = value.ToString();
+        }
+
+        public int OpereationRatioFind
+        {
+            get => int.Parse(_txtbx_operationsFind.Value);
+            set => _txtbx_operationsFind.Value = value.ToString();
+        }
+
+        public int OpereationRatioFindSpecific
+        {
+            get => int.Parse(_txtbx_operationsFindSpecific.Value);
+            set => _txtbx_operationsFindSpecific.Value = value.ToString();
+        }
+
+        public int OpereationRatioDelete
+        {
+            get => int.Parse(_txtbx_operationsDelete.Value);
+            set => _txtbx_operationsDelete.Value = value.ToString();
+        }
+
+        public int OpereationRatioDeleteSpecific
+        {
+            get => int.Parse(_txtbx_operationsDeleteSpecific.Value);
+            set => _txtbx_operationsDeleteSpecific.Value = value.ToString();
+        }
+        #endregion
 
         public event EventHandler? RunTest;
 

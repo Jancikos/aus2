@@ -23,12 +23,12 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
         private readonly string[] _lastnames = { "Novák", "Horváth", "Kováč", "Varga", "Tóth", "Nagy", "Baláž", "Molnár", "Szabó", "Kovács" };
         private readonly string[] _itemDescriptions = { "Olej", "Filtre", "Brzdy", "Výfuk", "Pneumatiky", "Baterie", "Interiér", "Elektronika" };
 
-        public HeapDataGenerator(int seed)
+        public HeapDataGenerator() : this(DateTime.Now.Millisecond) {}
+        public HeapDataGenerator(int seed) : this(new Random(seed)) {}
+        public HeapDataGenerator(Random random)
         {
-            _random = new Random(seed);
+            _random = random;
         }
-        public HeapDataGenerator() : this(DateTime.Now.Millisecond)
-        {}
 
         public HeapData GenerateItem()
         {

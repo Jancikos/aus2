@@ -11,6 +11,7 @@ using System.Windows.Shapes;
 using FRI.AUS2.Libs.Structures.Files;
 using FRI.AUS2.StructureTester.HeapFileTester.Models;
 using FRI.AUS2.StructureTester.HeapFileTester.Utils;
+using FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator;
 
 namespace FRI.AUS2.StructureTester.HeapFileTester
 {
@@ -37,6 +38,37 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             _rerenderAllStats();
 
             _frm_Insert.InitilizeDefaultValues();
+
+            _initOperationsGenerator();
+        }
+
+        private void _initOperationsGenerator()
+        {
+            _frm_OperationsGenerator.OpereationRatioInsertDuplicate = 0;
+            _frm_OperationsGenerator.OpereationRatioFindSpecific = 0;
+            _frm_OperationsGenerator.OpereationRatioDeleteSpecific = 0;
+
+            _frm_OperationsGenerator.InitializeForm(_createHeapFileOperationsGenerator());
+            _frm_OperationsGenerator.RunTest += (sender, e) => {
+                var generator = _createHeapFileOperationsGenerator();
+
+                _frm_OperationsGenerator.InitializeGenerator(generator);
+
+                generator.Generate();
+
+                _rerenderAllStats();
+            };
+        }
+
+        private HeapFileOperationsGenerator<HeapData> _createHeapFileOperationsGenerator()
+        {
+            return new HeapFileOperationsGenerator<HeapData>(
+                _structure,
+                (random, filter) => {
+                    var generator = new HeapDataGenerator(random);
+                    return generator.GenerateItem();
+                }
+            );
         }
 
         private void _rerenderAllStats()
