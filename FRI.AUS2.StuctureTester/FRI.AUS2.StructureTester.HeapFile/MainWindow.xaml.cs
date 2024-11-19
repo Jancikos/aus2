@@ -75,19 +75,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
 
         public void UpdateStructureStatistics()
         {
-            _txt_FileSize.Value = _structure.FileSize.ToString();
-            _txt_BlockSize.Value = _structure.BlockSize.ToString();
-            _txt_BlockFactor.Value = _structure.ActiveBlock.BlockFactor.ToString();
-            _txt_TDataSize.Value = _structure.ActiveBlock.TDataSize.ToString();
-            _txt_BlockMetaSize.Value = _structure.ActiveBlock.MetedataSize.ToString();
-
-            _txt_BlockDataSize.Value = _structure.ActiveBlock.DataSize.ToString();
-            _txt_BlockCount.Value = _structure.BlocksCount.ToString();
-
-            _txt_NextFreeBlock.Value = (_structure.NextFreeBlock?.ToString() ?? "?") + $" [{_structure.FreeBlocksCount}]";
-            _txt_NextEmptyBlock.Value = (_structure.NextEmptyBlock?.ToString() ?? "?") + $" [{_structure.EmptyBlocksCount}]";
-
-            _txt_ValidItemsCount.Value = _structure.ValidItemsCount.ToString();
+            _frm_Stats.UpdateStats(_structure);
         }
 
         public void RerenderAllBlocks()
