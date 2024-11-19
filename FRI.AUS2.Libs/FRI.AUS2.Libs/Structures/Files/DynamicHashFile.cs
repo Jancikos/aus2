@@ -27,6 +27,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         public DynamicHashFile(FileInfo file)
         {
             _heapFile = new HeapFile<TData>(500, file);
+            _heapFile.Clear();
 
             _increaseDepth();
             _addresses[0] = _heapFile.CreateNewBlock(); // pouztitie _heapFile.CreateNewBlock(); nahradit metodou GetEmptyBlock
@@ -36,7 +37,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         #region Insert
         public void Insert(TData data)
         {
-            int hash = data.GetHashCode();
+            int hash = data.GetHash();
             int addressIndex = _getAddressIndex(hash);
             int blockAddress = _addresses[addressIndex];
 
