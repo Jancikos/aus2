@@ -172,7 +172,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             _loadActiveBlock(address);
 
             // to znamena ze bol v zozname volnych blokov
-            bool wasInFreeBlockStack = ActiveBlock.IsInStack; 
+            bool wasInFreeBlockStack = ActiveBlock.IsChained || _nextFreeBlock == address; 
 
             bool itemDeleted = ActiveBlock.RemoveItem(filter);
             if (!itemDeleted)
@@ -297,7 +297,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// <param name="queueStartAddress"></param>
         private void _enqueActiveBlock(ref int? queueStartAddress)
         {
-            if (ActiveBlock.IsInStack)
+            if (ActiveBlock.IsChained || queueStartAddress == ActiveBlockAddress)
             {
                 throw new InvalidOperationException("Cannot enqueue block that is already in stack");
             }
@@ -530,7 +530,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         public int? PreviousBlock { get; set; }
         public int? NextBlock { get; set; }
-        public bool IsInStack => PreviousBlock is not null || NextBlock is not null;
+        public bool IsChained => PreviousBlock is not null || NextBlock is not null;
 
         public int MetedataSize => 3 * sizeof(int);
         public int TDataSize =>  (new TData()).Size;
