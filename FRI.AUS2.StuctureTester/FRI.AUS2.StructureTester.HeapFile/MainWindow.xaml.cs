@@ -40,6 +40,9 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             _frm_Insert.InitilizeDefaultValues();
 
             _initOperationsGenerator();
+
+            _structure.Clear();
+            _rerenderAllStats();
         }
 
         private void _initOperationsGenerator()
