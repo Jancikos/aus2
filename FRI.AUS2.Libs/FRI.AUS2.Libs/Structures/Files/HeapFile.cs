@@ -260,6 +260,13 @@ namespace FRI.AUS2.Libs.Structures.Files
         #endregion
 
         #region Blocks management
+
+        public HeapFileBlock<TData> GetBlock(int address)
+        {
+            _validateAddress(address);
+
+            return _loadBlock(address);
+        }
         public List<HeapFileBlock<TData>> GetAllDataBlocks()
         {
             List<HeapFileBlock<TData>> blocks = new();
@@ -451,7 +458,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             return _loadBlock(address.Value);
         }
 
-        private void _saveBlock(int address, HeapFileBlock<TData> block)
+        public void _saveBlock(int address, HeapFileBlock<TData> block)
         {
             _fileManager.WriteBytes(address, block.ToBytes());
         }

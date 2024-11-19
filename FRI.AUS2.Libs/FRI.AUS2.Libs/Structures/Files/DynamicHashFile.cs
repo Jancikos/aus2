@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using FRI.AUS2.Libs.Helpers;
@@ -27,21 +28,50 @@ namespace FRI.AUS2.Libs.Structures.Files
             _heapFile = new HeapFile<TData>(500, file);
 
             _increaseDepth();
-            _addresses[0] = _heapFile.CreateNewBlock();
-            _addresses[1] = _heapFile.CreateNewBlock();
+            _addresses[0] = _heapFile.CreateNewBlock(); // pouztitie _heapFile.CreateNewBlock(); nahradit metodou GetEmptyBlock
+            _addresses[1] = _heapFile.CreateNewBlock(); // pouztitie _heapFile.CreateNewBlock(); nahradit metodou GetEmptyBlock
         }
 
         #region Insert
         public void Insert(TData data)
         {
-            throw new NotImplementedException();
+            int hash = data.GetHashCode();
+            int addressIndex = _getAddressIndex(hash);
+            int blockAddress = _addresses[addressIndex];
+
+            var block = _heapFile.GetBlock(blockAddress);
+
+            if (block.IsFull)
+            {
+                throw new NotImplementedException("Block is full and split is not implemented");
+            }
+
+            block.AddItem(data);
+
+            _heapFile._saveBlock(blockAddress, block);
         }
         #endregion
 
         #region Find
         public TData Find(TData filter)
         {
-            throw new NotImplementedException();
+            int hash = filter.GetHashCode();
+            int addressIndex = _getAddressIndex(hash);
+            int blockAddress = _addresses[addressIndex];
+
+            var block = _heapFile.GetBlock(blockAddress);
+            if (block.IsEmpty)
+            {
+                throw new KeyNotFoundException("Block is empty");
+            }
+
+            var data = block.GetItem(filter);
+            if (data is null) 
+            {
+                throw new KeyNotFoundException("Data not found");
+            }
+
+            return data;
         }
         #endregion
 
