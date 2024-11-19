@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\FRI.AUS2.Libs\FRI.AUS2.Libs\FRI.AUS2.Libs.csproj" />
+    <ProjectReference Include="..\FRI.AUS2.StructureTester.HeapFile\FRI.AUS2.StructureTester.HeapFileTester.csproj" />
     <ProjectReference Include="..\FRI.AUS2.StructureTester.Libs\FRI.AUS2.StructureTester.Libs.csproj" />
   </ItemGroup>
 

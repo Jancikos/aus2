@@ -8,7 +8,7 @@ using FRI.AUS2.Libs.Structures.Files;
 
 namespace FRI.AUS2.StructureTester.HeapFileTester.Models
 {
-    public class HeapData : IHeapFileData
+    public class HeapData : IHeapFileData, IDynamicHashFileData
     {
         private const int _firstnameMax = 15;
         private string _firstname = "";
@@ -151,6 +151,11 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
             }
 
             return Id == otherData.Id;
+        }
+
+        public int GetHash()
+        {
+            return Id;
         }
 
         public override string ToString()

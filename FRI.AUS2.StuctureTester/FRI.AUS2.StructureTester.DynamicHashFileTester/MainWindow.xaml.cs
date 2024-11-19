@@ -12,6 +12,7 @@ using System.Windows.Shapes;
 using FRI.AUS2.Libs.Helpers;
 using FRI.AUS2.Libs.Structures.Files;
 using FRI.AUS2.StructureTester.DynamicHashFileTester.Models;
+using FRI.AUS2.StructureTester.HeapFileTester.Models;
 
 namespace FRI.AUS2.StructureTester.DynamicHashFileTester
 {
@@ -22,15 +23,17 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
     {
         private Uri DefaultFilesFolder = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\DynamicHashFileTester\");
      
-        private DynamicHashFile<DynamicHashFileData> _structure;
+        private DynamicHashFile<HeapData> _structure;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            _structure = new DynamicHashFile<DynamicHashFileData>(new(DefaultFilesFolder.LocalPath + "DynamicHashFileTester.bin"));
+            _structure = new DynamicHashFile<HeapData>(new(DefaultFilesFolder.LocalPath + "DynamicHashFileTester.bin"));
 
+            _frm_Insert.InitilizeDefaultValues();
             _btn_HashToAddress.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+
             _updateStructureStats();
         }
 
@@ -72,6 +75,22 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
         private void _btn_IncreaseDepth_Click(object sender, RoutedEventArgs e)
         {
             _structure._increaseDepth();
+            _updateStructureStats();
+        }
+
+        private void _btn_ManualInsert_Click(object sender, RoutedEventArgs e)
+        {
+            // Insert a new record
+            var data = _frm_Insert.HeapData;
+
+            try {
+                _structure.Insert(data);
+
+                MessageBox.Show($"Data inserted.", Title);
+            } catch (Exception ex) {
+                MessageBox.Show($"Error: {ex.Message}", Title);
+            }
+
             _updateStructureStats();
         }
     }
