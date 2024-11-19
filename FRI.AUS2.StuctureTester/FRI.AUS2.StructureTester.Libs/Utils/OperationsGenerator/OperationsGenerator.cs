@@ -1,22 +1,21 @@
-﻿using FRI.AUS2.Libs.Structures.Trees;
-using FRI.AUS2.Libs.Structures.Trees.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Navigation;
-using static FRI.AUS2.StuctureTester.MainWindow;
 
-namespace FRI.AUS2.StuctureTester.Utils
+namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
 {
-    class OperationsGenerator<T> where T : class, IKdTreeData
+    public abstract class OperationsGenerator<T> where T : class
     {
-        public KdTree<T> Structure { get; init; }
+        /// <summary>
+        /// total count of operations
+        /// </summary>
+        /// <value></value>
+        public int Count { get; set; }
 
-        public int Count { get; init; }
+        public abstract int StructureItemsCount { get; }
 
         private int _seed;
         public int Seed
@@ -25,7 +24,7 @@ namespace FRI.AUS2.StuctureTester.Utils
             {
                 return _seed;
             }
-            init
+            set
             {
                 _seed = value;
                 _random = new Random(value);
@@ -33,36 +32,51 @@ namespace FRI.AUS2.StuctureTester.Utils
         }
 
         public Uri LogsPath { get; set; } = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\");
-        public string LogsFileName { get; set; } = "operations.log";
+        public abstract string LogsFileNamePrefix { get; }
+        public string LogsFileName { get => $"{LogsFileNamePrefix}-operations.log"; }
         public Uri LogsFileUri => new Uri(LogsPath + @"\" + LogsFileName);
         public int LogsVerbosity { get; set; } = 1;
         public int LogsStatsFrequency { get; set; } = 0;
 
         private Random _random;
         private List<OperationType> _randomOperations;
-        /// <summary>
-        /// T? is used because when we are inserting new item with the specified key
-        /// </summary>
-        Func<Random, T?, T> _craeteRandomT;
 
-        private List<T> _structureData;
+        protected List<T> _structureData;
         private List<T> _structureDataWithFindProblems;
         private string? _structureDataStaticticsBefore;
-        private int? _structureNodesCountBefore;
-        private int _expectedNodesCount;
+        private int? _structureItemsCountBefore;
+        private int _expectedItemsCount;
         private Dictionary<OperationType, int> _operationStatistics = new Dictionary<OperationType, int>();
 
-        public OperationsGenerator(KdTree<T> structure, int count, int seed, Func<Random, T?, T> craeteRandomT)
+        public OperationsGenerator()
         {
-            Structure = structure;
-            Count = count;
-            Seed = seed;
-            _random = new Random(seed);
+            Count = 10;
+            Seed = 0;
+            _random = new Random(Seed);
             _randomOperations = new List<OperationType>();
             _structureData = new List<T>();
             _structureDataWithFindProblems = new List<T>();
-            _craeteRandomT = craeteRandomT;
         }
+
+        protected abstract void _initializeStructureData();
+
+        protected abstract void _structureInsert(T t);
+
+        /// <summary>
+        /// T? is used because when we are inserting new item with the specified key
+        /// </summary>
+        protected abstract T _createRandomT(Random random, T? filter);
+
+        protected abstract void _structureRemove(T filter);
+        protected abstract void _structureRemoveSpecific(T filter);
+
+        protected abstract IList<T> _findAllData(T filter, bool specific = false);
+
+        protected abstract IList<T> _structureFind(T filter);
+        protected abstract IList<T> _structureFindSpecific(T filter);
+
+        protected abstract string _getStructureStatictics();
+
 
         /// <summary>
         /// Add operation to the list of operations, that will be randomly used
@@ -85,7 +99,7 @@ namespace FRI.AUS2.StuctureTester.Utils
 
             for (int i = 0; i < Count; i++)
             {
-                OperationType operation = _structureData.Count == 0 
+                OperationType operation = _structureData.Count == 0
                     ? OperationType.Insert
                     : _randomOperations[_random.Next(0, randomOperationsCount)];
 
@@ -97,15 +111,16 @@ namespace FRI.AUS2.StuctureTester.Utils
             _afterGeneration();
         }
 
+
         private void _beforeGeneration()
         {
             // Get all data from the structure (to be able key all keys)
             _structureData = new List<T>();
 
             // Save structure data before operations
-            _structureData.AddRange(Structure);
+            _initializeStructureData();
             _structureDataStaticticsBefore = _getStructureStatictics();
-            _structureNodesCountBefore = _expectedNodesCount = Structure.NodesCount;
+            _structureItemsCountBefore = _expectedItemsCount = StructureItemsCount;
 
             // Initialize operation statistics
             _operationStatistics = new Dictionary<OperationType, int>
@@ -155,7 +170,7 @@ namespace FRI.AUS2.StuctureTester.Utils
             _log("");
 
             _log("Structure test:");
-            _log("Before nodes count: " + (_structureNodesCountBefore ?? 0), 1);
+            _log("Before items count: " + (_structureItemsCountBefore ?? 0), 1);
             _log($"Operations done: {Count}", 1);
             foreach (var operation in _operationStatistics)
             {
@@ -163,11 +178,11 @@ namespace FRI.AUS2.StuctureTester.Utils
             }
             _log("");
 
-            _log($"After nodes count should be: {_expectedNodesCount}", 1);
-            _log("After nodes count is: " + Structure.NodesCount, 1);
-            _log(_expectedNodesCount != Structure.NodesCount 
-                ? "!!! Nodes count is not correct !!!"
-                : "Nodes count is correct", 
+            _log($"After items count should be: {_expectedItemsCount}", 1);
+            _log("After items count is: " + StructureItemsCount, 1);
+            _log(_expectedItemsCount != StructureItemsCount
+                ? "!!! Items count is not correct !!!"
+                : "Items count is correct",
                 2
             );
 
@@ -237,18 +252,19 @@ namespace FRI.AUS2.StuctureTester.Utils
         /// <param name="filter">ak je zadany, tak urcuje kluc prvku, ktory bude vlozeny</param>
         private void _makeInsert(T? filter = null)
         {
-            var nodesCountBefore = Structure.NodesCount;
-            var t = _craeteRandomT(_random, filter);
+            var itemsCountBefore = StructureItemsCount;
+            var t = _createRandomT(_random, filter);
 
             _log($"Inserting: {t}" + (filter is not null ? " (DUPLICATE)" : ""), 1, 2);
 
-            ++_expectedNodesCount;
-            Structure.Insert(t);
+            ++_expectedItemsCount;
+            _structureInsert(t);
             _structureData.Add(t);
 
-            _checkNodesCount(nodesCountBefore + 1);
+            _checkItemsCount(itemsCountBefore + 1);
 
         }
+
 
         private void _makeDelete(bool specific = false)
         {
@@ -264,20 +280,20 @@ namespace FRI.AUS2.StuctureTester.Utils
             {
                 _log($"Deleting {(specific ? "specific" : "all")}: {filter}", 1, 2);
 
-                var nodesCountBefore = Structure.NodesCount;
-                var itemsFromList = _structureData.FindAll(x => KdTree<T>.CompareAllDimensions(x, filter) && (specific ? x.Equals(filter) : true));
+                var itemsCountBefore = StructureItemsCount;
+                var itemsFromList = _findAllData(filter, specific);
                 _log($"Found: {itemsFromList.Count} items in list", 1, 2);
 
-                _expectedNodesCount -= itemsFromList.Count;
+                _expectedItemsCount -= itemsFromList.Count;
 
-                Action<T, bool> removeAction = specific
-                    ? Structure.RemoveSpecific
-                    : Structure.Remove;
-                removeAction(filter, true);
+                Action<T> removeAction = specific
+                    ? _structureRemoveSpecific
+                    : _structureRemove;
+                removeAction(filter);
 
                 _structureData.RemoveAll(itemsFromList.Contains);
 
-                _checkNodesCount(nodesCountBefore - itemsFromList.Count);
+                _checkItemsCount(itemsCountBefore - itemsFromList.Count);
             }
             catch (InvalidOperationException e)
             {
@@ -298,18 +314,13 @@ namespace FRI.AUS2.StuctureTester.Utils
             _log($"Finding {(specific ? "specific" : "")}: {filter}", 1, 2);
 
             // check if all found items are the same as in the list
-            var itemsFromList = _structureData.FindAll(
-                x => KdTree<T>.CompareAllDimensions(x, filter) 
-                    && (specific 
-                        ? x.Equals(filter) 
-                        : true)
-            );
+            var itemsFromList = _findAllData(filter, specific);
             _log($"Found: {itemsFromList.Count} items in list", 1, 2);
             _log(string.Join(", ", itemsFromList.Select(x => x.ToString())), 2, 2);
 
-            var result = specific 
-                ? Structure.FindSpecific(filter) 
-                : Structure.Find(filter);
+            var result = specific
+                ? _structureFindSpecific(filter)
+                : _structureFind(filter);
             if (result.Count == 0)
             {
                 // key not found
@@ -351,12 +362,12 @@ namespace FRI.AUS2.StuctureTester.Utils
             return _structureData[_random.Next(0, _structureData.Count)];
         }
 
-        private void _checkNodesCount(int expectedNodesCount)
+        private void _checkItemsCount(int expectedItemCount)
         {
-            if (expectedNodesCount != Structure.NodesCount)
+            if (expectedItemCount != StructureItemsCount)
             {
-                _log($"!!! Nodes count is not correct !!!", 1, 2);
-                _log($"Expected: {expectedNodesCount}, Actual: {Structure.NodesCount}", 2, 2);
+                _log($"!!! Items count is not correct !!!", 1, 2);
+                _log($"Expected: {expectedItemCount}, Actual: {StructureItemsCount}", 2, 2);
             }
         }
 
@@ -371,11 +382,6 @@ namespace FRI.AUS2.StuctureTester.Utils
             }
 
             Debug.WriteLine(logMessage);
-        }
-
-        private string _getStructureStatictics()
-        {
-            return $"Nodes count: {Structure.NodesCount}, Depth: {Structure.Depth}, Root: {Structure.RootNode?.Data?.ToString() ?? "null"}";
         }
     }
 
