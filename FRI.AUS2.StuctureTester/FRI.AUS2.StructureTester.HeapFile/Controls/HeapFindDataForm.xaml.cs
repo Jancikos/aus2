@@ -26,6 +26,11 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
             get { return int.Parse(_txtbx_BlockAddress.Value); }
             set { _txtbx_BlockAddress.Value = value.ToString(); }
         }
+        public bool ShowAddress
+        {
+            get { return _txtbx_BlockAddress.Visibility == Visibility.Visible; }
+            set { _txtbx_BlockAddress.Visibility = value ? Visibility.Visible : Visibility.Collapsed; }
+        }
 
         public int Id
         {

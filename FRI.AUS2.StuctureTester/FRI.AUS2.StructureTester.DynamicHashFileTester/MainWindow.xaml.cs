@@ -93,6 +93,27 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
 
             _updateStructureStats();
         }
+
+        private void _btn_Find_Click(object sender, RoutedEventArgs e)
+        {
+
+            try {
+                var data = _structure.Find(
+                    _frm_FindFilter.HeapData
+                );
+
+                if (data is null) {
+                    MessageBox.Show("Data not found!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                MessageBox.Show($"Data found!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                _frm_FindResult.HeapData = data;
+            } catch (Exception ex) {
+                MessageBox.Show($"Error: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
     }
     #endregion
 }

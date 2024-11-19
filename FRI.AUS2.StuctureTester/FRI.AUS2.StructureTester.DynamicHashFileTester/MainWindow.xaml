@@ -52,6 +52,33 @@
                         <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_ManualInsert" Content="Insert" Margin="0" Click="_btn_ManualInsert_Click" />
                     </Grid>
                 </GroupBox>
+
+                <!-- manual data find -->
+                 <GroupBox Header="Find data">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="80" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        
+                        <GroupBox Header="Filter">
+                            <hfuc:HeapFindDataForm x:Name="_frm_FindFilter" ShowAddress="false" />
+                        </GroupBox>
+
+                        <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_Find" Content="Find" Margin="0" Click="_btn_Find_Click" />
+
+                        <!--data form-->
+                        <GroupBox Grid.Row="1" Grid.ColumnSpan="3" Header="Result">
+                            <hfuc:HeapDataForm x:Name="_frm_FindResult" />
+                        </GroupBox>
+
+                    </Grid>
+                 </GroupBox>
         </StackPanel>
 
 
