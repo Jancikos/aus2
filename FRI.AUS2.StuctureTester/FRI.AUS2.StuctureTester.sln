@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FRI.AUS2.Libs", "..\FRI.AUS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FRI.AUS2.StructureTester.HeapFileTester", "FRI.AUS2.StructureTester.HeapFile\FRI.AUS2.StructureTester.HeapFileTester.csproj", "{3935EF75-F6C6-4EC7-89AA-EF8A5262D41F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FRI.AUS2.StructureTester.Libs", "FRI.AUS2.StructureTester.Libs\FRI.AUS2.StructureTester.Libs.csproj", "{FEB0BB59-7766-4199-AB53-587216A3E6C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FRI.AUS2.StructureTester.Libs", "FRI.AUS2.StructureTester.Libs\FRI.AUS2.StructureTester.Libs.csproj", "{FEB0BB59-7766-4199-AB53-587216A3E6C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FRI.AUS2.StructureTester.DynamicHashFileTester", "FRI.AUS2.StructureTester.DynamicHashFileTester\FRI.AUS2.StructureTester.DynamicHashFileTester.csproj", "{B67EC592-A3FD-48F6-AFBD-BE2EB7E6519F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{FEB0BB59-7766-4199-AB53-587216A3E6C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEB0BB59-7766-4199-AB53-587216A3E6C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEB0BB59-7766-4199-AB53-587216A3E6C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B67EC592-A3FD-48F6-AFBD-BE2EB7E6519F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B67EC592-A3FD-48F6-AFBD-BE2EB7E6519F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B67EC592-A3FD-48F6-AFBD-BE2EB7E6519F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B67EC592-A3FD-48F6-AFBD-BE2EB7E6519F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
