@@ -148,6 +148,8 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// <returns></returns>
         public TData? Find(int address, TData filter)
         {
+            _validateAddress(address);
+
             _loadActiveBlock(address);
 
             return ActiveBlock.GetItem(filter);
@@ -169,6 +171,8 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// <param name="filter"></param>
         public void Delete(int address, TData filter)
         {
+            _validateAddress(address);
+
             _loadActiveBlock(address);
 
             // to znamena ze bol v zozname volnych blokov
@@ -240,6 +244,19 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
 
             return blocks;
+        }
+
+        private void _validateAddress(int address)
+        {
+            if (address < 0 || address >= _fileManager.Length)
+            {
+                throw new IndexOutOfRangeException("Address out of range");
+            }
+
+            if (address % BlockSize != 0)
+            {
+                throw new InvalidOperationException("Address is not valid address of the block beginning");
+            }
         }
 
         /// <summary>
