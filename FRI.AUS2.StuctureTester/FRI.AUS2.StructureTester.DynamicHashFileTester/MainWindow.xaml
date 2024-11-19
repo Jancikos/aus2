@@ -130,6 +130,20 @@
 
             </StackPanel>
 
+            <StackPanel Orientation="Horizontal" MaxHeight="300">
+                <GroupBox Header="HeapFile stats">
+                    <StackPanel Orientation="Horizontal">
+                        <GroupBox Header="Stats">
+                            <hfuc:HeapFileStats x:Name="_frm_HeapStats" />
+                        </GroupBox>
+
+                        <GroupBox Header="All Data Blocks"  MinWidth="250" MinHeight="300">
+                            <hfuc:HeapFileBlocks x:Name="_frm_HeapBlocks" />
+                        </GroupBox>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+
 
         </StackPanel>
     

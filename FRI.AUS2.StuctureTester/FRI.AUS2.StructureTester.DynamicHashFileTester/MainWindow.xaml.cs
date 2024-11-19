@@ -42,6 +42,9 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
             _txt_StatsDepth.Value = _structure.Depth.ToString();
             _txt_StatsAddressesCount.Value = _structure.AddressesCount.ToString();
             _lstbx_Addresses.ItemsSource = _structure.Addresses;
+
+            _frm_HeapStats.UpdateStats(_structure.HeapFile);
+            _frm_HeapBlocks.RerenderAllBlocks(_structure.HeapFile);
         }
 
         #region UI Events

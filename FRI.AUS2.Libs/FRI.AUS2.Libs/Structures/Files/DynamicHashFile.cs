@@ -22,6 +22,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         public int[] Addresses => _addresses;
 
         private HeapFile<TData> _heapFile;
+        public HeapFile<TData> HeapFile => _heapFile;
 
         public DynamicHashFile(FileInfo file)
         {

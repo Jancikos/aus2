@@ -150,7 +150,6 @@
                 <GroupBox Header="Operations generator">
                     <libsuc:OperationsGeneratorForm x:Name="_frm_OperationsGenerator" />
                 </GroupBox>
-
             </StackPanel>
         </StackPanel>
 
