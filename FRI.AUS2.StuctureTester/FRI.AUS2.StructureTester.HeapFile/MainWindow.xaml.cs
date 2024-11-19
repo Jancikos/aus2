@@ -36,6 +36,14 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
 
             _frm_Insert.InitilizeDefaultValues();
 
+            _frm_Blocks.OnItemDoubleClicked += (address, data) => {
+                _frm_FindFilter.Address = address;
+                _frm_FindFilter.HeapData = data;
+
+                _frm_DeleteFilter.Address = address;
+                _frm_DeleteFilter.HeapData = data;
+            };
+
             _initOperationsGenerator();
 
             _structure = new(500, new(DefaultFilesFolder.LocalPath + "HeapData.bin"));
@@ -69,57 +77,8 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
 
         private void _rerenderAllStats()
         {
-            UpdateStructureStatistics();
-            RerenderAllBlocks();
-        }
-
-        public void UpdateStructureStatistics()
-        {
             _frm_Stats.UpdateStats(_structure);
-        }
-
-        public void RerenderAllBlocks()
-        {
-            _treeView_Blocks.Items.Clear();
-
-            int i = 0;
-            foreach (var block in _structure.GetAllDataBlocks())
-            {
-                var blockItem = new TreeViewItem()
-                {
-                    Header = $"{i + 1}. block [{block.ValidCount}]",
-                    IsExpanded = true
-                };
-
-                var items = new List<TreeViewItem>() 
-                {
-                    new TreeViewItem() { Header = $"Address: {(i+1) * _structure.BlockSize}", Tag = (i+1) * _structure.BlockSize  },
-                    new TreeViewItem() { Header = $"Prev: {block.PreviousBlock?.ToString() ?? "?"}, Next: {block.NextBlock?.ToString() ?? "?"}" }
-                };
-
-                var dataItems = new TreeViewItem() { 
-                    Header = "Data [" + block.ValidCount + "]",
-                    Tag = "Data"
-                };
-                
-                for (int j = 0; j < block.ValidCount; j++)
-                {
-                    var data = block.Items[j];
-
-                    dataItems.Items.Add(new TreeViewItem() 
-                    { 
-                        Header = data.ToString(),
-                        Tag = data
-                    });
-                }
-                items.Add(dataItems);
-
-
-                blockItem.ItemsSource = items;
-                _treeView_Blocks.Items.Add(blockItem);
-
-                ++i;
-            }
+            _frm_Blocks.RerenderAllBlocks(_structure);
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -244,60 +203,6 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
             MessageBox.Show(result, Title);
             _txt_DeleteResult.Text = result;
             _rerenderAllStats();
-        }
-
-        private void _treeView_Blocks_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
-        {
-            var parentItem = (TreeViewItem)sender;
-
-            TreeViewItem? AddressItem = null; 
-            foreach (var item in parentItem.Items)
-            {
-                if (((TreeViewItem)item).Header.ToString().StartsWith("Address:"))
-                {
-                    AddressItem = (TreeViewItem)item;
-                    break;
-                }
-            }
-
-            TreeViewItem? dataItem = null; 
-            foreach (var item in parentItem.Items)
-            {
-                if (((TreeViewItem)item).Tag == "Data")
-                {
-                    dataItem = (TreeViewItem)item;
-                    break;
-                }
-            }
-            if (dataItem is null)
-            {
-                e.Handled = false;
-                return;
-            }
-
-            TreeViewItem? selectedItem = null;
-            HeapData? selectedData = null;
-            int i = 0;
-            while (selectedData is null && i < dataItem.Items.Count)
-            {
-                selectedItem = (TreeViewItem)dataItem.Items[i++];
-                if (selectedItem.IsSelected)
-                {
-                    selectedData = (HeapData)selectedItem.Tag;
-                }
-            }
-
-            if (selectedData is null)
-            {
-                e.Handled = false;
-                return;
-            }
-
-            _frm_FindFilter.Address = (int)AddressItem.Tag;
-            _frm_FindFilter.HeapData = selectedData;
-
-            _frm_DeleteFilter.Address = (int)AddressItem.Tag;
-            _frm_DeleteFilter.HeapData = selectedData;
         }
     }
         #endregion

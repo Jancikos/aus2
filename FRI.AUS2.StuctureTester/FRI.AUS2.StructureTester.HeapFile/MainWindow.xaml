@@ -143,15 +143,7 @@
 
                 <!-- all blocks -->
                 <GroupBox Header="All blocks" MinWidth="250" MinHeight="300">
-                    <ScrollViewer>
-                        <TreeView x:Name="_treeView_Blocks">
-                            <TreeView.ItemContainerStyle>
-                                <Style TargetType="{x:Type TreeViewItem}">
-                                    <EventSetter Event="MouseDoubleClick" Handler="_treeView_Blocks_OnItemDoubleClicked" />
-                                </Style>
-                            </TreeView.ItemContainerStyle>
-                        </TreeView>
-                    </ScrollViewer>
+                    <uc:HeapFileBlocks x:Name="_frm_Blocks" />
                 </GroupBox>
 
                 <!-- operations generator -->
