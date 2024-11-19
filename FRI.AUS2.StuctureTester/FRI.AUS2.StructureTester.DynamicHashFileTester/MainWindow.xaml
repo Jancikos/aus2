@@ -51,7 +51,7 @@
                         <GroupBox Header="Result" Grid.Row="1" Grid.ColumnSpan="3" >
                             <StackPanel>
                                 <libsuc:InlineText x:Name="_txt_HashBinary" Title="Hash (bin)" Value="00000001" />
-                                <libsuc:InlineText x:Name="_txt_StructureDepth" Title="Structure depth" Value="1" />
+                                <libsuc:InlineText x:Name="_txt_StatsDepth" Title="Structure depth" Value="1" />
                                 <libsuc:InlineText x:Name="_txt_BlockIndexBinary" Title="Block index (bin)" Value="00000001" />
                                 <libsuc:InlineText x:Name="_txt_BlockIndex" Title="Block index (dec)" Value="1" />
                             </StackPanel>
@@ -60,6 +60,24 @@
                         <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_HashToAddress" Content="Calc" Margin="0" Click="_btn_HashToAddress_Click" />
                     </Grid>
                 </GroupBox>
+
+                <!-- addresses -->
+                <GroupBox Header="Addresses">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="_btn_IncreaseDepth" Content="Increase depth" Click="_btn_IncreaseDepth_Click" />
+                        </StackPanel>
+
+                        <libsuc:InlineText x:Name="_txt_StatsAddressesCount" Title="AddressesCount" Value="1" />
+
+                        <GroupBox Header="Addresses" MaxHeight="150">
+                            <ScrollViewer>
+                                <ListBox x:Name="_lstbx_Addresses" />
+                            </ScrollViewer>
+                        </GroupBox>
+                    </StackPanel>
+                </GroupBox>
+
             </StackPanel>
         </StackPanel>
     

@@ -20,13 +20,25 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
     /// </summary>
     public partial class MainWindow : Window
     {
-        private DynamicHashFile<DynamicHashFileData> _structure = new DynamicHashFile<DynamicHashFileData>();
+        private Uri DefaultFilesFolder = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\DynamicHashFileTester\");
+     
+        private DynamicHashFile<DynamicHashFileData> _structure;
 
         public MainWindow()
         {
             InitializeComponent();
 
+            _structure = new DynamicHashFile<DynamicHashFileData>(new(DefaultFilesFolder.LocalPath + "DynamicHashFileTester.bin"));
+
             _btn_HashToAddress.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+            _updateStructureStats();
+        }
+
+        private void _updateStructureStats()
+        {
+            _txt_StatsDepth.Value = _structure.Depth.ToString();
+            _txt_StatsAddressesCount.Value = _structure.AddressesCount.ToString();
+            _lstbx_Addresses.ItemsSource = _structure.Addresses;
         }
 
         #region UI Events
@@ -51,11 +63,16 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
             var hash = int.Parse(_txtbx_Hash.Value);
 
             _txt_HashBinary.Value = hash.ToBinaryString();
-            _txt_StructureDepth.Value = _structure.Depth.ToString();
 
             var addressIndex = _structure._getAddressIndex(hash);
             _txt_BlockIndex.Value = addressIndex.ToString();
-            _txt_BlockIndexBinary.Value = addressIndex.ToBinaryString(_structure.Depth);
+            _txt_BlockIndexBinary.Value = addressIndex.ToBinaryString(_structure.Depth, false);
+        }
+
+        private void _btn_IncreaseDepth_Click(object sender, RoutedEventArgs e)
+        {
+            _structure._increaseDepth();
+            _updateStructureStats();
         }
     }
     #endregion

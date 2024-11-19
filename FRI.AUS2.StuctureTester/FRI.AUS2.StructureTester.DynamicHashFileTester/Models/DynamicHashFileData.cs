@@ -10,22 +10,24 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester.Models
 {
     public class DynamicHashFileData : IDynamicHashFileData
     {
-        public int Compare(int level, IKdTreeData other)
+        public int Size => 50;
+
+        public bool Equals(IHeapFileData other)
         {
             throw new NotImplementedException();
         }
 
-        public bool Equals(IKdTreeData other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int GetDiminesionsCount()
+        public void FromBytes(byte[] bytes)
         {
             throw new NotImplementedException();
         }
 
         public int GetHash()
+        {
+            throw new NotImplementedException();
+        }
+
+        public byte[] ToBytes()
         {
             throw new NotImplementedException();
         }
