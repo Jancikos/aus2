@@ -46,8 +46,8 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
         private void _initOperationsGenerator()
         {
             _frm_OperationsGenerator.OpereationRatioInsertDuplicate = 0;
-            _frm_OperationsGenerator.OpereationRatioFindSpecific = 0;
-            _frm_OperationsGenerator.OpereationRatioDeleteSpecific = 0;
+            _frm_OperationsGenerator.OpereationRatioFind = 0;
+            _frm_OperationsGenerator.OpereationRatioDelete = 0;
 
             _frm_OperationsGenerator.InitializeForm(new HeapFileOperationsGenerator(_structure));
             _frm_OperationsGenerator.RunTest += (sender, e) => {
@@ -55,9 +55,14 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
 
                 _frm_OperationsGenerator.InitializeGenerator(operatiosnGenerator);
 
-                operatiosnGenerator.Generate();
+                try {
+                    operatiosnGenerator.Generate();
+                    
+                    MessageBox.Show("Operations generated", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                } catch (Exception ex) {
+                    MessageBox.Show(ex.Message, Title, MessageBoxButton.OK, MessageBoxImage.Error);
+                }
 
-                MessageBox.Show("Operations generated", Title, MessageBoxButton.OK, MessageBoxImage.Information);
                 _rerenderAllStats();
             };
         }

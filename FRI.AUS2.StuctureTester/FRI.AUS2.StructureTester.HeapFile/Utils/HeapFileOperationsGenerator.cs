@@ -39,7 +39,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
 
         protected override string _getStructureStatictics()
         {
-            return "TODO";
+            return $"FileSize: {HeapFile.FileSize}, BlocksCount: {HeapFile.BlocksCount}, ValidItemsCount: {HeapFile.ValidItemsCount}, NextFreeBlock: {HeapFile.NextFreeBlock?.ToString() ?? "?"} [{HeapFile.FreeBlocksCount}], NextEmptyBlock: {HeapFile.NextEmptyBlock?.ToString() ?? "?"} [{HeapFile.EmptyBlocksCount}]";
         }
 
         protected override void _initializeStructureData()
@@ -61,12 +61,12 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
 
         protected override IList<HeapData> _structureFind(HeapData filter)
         {
-            return HeapFile.AllData.Where(x => x.Equals(filter)).ToList();
+            throw new NotImplementedException("Operation find all is not supported for HeapFile");
         }
 
         protected override IList<HeapData> _structureFindSpecific(HeapData filter)
         {
-            throw new NotImplementedException();
+            return HeapFile.AllData.Where(x => x.Equals(filter)).ToList();
         }
 
         protected override void _structureInsert(HeapData t)
@@ -77,14 +77,14 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
 
         protected override void _structureRemove(HeapData filter)
         {
-            var address = _structureDataDict[filter.Id].address;
-            HeapFile.Delete(address, filter);
-            _structureDataDict.Remove(filter.Id);
+            throw new NotImplementedException("Operation remove all is not supported for HeapFile");
         }
 
         protected override void _structureRemoveSpecific(HeapData filter)
         {
-            throw new NotImplementedException();
+            var address = _structureDataDict[filter.Id].address;
+            HeapFile.Delete(address, filter);
+            _structureDataDict.Remove(filter.Id);
         }
     }
 }

@@ -44,8 +44,8 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
         protected List<T> _structureData;
         private List<T> _structureDataWithFindProblems;
         private string? _structureDataStaticticsBefore;
-        private int? _structureNodesCountBefore;
-        private int _expectedNodesCount;
+        private int? _structureItemsCountBefore;
+        private int _expectedItemsCount;
         private Dictionary<OperationType, int> _operationStatistics = new Dictionary<OperationType, int>();
 
         public OperationsGenerator()
@@ -120,7 +120,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
             // Save structure data before operations
             _initializeStructureData();
             _structureDataStaticticsBefore = _getStructureStatictics();
-            _structureNodesCountBefore = _expectedNodesCount = StructureItemsCount;
+            _structureItemsCountBefore = _expectedItemsCount = StructureItemsCount;
 
             // Initialize operation statistics
             _operationStatistics = new Dictionary<OperationType, int>
@@ -170,7 +170,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
             _log("");
 
             _log("Structure test:");
-            _log("Before nodes count: " + (_structureNodesCountBefore ?? 0), 1);
+            _log("Before items count: " + (_structureItemsCountBefore ?? 0), 1);
             _log($"Operations done: {Count}", 1);
             foreach (var operation in _operationStatistics)
             {
@@ -178,11 +178,11 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
             }
             _log("");
 
-            _log($"After nodes count should be: {_expectedNodesCount}", 1);
-            _log("After nodes count is: " + StructureItemsCount, 1);
-            _log(_expectedNodesCount != StructureItemsCount
-                ? "!!! Nodes count is not correct !!!"
-                : "Nodes count is correct",
+            _log($"After items count should be: {_expectedItemsCount}", 1);
+            _log("After items count is: " + StructureItemsCount, 1);
+            _log(_expectedItemsCount != StructureItemsCount
+                ? "!!! Items count is not correct !!!"
+                : "Items count is correct",
                 2
             );
 
@@ -252,16 +252,16 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
         /// <param name="filter">ak je zadany, tak urcuje kluc prvku, ktory bude vlozeny</param>
         private void _makeInsert(T? filter = null)
         {
-            var nodesCountBefore = StructureItemsCount;
+            var itemsCountBefore = StructureItemsCount;
             var t = _createRandomT(_random, filter);
 
             _log($"Inserting: {t}" + (filter is not null ? " (DUPLICATE)" : ""), 1, 2);
 
-            ++_expectedNodesCount;
+            ++_expectedItemsCount;
             _structureInsert(t);
             _structureData.Add(t);
 
-            _checkNodesCount(nodesCountBefore + 1);
+            _checkItemsCount(itemsCountBefore + 1);
 
         }
 
@@ -280,11 +280,11 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
             {
                 _log($"Deleting {(specific ? "specific" : "all")}: {filter}", 1, 2);
 
-                var nodesCountBefore = StructureItemsCount;
+                var itemsCountBefore = StructureItemsCount;
                 var itemsFromList = _findAllData(filter, specific);
                 _log($"Found: {itemsFromList.Count} items in list", 1, 2);
 
-                _expectedNodesCount -= itemsFromList.Count;
+                _expectedItemsCount -= itemsFromList.Count;
 
                 Action<T> removeAction = specific
                     ? _structureRemoveSpecific
@@ -293,7 +293,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
 
                 _structureData.RemoveAll(itemsFromList.Contains);
 
-                _checkNodesCount(nodesCountBefore - itemsFromList.Count);
+                _checkItemsCount(itemsCountBefore - itemsFromList.Count);
             }
             catch (InvalidOperationException e)
             {
@@ -362,12 +362,12 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
             return _structureData[_random.Next(0, _structureData.Count)];
         }
 
-        private void _checkNodesCount(int expectedNodesCount)
+        private void _checkItemsCount(int expectedItemCount)
         {
-            if (expectedNodesCount != StructureItemsCount)
+            if (expectedItemCount != StructureItemsCount)
             {
-                _log($"!!! Nodes count is not correct !!!", 1, 2);
-                _log($"Expected: {expectedNodesCount}, Actual: {StructureItemsCount}", 2, 2);
+                _log($"!!! Items count is not correct !!!", 1, 2);
+                _log($"Expected: {expectedItemCount}, Actual: {StructureItemsCount}", 2, 2);
             }
         }
 
