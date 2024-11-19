@@ -9,7 +9,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 {
     public class DynamicHashFile<TData> where TData : class, IDynamicHashFileData, new()
     {
-        private int _depth;
+        private int _depth = 3;
         public int Depth => _depth;
 
         #region Insert
@@ -35,20 +35,16 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         #region Management
         
-        private int _getAddress(int hash)
+        public int _getAddressIndex(int hash)
         {
-            int address = 0;
+            int mask = 0;
 
-            for (int i = 0; i < Depth; i++)
+            _depth.Repeat(() =>
             {
-                int mask = 1 << i;
-                int bit = (hash & mask) >> i;
-
-                address = address << 1;
-                address = address | bit;
-            }
-
-            return address;
+                mask = (mask << 1) | 1;
+            });
+            
+            return hash & mask;
         }
 
         #endregion

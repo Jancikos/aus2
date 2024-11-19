@@ -4,8 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FRI.AUS2.StructureTester.DynamicHashFileTester"
+        xmlns:libsuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls;assembly=FRI.AUS2.StructureTester.Libs"
         mc:Ignorable="d"
         Title="AUS2 Structure tester - DynamicHashFile" Height="650" Width="800">
+        
+    <Window.Resources>
+        <ResourceDictionary Source="/Dictionary.xaml" />
+    </Window.Resources>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -26,6 +32,35 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Vertical" Margin="5">
+            <StackPanel Orientation="Horizontal">
+                <!-- hash to address test -->
+                 <GroupBox Header="Hash to address">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="80" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <libsuc:InlineTextBox x:Name="_txtbx_Hash" Title="Hash (dec)" Value="1" />
+
+                        <GroupBox Header="Result" Grid.Row="1" Grid.ColumnSpan="3" >
+                            <StackPanel>
+                                <libsuc:InlineText x:Name="_txt_HashBinary" Title="Hash (bin)" Value="00000001" />
+                                <libsuc:InlineText x:Name="_txt_StructureDepth" Title="Structure depth" Value="1" />
+                                <libsuc:InlineText x:Name="_txt_BlockIndexBinary" Title="Block index (bin)" Value="00000001" />
+                                <libsuc:InlineText x:Name="_txt_BlockIndex" Title="Block index (dec)" Value="1" />
+                            </StackPanel>
+                        </GroupBox>
+                        
+                        <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_HashToAddress" Content="Calc" Margin="0" Click="_btn_HashToAddress_Click" />
+                    </Grid>
+                </GroupBox>
+            </StackPanel>
         </StackPanel>
     
     </Grid>
