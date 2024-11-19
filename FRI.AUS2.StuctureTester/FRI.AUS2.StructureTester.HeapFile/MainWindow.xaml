@@ -139,15 +139,18 @@
                 <!-- statictics  -->
                 <GroupBox Header="Structure statistics">
                     <StackPanel Orientation="Vertical">
+                        <libsuc:InlineText x:Name="_txt_FileSize" Title="FileSize" Value="" />
                         <libsuc:InlineText x:Name="_txt_BlockSize" Title="BlockSize" Value="" />
                         <libsuc:InlineText x:Name="_txt_BlockMetaSize" Title="BlockMetaSize" Value="" />
                         <libsuc:InlineText x:Name="_txt_BlockDataSize" Title="BlockDataSize" Value="" />
                         <libsuc:InlineText x:Name="_txt_TDataSize" Title="TDataSize" Value="" />
                         <libsuc:InlineText x:Name="_txt_BlockFactor" Title="BlockFactor" Value="" />
-
+                        
                         <libsuc:InlineText x:Name="_txt_BlockCount" Title="BlocksCount" Value="" Margin="0,4,0,0" />
                         <libsuc:InlineText x:Name="_txt_NextFreeBlock" Title="NextFreeBlock" Value="" />
                         <libsuc:InlineText x:Name="_txt_NextEmptyBlock" Title="NextEmptyBlock" Value="" />
+
+                        <libsuc:InlineText x:Name="_txt_ValidItemsCount" Title="ValidItemsCount" Value="" Margin="0,4,0,0" />
                     </StackPanel>
                 </GroupBox>
 

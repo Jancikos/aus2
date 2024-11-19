@@ -14,6 +14,7 @@ namespace FRI.AUS2.Libs.Structures.Files
     public class HeapFile<TData> : IBinaryData, IDisposable where TData : class, IHeapFileData, new()
     {
         protected BinaryFileManager _fileManager;
+        public int FileSize => _fileManager.Length;
         public int BlockSize { get; private set; }
         public int BlocksCount => _fileManager.Length / BlockSize;
         public int ValidItemsCount => GetAllDataBlocks().Sum(b => b.ValidCount);

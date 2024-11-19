@@ -34,13 +34,11 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
                 System.IO.Directory.CreateDirectory(DefaultFilesFolder.LocalPath);
             }
 
-            _structure = new(500, new(DefaultFilesFolder.LocalPath + "HeapData.bin"));
-            _rerenderAllStats();
-
             _frm_Insert.InitilizeDefaultValues();
 
             _initOperationsGenerator();
 
+            _structure = new(500, new(DefaultFilesFolder.LocalPath + "HeapData.bin"));
             _structure.Clear();
             _rerenderAllStats();
         }
@@ -59,6 +57,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
 
                 operatiosnGenerator.Generate();
 
+                MessageBox.Show("Operations generated", Title, MessageBoxButton.OK, MessageBoxImage.Information);
                 _rerenderAllStats();
             };
         }
@@ -71,6 +70,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
 
         public void UpdateStructureStatistics()
         {
+            _txt_FileSize.Value = _structure.FileSize.ToString();
             _txt_BlockSize.Value = _structure.BlockSize.ToString();
             _txt_BlockFactor.Value = _structure.ActiveBlock.BlockFactor.ToString();
             _txt_TDataSize.Value = _structure.ActiveBlock.TDataSize.ToString();
@@ -81,6 +81,8 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
 
             _txt_NextFreeBlock.Value = (_structure.NextFreeBlock?.ToString() ?? "?") + $" [{_structure.FreeBlocksCount}]";
             _txt_NextEmptyBlock.Value = (_structure.NextEmptyBlock?.ToString() ?? "?") + $" [{_structure.EmptyBlocksCount}]";
+
+            _txt_ValidItemsCount.Value = _structure.ValidItemsCount.ToString();
         }
 
         public void RerenderAllBlocks()
