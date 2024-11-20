@@ -27,7 +27,10 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         public DynamicHashFile(FileInfo file)
         {
-            _heapFile = new HeapFile<TData>(500, file);
+            _heapFile = new HeapFile<TData>(500, file)
+            {
+                ManageFreeBlocks = false
+            };
             _heapFile.Clear();
             
             _initializeAddresses();

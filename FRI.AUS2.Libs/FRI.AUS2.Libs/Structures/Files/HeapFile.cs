@@ -40,6 +40,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             get => _countStackItems(NextFreeBlock);
         }
+        public bool ManageFreeBlocks { get; set; } = true;
 
         private int? _nextEmptyBlock = null;
         public int? NextEmptyBlock { get => _nextEmptyBlock; protected set => _nextEmptyBlock = value; }
@@ -477,11 +478,21 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         private void _enqueNextFreeBlock()
         {
+            if (!ManageFreeBlocks) 
+            {
+                return;
+            }
+
             _enqueActiveBlock(ref _nextFreeBlock);
         }
 
         private void _dequeNextFreeBlock()
         {
+            if (!ManageFreeBlocks) 
+            {
+                return;
+            }
+
             _dequeActiveBlock(ref _nextFreeBlock);
         }
 
