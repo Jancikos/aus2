@@ -103,6 +103,22 @@ namespace FRI.AUS2.Libs.Structures.Files
             return _insertToBlock(address, addressType, data);
         }
 
+        public int InsertToBlock(int address, TData data)
+        {
+            _validateAddress(address);
+
+
+            _loadActiveBlock(address);
+            var addressType = _getBlockAddressType(address, ActiveBlock);
+            
+            if (addressType == BlockAdressType.FullBlock)
+            {
+                throw new InvalidOperationException("Block is full");
+            }
+
+            return _insertToBlock(address, addressType, data);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -122,13 +138,13 @@ namespace FRI.AUS2.Libs.Structures.Files
             _saveActiveBlockDisabled = true;
             switch (addressType)
             {
-                case BlockAdressType.NextFreeBlock:
+                case BlockAdressType.FreeBlock:
                     if (ActiveBlock.IsFull)
                     {
                         _dequeNextFreeBlock();
                     }
                     break;
-                case BlockAdressType.NextEmptyBlock:
+                case BlockAdressType.EmptyBlock:
                     if (!ActiveBlock.IsEmpty)
                     {
                         _dequeNextEmptyBlock();
@@ -143,7 +159,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                     if (data is null) 
                     {
                         // lebo sa do noveho nepridali ziadne data
-                        _enqueNextFreeBlock();
+                        _enqueNextEmptyBlock();
                         break;
                     }
 
@@ -292,6 +308,26 @@ namespace FRI.AUS2.Libs.Structures.Files
             {
                 throw new InvalidOperationException("Address is not valid address of the block beginning");
             }
+        }
+
+        private BlockAdressType _getBlockAddressType(int adrress, HeapFileBlock<TData> block)
+        {
+            if (adrress == FileSize)
+            {
+                return BlockAdressType.NewBlock;
+            }
+
+            if (block.IsEmpty)
+            {
+                return BlockAdressType.EmptyBlock;
+            }
+
+            if (block.IsFull)
+            {
+                return BlockAdressType.FullBlock;
+            }
+
+            return BlockAdressType.FreeBlock;
         }
 
         /// <summary>
@@ -483,12 +519,12 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             if (NextFreeBlock is not null)
             {
-                return (NextFreeBlock.Value, BlockAdressType.NextFreeBlock);
+                return (NextFreeBlock.Value, BlockAdressType.FreeBlock);
             }
 
             if (NextEmptyBlock is not null)
             {
-                return (NextEmptyBlock.Value, BlockAdressType.NextEmptyBlock);
+                return (NextEmptyBlock.Value, BlockAdressType.EmptyBlock);
             }
 
             return (_fileManager.Length, BlockAdressType.NewBlock);
@@ -551,9 +587,10 @@ namespace FRI.AUS2.Libs.Structures.Files
 
     public enum BlockAdressType
     {
-        NextFreeBlock,
-        NextEmptyBlock,
-        NewBlock
+        FreeBlock,
+        EmptyBlock,
+        NewBlock,
+        FullBlock
     }
 
     public class HeapFileBlock<TData> : IBinaryData where TData : class, IHeapFileData, new()

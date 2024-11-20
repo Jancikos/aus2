@@ -41,16 +41,13 @@ namespace FRI.AUS2.Libs.Structures.Files
             int addressIndex = _getAddressIndex(hash);
             int blockAddress = _addresses[addressIndex];
 
-            var block = _heapFile.GetBlock(blockAddress);
-
-            if (block.IsFull)
-            {
+            try {
+                _heapFile.InsertToBlock(blockAddress, data);
+            } catch (InvalidOperationException e) {
+                // block is full
+                // split block
                 throw new NotImplementedException("Block is full and split is not implemented");
             }
-
-            block.AddItem(data);
-
-            _heapFile._saveBlock(blockAddress, block);
         }
         #endregion
 
