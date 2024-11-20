@@ -24,6 +24,12 @@ namespace FRI.AUS2.StructureTester.Libs.Controls
     {
         public string? _logFilePath {get; set;} = null;
 
+        public int Count 
+        {
+            get => int.Parse(_txtbx_Count.Value);
+            set => _txtbx_Count.Value = value.ToString();
+        }
+
         #region OperationsRatioUI
         Dictionary<OperationType, int> OperationsRatios
         {

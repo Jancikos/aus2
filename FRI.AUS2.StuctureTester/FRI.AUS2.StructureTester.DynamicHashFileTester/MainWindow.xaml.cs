@@ -12,6 +12,7 @@ using System.Windows.Shapes;
 using FRI.AUS2.Libs.Helpers;
 using FRI.AUS2.Libs.Structures.Files;
 using FRI.AUS2.StructureTester.DynamicHashFileTester.Models;
+using FRI.AUS2.StructureTester.DynamicHashFileTester.Utils;
 using FRI.AUS2.StructureTester.HeapFileTester.Models;
 
 namespace FRI.AUS2.StructureTester.DynamicHashFileTester
@@ -40,7 +41,36 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
             };
             _frm_Insert.InitilizeDefaultValues();
 
+            _initOperationsGenerator();
+
             _updateStructureStats();
+        }
+
+        private void _initOperationsGenerator()
+        {
+            _frm_OperationsGenerator.Count = 10;
+            _frm_OperationsGenerator.OpereationRatioInsertDuplicate = 0;
+            _frm_OperationsGenerator.OpereationRatioFind = 0;
+            _frm_OperationsGenerator.OpereationRatioFindSpecific = 0;
+            _frm_OperationsGenerator.OpereationRatioDelete = 0;
+            _frm_OperationsGenerator.OpereationRatioDeleteSpecific = 0;
+
+            _frm_OperationsGenerator.InitializeForm(new DynamicHashFileOperationsGenerator(_structure));
+            _frm_OperationsGenerator.RunTest += (sender, e) => {
+                var operatiosnGenerator = new DynamicHashFileOperationsGenerator(_structure);
+
+                _frm_OperationsGenerator.InitializeGenerator(operatiosnGenerator);
+
+                try {
+                    operatiosnGenerator.Generate();
+                    
+                    MessageBox.Show("Operations generated", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                } catch (Exception ex) {
+                    MessageBox.Show(ex.Message, Title, MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+
+                _updateStructureStats();
+            };
         }
 
         private void _updateStructureStats()

@@ -66,6 +66,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
 
         protected override IList<HeapData> _structureFindSpecific(HeapData filter)
         {
+            // todo - upravit to aby sa tu findovalo klasicky cez heapfile
             return HeapFile.AllData.Where(x => x.Equals(filter)).ToList();
         }
 

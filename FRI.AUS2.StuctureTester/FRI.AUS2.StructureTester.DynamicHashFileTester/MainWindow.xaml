@@ -134,6 +134,7 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" MaxHeight="300">
+                <!-- heap file stats -->
                 <GroupBox Header="HeapFile stats">
                     <StackPanel Orientation="Horizontal">
                         <GroupBox Header="Stats">
@@ -144,6 +145,11 @@
                             <hfuc:HeapFileBlocks x:Name="_frm_HeapBlocks" MaxHeight="290" />
                         </GroupBox>
                     </StackPanel>
+                </GroupBox>
+                
+                <!-- operations generator -->
+                <GroupBox Header="Operations generator">
+                    <libsuc:OperationsGeneratorForm x:Name="_frm_OperationsGenerator" />
                 </GroupBox>
             </StackPanel>
 
