@@ -7,7 +7,7 @@
         xmlns:libsuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls;assembly=FRI.AUS2.StructureTester.Libs"
         xmlns:hfuc="clr-namespace:FRI.AUS2.StructureTester.HeapFileTester.Controls;assembly=FRI.AUS2.StructureTester.HeapFileTester"
         mc:Ignorable="d"
-        Title="AUS2 Structure tester - DynamicHashFile" Height="750" Width="800">
+        Title="AUS2 Structure tester - DynamicHashFile" Height="750" Width="800" SizeToContent="WidthAndHeight">
         
     <Window.Resources>
         <ResourceDictionary Source="/Dictionary.xaml" />
@@ -141,8 +141,8 @@
                             <hfuc:HeapFileStats x:Name="_frm_HeapStats" />
                         </GroupBox>
 
-                        <GroupBox Header="All Data Blocks"  MinWidth="250" MinHeight="300">
-                            <hfuc:HeapFileBlocks x:Name="_frm_HeapBlocks" MaxHeight="290" />
+                        <GroupBox Header="All Data Blocks"  MinWidth="250">
+                            <hfuc:HeapFileBlocks x:Name="_frm_HeapBlocks" />
                         </GroupBox>
                     </StackPanel>
                 </GroupBox>
