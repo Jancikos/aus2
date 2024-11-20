@@ -7,7 +7,7 @@
         xmlns:libsuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls;assembly=FRI.AUS2.StructureTester.Libs"
         xmlns:hfuc="clr-namespace:FRI.AUS2.StructureTester.HeapFileTester.Controls;assembly=FRI.AUS2.StructureTester.HeapFileTester"
         mc:Ignorable="d"
-        Title="AUS2 Structure tester - DynamicHashFile" Height="650" Width="800">
+        Title="AUS2 Structure tester - DynamicHashFile" Height="750" Width="800">
         
     <Window.Resources>
         <ResourceDictionary Source="/Dictionary.xaml" />
@@ -49,7 +49,10 @@
                         <!--data form-->
                         <hfuc:HeapDataForm x:Name="_frm_Insert" />
 
-                        <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_ManualInsert" Content="Insert" Margin="0" Click="_btn_ManualInsert_Click" />
+                        <StackPanel Grid.Column="2" Orientation="Vertical">
+                            <Button x:Name="_btn_ManualInsertFormRefresh" Content="Refresh" Margin="0" Click="_btn_ManualInsertFormRefresh_Click" />
+                            <Button x:Name="_btn_ManualInsert" Content="Insert" Margin="0" Click="_btn_ManualInsert_Click" />
+                        </StackPanel>
                     </Grid>
                 </GroupBox>
 
@@ -138,7 +141,7 @@
                         </GroupBox>
 
                         <GroupBox Header="All Data Blocks"  MinWidth="250" MinHeight="300">
-                            <hfuc:HeapFileBlocks x:Name="_frm_HeapBlocks" />
+                            <hfuc:HeapFileBlocks x:Name="_frm_HeapBlocks" MaxHeight="290" />
                         </GroupBox>
                     </StackPanel>
                 </GroupBox>

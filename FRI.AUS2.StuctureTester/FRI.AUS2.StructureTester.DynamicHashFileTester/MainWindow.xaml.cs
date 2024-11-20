@@ -22,7 +22,7 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
     public partial class MainWindow : Window
     {
         private Uri DefaultFilesFolder = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\DynamicHashFileTester\");
-     
+
         private DynamicHashFile<HeapData> _structure;
 
         public MainWindow()
@@ -31,7 +31,8 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
 
             _structure = new DynamicHashFile<HeapData>(new(DefaultFilesFolder.LocalPath + "DynamicHashFileTester.bin"));
 
-            _frm_Insert.OnIdChanged = (id) => {
+            _frm_Insert.OnIdChanged = (id) =>
+            {
                 _frm_FindFilter.Id = id;
 
                 _txtbx_Hash.Value = id.ToString();
@@ -92,33 +93,46 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
             // Insert a new record
             var data = _frm_Insert.HeapData;
 
-            try {
+            try
+            {
                 _structure.Insert(data);
 
                 MessageBox.Show($"Data inserted.", Title, MessageBoxButton.OK, MessageBoxImage.Information);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 MessageBox.Show($"Error: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             _updateStructureStats();
         }
 
+        private void _btn_ManualInsertFormRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            _frm_Insert.Id++;
+            _frm_Insert.InitilizeDefaultValues();
+        }
+
         private void _btn_Find_Click(object sender, RoutedEventArgs e)
         {
 
-            try {
+            try
+            {
                 var data = _structure.Find(
                     _frm_FindFilter.HeapData
                 );
 
-                if (data is null) {
+                if (data is null)
+                {
                     MessageBox.Show("Data not found!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 MessageBox.Show($"Data found!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
                 _frm_FindResult.HeapData = data;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 MessageBox.Show($"Error: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
