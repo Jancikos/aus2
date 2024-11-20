@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,9 +18,9 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// array of addresses to the blocks
         /// </summary>
         /// <returns></returns>
-        private int[] _addresses = new int[0];
+        private DynamicHashFileBlock<TData>[] _addresses = [];
         public int AddressesCount => _addresses.Length;
-        public int[] Addresses => _addresses;
+        public DynamicHashFileBlock<TData>[] Addresses => _addresses;
 
         private HeapFile<TData> _heapFile;
         public HeapFile<TData> HeapFile => _heapFile;
@@ -28,10 +29,8 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             _heapFile = new HeapFile<TData>(500, file);
             _heapFile.Clear();
-
-            _increaseDepth();
-            _addresses[0] = _heapFile.CreateNewBlock(); // pouztitie _heapFile.CreateNewBlock(); nahradit metodou GetEmptyBlock
-            _addresses[1] = _heapFile.CreateNewBlock(); // pouztitie _heapFile.CreateNewBlock(); nahradit metodou GetEmptyBlock
+            
+            _initializeAddresses();
         }
 
         #region Insert
@@ -39,15 +38,19 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             int hash = data.GetHash();
             int addressIndex = _getAddressIndex(hash);
-            int blockAddress = _addresses[addressIndex];
+            var dhfBlock = _addresses[addressIndex];
 
-            try {
-                _heapFile.InsertToBlock(blockAddress, data);
-            } catch (InvalidOperationException e) {
-                // block is full
-                // split block
-                throw new NotImplementedException("Block is full and split is not implemented");
-            }
+            bool inserted = false;
+            do {
+                try {
+                    _heapFile.InsertToBlock(dhfBlock.Address, data);
+                    inserted = true;
+                } catch (InvalidOperationException) {
+                    // block is full
+                    // split block
+                    throw new NotImplementedException("Block is full and split is not implemented");
+                }
+            } while (!inserted);
         }
         #endregion
 
@@ -56,9 +59,8 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             int hash = filter.GetHashCode();
             int addressIndex = _getAddressIndex(hash);
-            int blockAddress = _addresses[addressIndex];
 
-            var block = _heapFile.GetBlock(blockAddress);
+            var block = _addresses[addressIndex].Block;
             if (block.IsEmpty)
             {
                 throw new KeyNotFoundException("Block is empty");
@@ -82,7 +84,16 @@ namespace FRI.AUS2.Libs.Structures.Files
         #endregion
 
         #region Management
-        
+
+
+        private void _initializeAddresses()
+        {
+            _increaseDepth();
+            
+            _addresses[0] = new DynamicHashFileBlock<TData>(_heapFile.CreateNewBlock(), _heapFile); // pouztitie _heapFile.CreateNewBlock(); nahradit metodou GetEmptyBlock
+            _addresses[1] = new DynamicHashFileBlock<TData>(_heapFile.CreateNewBlock(), _heapFile); // pouztitie _heapFile.CreateNewBlock(); nahradit metodou GetEmptyBlock
+        }
+
         public int _getAddressIndex(int hash)
         {
             int mask = 0;
@@ -98,15 +109,19 @@ namespace FRI.AUS2.Libs.Structures.Files
         public void _increaseDepth()
         {
             _depth++;
-            int[] newAddresses = new int[(int)Math.Pow(2, Depth)];
+            DynamicHashFileBlock<TData>[] newAddresses = new DynamicHashFileBlock<TData>[(int)Math.Pow(2, Depth)];
             
             for (int i = 0; i < _addresses.Length; i++)
             {
                 int newIndexBase = i * 2;
+                var adressBlock = _addresses[i];
 
                 for (int j = 0; j < 2; j++)
                 {
-                    newAddresses[newIndexBase + j] = _addresses[i];
+                    newAddresses[newIndexBase + j] = new DynamicHashFileBlock<TData>(adressBlock.Address, _heapFile) 
+                    {
+                         BlockDepth = adressBlock.BlockDepth
+                    };
                 }
             }
 
@@ -114,5 +129,25 @@ namespace FRI.AUS2.Libs.Structures.Files
         }
 
         #endregion
+    }
+
+    public class DynamicHashFileBlock<TData> where TData : class, IDynamicHashFileData, new()
+    {
+        public int Address { get; set; }
+        public int BlockDepth { get; set; } = 1;
+        public HeapFileBlock<TData> Block => _heapFile.GetBlock(Address);
+
+        private HeapFile<TData> _heapFile;
+
+        public DynamicHashFileBlock(int address, HeapFile<TData> heapFile)
+        {
+            Address = address;
+            _heapFile = heapFile;
+        }
+
+        public override string ToString()
+        {
+            return $"[{BlockDepth}] {Address}";
+        }
     }
 }
