@@ -31,8 +31,13 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
 
             _structure = new DynamicHashFile<HeapData>(new(DefaultFilesFolder.LocalPath + "DynamicHashFileTester.bin"));
 
+            _frm_Insert.OnIdChanged = (id) => {
+                _frm_FindFilter.Id = id;
+
+                _txtbx_Hash.Value = id.ToString();
+                _btn_HashToAddress.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+            };
             _frm_Insert.InitilizeDefaultValues();
-            _btn_HashToAddress.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
 
             _updateStructureStats();
         }
@@ -41,7 +46,8 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
         {
             _txt_StatsDepth.Value = _structure.Depth.ToString();
             _txt_StatsAddressesCount.Value = _structure.AddressesCount.ToString();
-            _lstbx_Addresses.ItemsSource = _structure.Addresses;
+            int i = 0;
+            _lstbx_Addresses.ItemsSource = _structure.Addresses.Select(b => $"{i++.ToBinaryString(_structure.Depth, false)}: {b}");
 
             _frm_HeapStats.UpdateStats(_structure.HeapFile);
             _frm_HeapBlocks.RerenderAllBlocks(_structure.HeapFile);
@@ -89,9 +95,9 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
             try {
                 _structure.Insert(data);
 
-                MessageBox.Show($"Data inserted.", Title);
+                MessageBox.Show($"Data inserted.", Title, MessageBoxButton.OK, MessageBoxImage.Information);
             } catch (Exception ex) {
-                MessageBox.Show($"Error: {ex.Message}", Title);
+                MessageBox.Show($"Error: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             _updateStructureStats();

@@ -30,7 +30,7 @@
             </Grid.RowDefinitions>
     
             <TextBlock Text="ID:" />
-            <TextBox x:Name="_txtb_Id" Grid.Column="2" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" />
+            <TextBox x:Name="_txtb_Id" Grid.Column="2" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" TextChanged="_txtb_Id_TextChanged" />
     
             <TextBlock Text="Firstname:" Grid.Row="4" />
             <TextBox x:Name="_txtb_Firstname" Grid.Column="2" Grid.Row="4" TextAlignment="Right" />

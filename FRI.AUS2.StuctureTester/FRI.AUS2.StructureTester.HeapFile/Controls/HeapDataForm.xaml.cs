@@ -22,6 +22,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
     /// </summary>
     public partial class HeapDataForm : UserControl
     {
+        public Action<int>? OnIdChanged;
         public int Id
         {
             get { return int.Parse(_txtb_Id.Text); }
@@ -99,6 +100,14 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
             {
                 txtb.Text = (result + 1).ToString();
                 return;
+            }
+        }
+
+        private void _txtb_Id_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (int.TryParse(_txtb_Id.Text, out int result))
+            {
+                OnIdChanged?.Invoke(result);
             }
         }
 
