@@ -48,10 +48,10 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
 
         private void _initOperationsGenerator()
         {
-            _frm_OperationsGenerator.Count = 10;
+            _frm_OperationsGenerator.Count = 100;
             _frm_OperationsGenerator.OpereationRatioInsertDuplicate = 0;
             _frm_OperationsGenerator.OpereationRatioFind = 0;
-            _frm_OperationsGenerator.OpereationRatioFindSpecific = 0;
+            _frm_OperationsGenerator.OpereationRatioFindSpecific = 1;
             _frm_OperationsGenerator.OpereationRatioDelete = 0;
             _frm_OperationsGenerator.OpereationRatioDeleteSpecific = 0;
 

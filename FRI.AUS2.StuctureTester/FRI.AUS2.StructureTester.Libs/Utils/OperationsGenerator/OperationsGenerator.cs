@@ -342,7 +342,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
             {
                 result.ToList().ForEach(x =>
                 {
-                    if (!x.Equals(filter))
+                    if (!_compareItems(x, filter))
                     {
                         _log("Found item is not the same as searched item !!!", 1, 2);
                         _structureDataWithFindProblems.Add(filter);
@@ -350,6 +350,11 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
                 });
             }
 
+        }
+
+        protected virtual bool _compareItems(T item1, T item2)
+        {
+            return item1.Equals(item2);
         }
 
         private T? _getRandomKey()

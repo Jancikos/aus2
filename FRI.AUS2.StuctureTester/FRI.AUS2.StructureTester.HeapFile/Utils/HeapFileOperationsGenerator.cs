@@ -32,6 +32,11 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
             return generator.GenerateItem();
         }
 
+        protected override bool _compareItems(HeapData item1, HeapData item2)
+        {
+            return item1.Equals(item2);
+        }
+
         protected override IList<HeapData> _findAllData(HeapData filter, bool specific = false)
         {
             return _structureData.FindAll(x => x.Equals(filter));
