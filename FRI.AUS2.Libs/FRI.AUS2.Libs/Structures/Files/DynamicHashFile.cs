@@ -70,7 +70,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         #region Find
         public TData Find(TData filter)
         {
-            int hash = filter.GetHashCode();
+            int hash = filter.GetHash();
             int addressIndex = _getAddressIndex(hash);
 
             var block = _addresses[addressIndex].Block;
