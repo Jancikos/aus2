@@ -146,8 +146,9 @@ namespace FRI.AUS2.Libs.Structures.Files
             _addresses = newAddresses;
         }
 
-        private void _splitBlock(int splittingIndex)
+        private void _splitBlock(int splittingBlockIndex)
         {
+            var splittingIndex = splittingBlockIndex % (int)Math.Pow(2, _addresses[splittingBlockIndex].BlockDepth);
             var splittingBlock = _addresses[splittingIndex];
             var newBlockDepth = splittingBlock.BlockDepth + 1;
             var targetBlock = _addresses[splittingIndex + (int)Math.Pow(2, splittingBlock.BlockDepth)];

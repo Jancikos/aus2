@@ -138,10 +138,18 @@ namespace FRI.AUS2.Libs.Structures.Files
                 throw new InvalidOperationException("Items count is greater than block factor");
             }
 
+            var itemsCount = items.Length;
+            if (itemsCount < ActiveBlock.BlockFactor)
+            {
+                var itemsCopy = new TData[ActiveBlock.BlockFactor];
+                items.CopyTo(itemsCopy, 0);
+                items = itemsCopy;
+            }
+
             var addressType = _getBlockAddressType(address, ActiveBlock);
 
             ActiveBlock.Items = items;
-            ActiveBlock.ValidCount = items.Length;
+            ActiveBlock.ValidCount = itemsCount;
 
             _postInsertToActiveBlock(addressType);
         }
