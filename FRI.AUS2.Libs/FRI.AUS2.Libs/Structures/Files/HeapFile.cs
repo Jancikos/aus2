@@ -100,41 +100,57 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             var (address, addressType) = _findAddressOfNextFreeBlock();
 
-            return _insertToBlock(address, addressType, data);
+            _loadActiveBlock(address);
+            ActiveBlock.AddItem(data);
+
+            _postInsertToActiveBlock(addressType);
+
+            return address;
         }
 
         public int InsertToBlock(int address, TData data)
         {
             _validateAddress(address);
 
-
             _loadActiveBlock(address);
             var addressType = _getBlockAddressType(address, ActiveBlock);
-            
             if (addressType == BlockAdressType.FullBlock)
             {
                 throw new InvalidOperationException("Block is full");
             }
 
-            return _insertToBlock(address, addressType, data);
+            ActiveBlock.AddItem(data);
+
+            _postInsertToActiveBlock(addressType);
+
+            return address;
+        }
+
+        public void SetBlockItems(int address, TData[] items)
+        {
+            _validateAddress(address);
+
+            _loadActiveBlock(address);
+
+            if (ActiveBlock.BlockFactor < items.Length)
+            {
+                throw new InvalidOperationException("Items count is greater than block factor");
+            }
+
+            var addressType = _getBlockAddressType(address, ActiveBlock);
+
+            ActiveBlock.Items = items;
+
+            _postInsertToActiveBlock(addressType);
         }
 
         /// <summary>
-        /// 
+        /// it also saves the active block
         /// </summary>
-        /// <param name="address"></param>
-        /// <param name="addressType"></param>
-        /// <param name="data">ak je null, tak sa data do bloku nepridavaju</param>
+        /// <param name="addressType">the state within the block was before inserting</param>
         /// <returns></returns>
-        private int _insertToBlock(int address, BlockAdressType addressType, TData? data)
+        private void _postInsertToActiveBlock(BlockAdressType addressType)
         {
-            _loadActiveBlock(address);
-
-            if (data is not null)
-            {
-                ActiveBlock.AddItem(data);
-            }
-
             _saveActiveBlockDisabled = true;
             switch (addressType)
             {
@@ -156,14 +172,19 @@ namespace FRI.AUS2.Libs.Structures.Files
                     }
                     break;
                 case BlockAdressType.NewBlock:
-                    if (data is null) 
+                    // iba jeden zapis
+                    if (!ActiveBlock.IsFull)
                     {
-                        // lebo sa do noveho nepridali ziadne data
+                        _enqueNextFreeBlock();
+                    }
+                    break;
+                case BlockAdressType.FullBlock:
+                    if (ActiveBlock.IsEmpty)
+                    {
                         _enqueNextEmptyBlock();
                         break;
                     }
 
-                    // iba jeden zapis
                     if (!ActiveBlock.IsFull)
                     {
                         _enqueNextFreeBlock();
@@ -172,13 +193,19 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
 
             _saveActiveBlock(true);
-
-            return address;
         }
 
         public int CreateNewBlock()
         {
-            return _insertToBlock(_fileManager.Length, BlockAdressType.NewBlock, null);
+            _loadActiveBlock(_fileManager.Length);
+
+            _saveActiveBlockDisabled = true;
+            // lebo sa do noveho nepridali ziadne data
+            _enqueNextEmptyBlock();
+
+            _saveActiveBlock(true);
+
+            return ActiveBlockAddress;
         }
         
         #endregion

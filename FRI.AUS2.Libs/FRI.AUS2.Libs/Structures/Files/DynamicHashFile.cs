@@ -37,18 +37,29 @@ namespace FRI.AUS2.Libs.Structures.Files
         public void Insert(TData data)
         {
             int hash = data.GetHash();
-            int addressIndex = _getAddressIndex(hash);
-            var dhfBlock = _addresses[addressIndex];
 
             bool inserted = false;
             do {
+                int addressIndex = _getAddressIndex(hash);
+                var dhfBlock = _addresses[addressIndex];
+
                 try {
                     _heapFile.InsertToBlock(dhfBlock.Address, data);
                     inserted = true;
                 } catch (InvalidOperationException) {
                     // block is full
                     // split block
-                    throw new NotImplementedException("Block is full and split is not implemented");
+                    // throw new NotImplementedException("Block is full and split is not implemented");
+                    
+                    // blok uz je maximalnej hlbky, tak sa hlabka struktury musi zvacsit aby sa mohol blok rozdelit
+                    if (dhfBlock.BlockDepth == Depth) {
+                        _increaseDepth();
+                    }
+
+                    // rozdel blok
+                    _splitBlock(addressIndex);
+
+                    inserted = false;
                 }
             } while (!inserted);
         }
@@ -94,11 +105,12 @@ namespace FRI.AUS2.Libs.Structures.Files
             _addresses[1] = new DynamicHashFileBlock<TData>(_heapFile.CreateNewBlock(), _heapFile); // pouztitie _heapFile.CreateNewBlock(); nahradit metodou GetEmptyBlock
         }
 
-        public int _getAddressIndex(int hash)
+        public int _getAddressIndex(int hash) => _getAddressIndex(hash, Depth);
+        public int _getAddressIndex(int hash, int depth)
         {
             int mask = 0;
 
-            _depth.Repeat(() =>
+            depth.Repeat(() =>
             {
                 mask = (mask << 1) | 1;
             });
@@ -126,6 +138,47 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
 
             _addresses = newAddresses;
+        }
+
+        private void _splitBlock(int splittingIndex)
+        {
+            var splittingBlock = _addresses[splittingIndex];
+            var newBlockDepth = splittingBlock.BlockDepth + 1;
+            var targetBlock = _addresses[splittingIndex + 1];
+
+            // create new block
+            targetBlock.Address = _heapFile.CreateNewBlock(); // pouztitie _heapFile.CreateNewBlock(); nahradit metodou GetEmptyBlock
+
+            // try reinsert items
+            var items = splittingBlock.Block.ValidItems;
+            var splittingBlockItems = items.ToList();
+            var targetBlockItems = new List<TData>();
+            foreach (var item in items)
+            {
+                int hash = item.GetHash();
+                int newIndex = _getAddressIndex(hash, newBlockDepth);
+
+                if (newIndex == splittingIndex)
+                {
+                    // item stays in the same block
+                    continue;
+                }
+
+                // do tychto zoznamov sa to uklada kvoli odlozenemu zapisu do suboru
+                splittingBlockItems.Remove(item);
+                targetBlockItems.Add(item);
+            }
+
+            if (splittingBlockItems.Count != 0)
+            {
+                // zapise sa zmena do suboru
+                _heapFile.SetBlockItems(splittingBlock.Address, splittingBlockItems.ToArray());
+                _heapFile.SetBlockItems(targetBlock.Address, targetBlockItems.ToArray());
+            }
+
+            // update block depths
+            splittingBlock.BlockDepth = newBlockDepth;
+            targetBlock.BlockDepth = newBlockDepth;
         }
 
         #endregion
