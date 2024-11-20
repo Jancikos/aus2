@@ -49,7 +49,6 @@ namespace FRI.AUS2.Libs.Structures.Files
                 } catch (InvalidOperationException) {
                     // block is full
                     // split block
-                    // throw new NotImplementedException("Block is full and split is not implemented");
                     
                     // blok uz je maximalnej hlbky, tak sa hlabka struktury musi zvacsit aby sa mohol blok rozdelit
                     if (dhfBlock.BlockDepth == Depth) {
@@ -125,12 +124,16 @@ namespace FRI.AUS2.Libs.Structures.Files
             
             for (int i = 0; i < _addresses.Length; i++)
             {
-                int newIndexBase = i * 2;
+                int newIndexBase = i;
                 var adressBlock = _addresses[i];
 
-                for (int j = 0; j < 2; j++)
+                // for (int j = 0; j < 2; j++)
+                foreach(int offset in new int[]{
+                    0, 
+                    (int)Math.Pow(2, Depth - 1)
+                })
                 {
-                    newAddresses[newIndexBase + j] = new DynamicHashFileBlock<TData>(adressBlock.Address, _heapFile) 
+                    newAddresses[newIndexBase + offset] = new DynamicHashFileBlock<TData>(adressBlock.Address, _heapFile) 
                     {
                          BlockDepth = adressBlock.BlockDepth
                     };
@@ -144,8 +147,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             var splittingBlock = _addresses[splittingIndex];
             var newBlockDepth = splittingBlock.BlockDepth + 1;
-            var targetBlock = _addresses[splittingIndex + 1];
-
+            var targetBlock = _addresses[splittingIndex + (int)Math.Pow(2, splittingBlock.BlockDepth)];
             // create new block
             targetBlock.Address = _heapFile.CreateNewBlock(); // pouztitie _heapFile.CreateNewBlock(); nahradit metodou GetEmptyBlock
 
@@ -156,7 +158,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             foreach (var item in items)
             {
                 int hash = item.GetHash();
-                int newIndex = _getAddressIndex(hash, newBlockDepth);
+                int newIndex = _getAddressIndex(hash, newBlockDepth); // tuto pozor
 
                 if (newIndex == splittingIndex)
                 {

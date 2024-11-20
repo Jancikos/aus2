@@ -140,6 +140,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             var addressType = _getBlockAddressType(address, ActiveBlock);
 
             ActiveBlock.Items = items;
+            ActiveBlock.ValidCount = items.Length;
 
             _postInsertToActiveBlock(addressType);
         }
