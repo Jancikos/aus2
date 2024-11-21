@@ -102,6 +102,35 @@
                         <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_Generate" Content="Generate" Margin="0" Click="_btn_Generate_Click" />
                     </Grid>
                 </GroupBox>
+
+                
+                <!-- manual data delete -->
+                <GroupBox Header="Delete data">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="80" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        
+                        <GroupBox Header="Filter">
+                            <hfuc:HeapFindDataForm x:Name="_frm_DeleteFilter" ShowAddress="false" />
+                        </GroupBox>
+
+                        <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_Delete" Content="Delete" Margin="0" Click="_btn_Delete_Click" />
+
+                        <!--data form-->
+                        <GroupBox Grid.Row="1" Grid.ColumnSpan="3" Header="Result">
+                            <TextBlock x:Name="_txt_DeleteResult" />
+                        </GroupBox>
+
+                    </Grid>
+                </GroupBox>
+                
         </StackPanel>
 
 

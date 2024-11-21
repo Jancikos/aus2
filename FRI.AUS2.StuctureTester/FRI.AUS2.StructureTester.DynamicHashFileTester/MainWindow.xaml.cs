@@ -33,18 +33,25 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
 
             _structure = new DynamicHashFile<HeapData>(new(DefaultFilesFolder.LocalPath + "DynamicHashFileTester.bin"));
 
-            _frm_Insert.OnIdChanged = (id) =>
-            {
-                _frm_FindFilter.Id = id;
-
-                _txtbx_Hash.Value = id.ToString();
-                _btn_HashToAddress.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
-            };
+            _frm_Insert.OnIdChanged = _setSelectedId;
             _frm_Insert.InitilizeDefaultValues();
+
+            _frm_HeapBlocks.OnItemDoubleClicked += (address, data) => {
+                _setSelectedId(data.Id);
+            };
 
             _initOperationsGenerator();
 
             _updateStructureStats();
+        }
+
+        private void _setSelectedId(int id)
+        {
+            _frm_FindFilter.Id = id;
+            _frm_DeleteFilter.Id = id;
+
+            _txtbx_Hash.Value = id.ToString();
+            _btn_HashToAddress.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
         }
 
         private void _initOperationsGenerator()
@@ -182,6 +189,24 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
             _updateStructureStats();
         }
 
+        private void _btn_Delete_Click(object sender, RoutedEventArgs e)
+        {
+            var data = _frm_DeleteFilter.HeapData;
+
+            try
+            {
+                _structure.Delete(
+                    data
+                );
+               MessageBox.Show("Data deleted", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            _updateStructureStats();
+        }
     }
     #endregion
 }
