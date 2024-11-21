@@ -14,6 +14,7 @@ using FRI.AUS2.Libs.Structures.Files;
 using FRI.AUS2.StructureTester.DynamicHashFileTester.Models;
 using FRI.AUS2.StructureTester.DynamicHashFileTester.Utils;
 using FRI.AUS2.StructureTester.HeapFileTester.Models;
+using FRI.AUS2.StructureTester.HeapFileTester.Utils;
 
 namespace FRI.AUS2.StructureTester.DynamicHashFileTester
 {
@@ -165,6 +166,20 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
             {
                 MessageBox.Show($"Error: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void _btn_Generate_Click(object sender, RoutedEventArgs e)
+        {
+            var dataGenerator = new HeapDataGenerator(int.Parse(_txtbx_GenerateSeed.Value));
+            var dataCount = int.Parse(_txtbx_GenerateCount.Value);
+
+            for (int i = 0; i < dataCount; i++)
+            {
+                _structure.Insert(dataGenerator.GenerateItem());
+            }
+
+            MessageBox.Show($"Generated {dataCount} records", Title);
+            _updateStructureStats();
         }
 
     }

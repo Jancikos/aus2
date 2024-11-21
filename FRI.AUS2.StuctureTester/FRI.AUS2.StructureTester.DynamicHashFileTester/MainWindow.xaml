@@ -79,9 +79,29 @@
                         <GroupBox Grid.Row="1" Grid.ColumnSpan="3" Header="Result">
                             <hfuc:HeapDataForm x:Name="_frm_FindResult" />
                         </GroupBox>
-
                     </Grid>
-                 </GroupBox>
+                </GroupBox>
+
+
+                <!-- generate data -->
+                <GroupBox Header="Generate data">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="80" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <libsuc:InlineTextBox x:Name="_txtbx_GenerateCount" Title="Count" Value="15" />
+                        <libsuc:InlineTextBox Grid.Row="1" x:Name="_txtbx_GenerateSeed" Title="Seed" Value="1" />
+
+                        <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_Generate" Content="Generate" Margin="0" Click="_btn_Generate_Click" />
+                    </Grid>
+                </GroupBox>
         </StackPanel>
 
 
