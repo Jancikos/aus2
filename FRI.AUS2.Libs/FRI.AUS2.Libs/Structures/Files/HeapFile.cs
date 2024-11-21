@@ -48,6 +48,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             get => _countStackItems(NextEmptyBlock);
         }
+        public bool DeleteEmptyBlocksFromEnd { get; set; } = true; 
 
         protected int ActiveBlockAddress { get; set; }
         public HeapFileBlock<TData> ActiveBlock { get; protected set; }
@@ -250,7 +251,8 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// 
         /// <param name="address"></param>
         /// <param name="filter"></param>
-        public void Delete(int address, TData filter)
+        /// <param name="saveActiveBlock">if false, the active block will not be saved at the end of the method</param>
+        public void Delete(int address, TData filter, bool saveActiveBlock = true)
         {
             _validateAddress(address);
 
@@ -296,7 +298,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                 }
 
                 // ak je to posledny blok, tak spustime proces mazania blokov od konca
-                if (address == _getAddressByBlockIndex(BlocksCount - 1))
+                if (DeleteEmptyBlocksFromEnd && address == _getAddressByBlockIndex(BlocksCount - 1))
                 {
                     _deleteEmptyBlocksFromEnd();
                     return;
@@ -305,7 +307,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                 // zaradime ho do zoznamu prazdnych blokov
                 _enqueNextEmptyBlock();
 
-                _saveActiveBlock(true);
+                _saveActiveBlock(saveActiveBlock);
             }
         }
 
@@ -372,6 +374,11 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// </summary>
         private void _deleteEmptyBlocksFromEnd()
         {
+            if (!DeleteEmptyBlocksFromEnd)
+            {
+                return;
+            }
+
             int lastBlockIndex = BlocksCount - 1;
             int lastBlockAddress = _getAddressByBlockIndex(lastBlockIndex);
             int lastDeletedBlockAddress = lastBlockAddress;
@@ -549,7 +556,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// 
         /// </summary>
         /// <param name="force">saves even _saveActiveBlockDisabled is true, also sets _saveActiveBlockDisabled to false</param>
-        private void _saveActiveBlock(bool force = false)
+        public void _saveActiveBlock(bool force = false)
         {
             if (_saveActiveBlockDisabled) 
             {
@@ -747,6 +754,8 @@ namespace FRI.AUS2.Libs.Structures.Files
             {
                 Items[i] = Items[i + 1];
             }
+            // todo otestovat
+            // Items[index] = Items[ValidCount - 1]; // alternative k tomu for cyklu 
 
             ValidCount--;
         }

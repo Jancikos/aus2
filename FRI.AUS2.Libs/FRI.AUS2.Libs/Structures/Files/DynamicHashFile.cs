@@ -29,7 +29,8 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             _heapFile = new HeapFile<TData>(500, file)
             {
-                ManageFreeBlocks = false
+                ManageFreeBlocks = false,
+                DeleteEmptyBlocksFromEnd = false
             };
             _heapFile.Clear();
             
@@ -92,7 +93,17 @@ namespace FRI.AUS2.Libs.Structures.Files
         #region Delete
         public void Delete(TData filter)
         {
-            throw new NotImplementedException();
+            int hash = filter.GetHash();
+            int addressIndex = _getAddressIndex(hash);
+            var hashBlock = _addresses[addressIndex];
+
+            _heapFile.Delete(hashBlock.Address, filter);
+
+            var deletionBlock = _heapFile.ActiveBlock;
+
+            // check if can be merged
+
+            _heapFile._saveActiveBlock(true);
         }
         #endregion
 
