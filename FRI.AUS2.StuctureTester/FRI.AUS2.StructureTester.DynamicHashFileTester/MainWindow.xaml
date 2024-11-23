@@ -168,6 +168,7 @@
                     <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal">
                             <Button x:Name="_btn_IncreaseDepth" Content="Increase depth" Click="_btn_IncreaseDepth_Click" />
+                            <Button x:Name="_btn_DecreaseDepth" Content="Decrease depth" Click="_btn_DecreaseDepth_Click" />
                         </StackPanel>
 
                         <libsuc:InlineText x:Name="_txt_StatsAddressesCount" Title="AddressesCount" Value="1" />

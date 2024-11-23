@@ -122,7 +122,22 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
 
         private void _btn_IncreaseDepth_Click(object sender, RoutedEventArgs e)
         {
-            _structure._increaseDepth();
+            try {
+                _structure._increaseDepth();
+            } catch (Exception ex) {
+                MessageBox.Show($"Error: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            _updateStructureStats();
+        }
+
+        
+        private void _btn_DecreaseDepth_Click(object sender, RoutedEventArgs e)
+        {
+            try {
+                _structure._decreaseDepth();
+            } catch (Exception ex) {
+                MessageBox.Show($"Error: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
             _updateStructureStats();
         }
 
