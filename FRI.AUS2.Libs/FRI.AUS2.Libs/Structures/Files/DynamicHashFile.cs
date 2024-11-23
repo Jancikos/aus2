@@ -101,7 +101,10 @@ namespace FRI.AUS2.Libs.Structures.Files
 
             _heapFile.Delete(deletionHashBlock.Address, filter);
 
-            var deletionBlock = _heapFile.ActiveBlock;
+            // var deletionBlock = _heapFile.ActiveBlock;
+            var deletionBlock = new HeapFileBlock<TData>(_heapFile.BlockSize);
+            deletionBlock.FromBytes(_heapFile.ActiveBlock.ToBytes()); // aby sa tam nakopiaoval cely objekt, nie len odkaz nan
+            var deletionAddress = deletionHashBlock.Address;
 
             var siblingIndex = deletionIndex % (int)Math.Pow(2, deletionHashBlock.BlockDepth - 1);
             if (siblingIndex == deletionIndex)
@@ -110,12 +113,29 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
 
             // check if can be merged
+            var siblingHashBlock = _addresses[siblingIndex];
+            var siblingBlock = siblingHashBlock.Block;
             // TODO - items in deletion block can be moved to sibling block
+            if (deletionBlock.ValidCount + siblingBlock.ValidCount <= _heapFile.BlockSize)
+            {
+                // merge blocks into one
+                foreach (var item in deletionBlock.ValidItems)
+                {
+                    siblingBlock.AddItem(item);
+                }
+                _heapFile._saveBlock(siblingHashBlock.Address, siblingBlock);
+
+                // delete deletion block items
+                deletionBlock.ClearItems();
+
+                // TODO - doplnit to aby to bolo cyklicke...
+            }
+
+            // HLAVNE TO UROBIT PODLA MATERIALOV !!!
 
             // check if deletion block is empty
             if (deletionBlock.IsEmpty && deletionHashBlock.BlockDepth > 1)
             {
-                var siblingHashBlock = _addresses[siblingIndex];
                 if (siblingHashBlock.BlockDepth == deletionHashBlock.BlockDepth)
                 {
                     // merge blocks
@@ -138,7 +158,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                 }
             }
 
-            _heapFile._saveActiveBlock(true);
+            _heapFile._saveBlock(deletionAddress, deletionBlock);
         }
         #endregion
 

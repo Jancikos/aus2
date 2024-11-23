@@ -397,7 +397,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
             int lastBlockIndex = BlocksCount - 1;
             int lastBlockAddress = _getAddressByBlockIndex(lastBlockIndex);
-            int lastDeletedBlockAddress = lastBlockAddress;
+            int? lastDeletedBlockAddress = null;
 
             while (lastBlockIndex > 0)
             {
@@ -422,7 +422,10 @@ namespace FRI.AUS2.Libs.Structures.Files
             //     return;
             // }
 
-            _fileManager.Truncate(lastDeletedBlockAddress);
+            if (lastDeletedBlockAddress is not null)
+            {
+                _fileManager.Truncate(lastDeletedBlockAddress.Value);
+            }
         }
 
         private int _countStackItems(int? startAddress)
@@ -775,6 +778,11 @@ namespace FRI.AUS2.Libs.Structures.Files
             // Items[index] = Items[ValidCount - 1]; // alternative k tomu for cyklu 
 
             ValidCount--;
+        }
+
+        public void ClearItems()
+        {
+            ValidCount = 0;
         }
 
 
