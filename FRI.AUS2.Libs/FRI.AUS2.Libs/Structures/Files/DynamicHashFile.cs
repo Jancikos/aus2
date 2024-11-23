@@ -31,7 +31,8 @@ namespace FRI.AUS2.Libs.Structures.Files
             _heapFile = new HeapFile<TData>(500, file)
             {
                 ManageFreeBlocks = false,
-                DeleteEmptyBlocksFromEnd = false
+                DeleteEmptyBlocksFromEnd = false,
+                EnqueueNewBlockToEmptyBlocks = false
             };
             _heapFile.Clear();
             
@@ -152,8 +153,8 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             _increaseDepth();
             
-            _addresses[0] = new DynamicHashFileBlock<TData>(_heapFile.CreateNewBlock(), _heapFile); // pouztitie _heapFile.CreateNewBlock(); nahradit metodou GetEmptyBlock
-            _addresses[1] = new DynamicHashFileBlock<TData>(_heapFile.CreateNewBlock(), _heapFile); // pouztitie _heapFile.CreateNewBlock(); nahradit metodou GetEmptyBlock
+            _addresses[0] = new DynamicHashFileBlock<TData>(_heapFile.GetEmptyBlock(), _heapFile);
+            _addresses[1] = new DynamicHashFileBlock<TData>(_heapFile.GetEmptyBlock(), _heapFile);
         }
 
         public int _getAddressIndex(int hash) => _getAddressIndex(hash, Depth);
@@ -226,7 +227,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             var newBlockDepth = splittingBlock.BlockDepth + 1;
             var targetBlock = _addresses[splittingIndex + (int)Math.Pow(2, splittingBlock.BlockDepth)];
             // create new block
-            targetBlock.Address = _heapFile.CreateNewBlock(); // pouztitie _heapFile.CreateNewBlock(); nahradit metodou GetEmptyBlock
+            targetBlock.Address = _heapFile.GetEmptyBlock();
 
             // try reinsert items
             var items = splittingBlock.Block.ValidItems;

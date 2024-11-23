@@ -48,6 +48,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             get => _countStackItems(NextEmptyBlock);
         }
+        public bool EnqueueNewBlockToEmptyBlocks { get; set; } = true;
         public bool DeleteEmptyBlocksFromEnd { get; set; } = true; 
 
         protected int ActiveBlockAddress { get; set; }
@@ -210,13 +211,28 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             _loadActiveBlock(_fileManager.Length);
 
-            _saveActiveBlockDisabled = true;
-            // lebo sa do noveho nepridali ziadne data
-            _enqueNextEmptyBlock();
+            if (EnqueueNewBlockToEmptyBlocks) 
+            {
+                _saveActiveBlockDisabled = true;
+                // lebo sa do noveho nepridali ziadne data
+                _enqueNextEmptyBlock();
+            }
 
             _saveActiveBlock(true);
 
             return ActiveBlockAddress;
+        }
+
+        public int GetEmptyBlock()
+        {
+            var (address, addressType) = _findAddressOfNextFreeBlock();
+
+            if (addressType != BlockAdressType.EmptyBlock)
+            {
+                address = CreateNewBlock();
+            }
+
+            return address;
         }
         
         #endregion
@@ -387,6 +403,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             {
                 _loadActiveBlock(lastBlockAddress);
 
+                
                 if (!ActiveBlock.IsEmpty)
                 {
                     break;
