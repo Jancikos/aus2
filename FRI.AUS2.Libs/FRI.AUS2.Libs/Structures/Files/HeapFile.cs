@@ -372,9 +372,9 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// <summary>
         /// O(n , 1) + operacie nad zasobnikmi, kde n je pocet prazdnych blokov na konci suboru
         /// </summary>
-        private void _deleteEmptyBlocksFromEnd()
+        public void _deleteEmptyBlocksFromEnd(bool force = false)
         {
-            if (!DeleteEmptyBlocksFromEnd)
+            if (!DeleteEmptyBlocksFromEnd && !force)
             {
                 return;
             }

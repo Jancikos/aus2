@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
@@ -94,14 +95,47 @@ namespace FRI.AUS2.Libs.Structures.Files
         public void Delete(TData filter)
         {
             int hash = filter.GetHash();
-            int addressIndex = _getAddressIndex(hash);
-            var hashBlock = _addresses[addressIndex];
+            int deletionIndex = _getAddressIndex(hash);
+            var deletionHashBlock = _addresses[deletionIndex];
 
-            _heapFile.Delete(hashBlock.Address, filter);
+            _heapFile.Delete(deletionHashBlock.Address, filter);
 
             var deletionBlock = _heapFile.ActiveBlock;
 
+            var siblingIndex = deletionIndex % (int)Math.Pow(2, deletionHashBlock.BlockDepth - 1);
+            if (siblingIndex == deletionIndex)
+            {
+                siblingIndex += (int)Math.Pow(2, deletionHashBlock.BlockDepth - 1);
+            }
+
             // check if can be merged
+            // TODO - items in deletion block can be moved to sibling block
+
+            // check if deletion block is empty
+            if (deletionBlock.IsEmpty && deletionHashBlock.BlockDepth > 1)
+            {
+                var siblingHashBlock = _addresses[siblingIndex];
+                if (siblingHashBlock.BlockDepth == deletionHashBlock.BlockDepth)
+                {
+                    // merge blocks
+                    deletionHashBlock.Address = siblingHashBlock.Address;
+
+                    deletionHashBlock.BlockDepth--;
+                    siblingHashBlock.BlockDepth--;
+
+                    // shrink file size
+                    _heapFile._deleteEmptyBlocksFromEnd(true);
+
+
+                    if (deletionHashBlock.BlockDepth + 1 == Depth)
+                    {
+                        if (!_hasBlockWithStrucuteDepth())
+                        {
+                            _decreaseDepth();
+                        }
+                    }
+                }
+            }
 
             _heapFile._saveActiveBlock(true);
         }
@@ -109,6 +143,10 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         #region Management
 
+        private bool _hasBlockWithStrucuteDepth()
+        {
+            return _addresses.Any(a => a.BlockDepth == Depth);
+        }
 
         private void _initializeAddresses()
         {
@@ -129,6 +167,30 @@ namespace FRI.AUS2.Libs.Structures.Files
             });
             
             return hash & mask;
+        }
+
+        public void _decreaseDepth()
+        {
+            if (Depth <= 1)
+            {
+                throw new InvalidOperationException("Cannot decrease depth below 1");
+            }
+
+            _depth--;
+            DynamicHashFileBlock<TData>[] newAddresses = new DynamicHashFileBlock<TData>[(int)Math.Pow(2, Depth)];
+
+            for (int i = 0; i < newAddresses.Length; i++)
+            {
+                int newIndexBase = i;
+                var adressBlock = _addresses[i];
+                
+                var newAddress = newAddresses[i] = new DynamicHashFileBlock<TData>(adressBlock.Address, _heapFile) 
+                {
+                        BlockDepth = adressBlock.BlockDepth
+                };
+            }
+
+            _addresses = newAddresses;
         }
 
         public void _increaseDepth()
