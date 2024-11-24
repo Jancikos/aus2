@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -115,7 +116,7 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
 
             _txt_HashBinary.Value = hash.ToBinaryString();
 
-            var addressIndex = _structure._getAddressIndex(hash);
+            var addressIndex = _structure._getAddressIndex(new BitArray(BitConverter.GetBytes(hash)));
             _txt_BlockIndex.Value = addressIndex.ToString();
             _txt_BlockIndexBinary.Value = addressIndex.ToBinaryString(_structure.Depth, false);
         }

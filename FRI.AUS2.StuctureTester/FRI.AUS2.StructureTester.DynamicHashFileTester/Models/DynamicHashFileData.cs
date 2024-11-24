@@ -1,6 +1,7 @@
 ﻿using FRI.AUS2.Libs.Structures.Files;
 using FRI.AUS2.Libs.Structures.Trees.Interfaces;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,12 +23,12 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester.Models
             throw new NotImplementedException();
         }
 
-        public int GetHash()
+        public byte[] ToBytes()
         {
             throw new NotImplementedException();
         }
 
-        public byte[] ToBytes()
+        BitArray IDynamicHashFileData.GetHash()
         {
             throw new NotImplementedException();
         }

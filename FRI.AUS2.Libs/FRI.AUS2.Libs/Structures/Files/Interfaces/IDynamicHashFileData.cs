@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 {
     public interface IDynamicHashFileData : IHeapFileData
     {
-        public int GetHash();
+        public BitArray GetHash();
     }
 
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -153,10 +154,10 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
             return Id == otherData.Id;
         }
 
-        public int GetHash()
+        public BitArray GetHash()
         {
-            return Id;
-        }
+            return new BitArray(BitConverter.GetBytes(Id));
+        }   
 
         public override string ToString()
         {

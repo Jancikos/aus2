@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -42,7 +43,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         #region Insert
         public void Insert(TData data)
         {
-            int hash = data.GetHash();
+            var hash = data.GetHash();
 
             bool inserted = false;
             do {
@@ -73,7 +74,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         #region Find
         public TData Find(TData filter)
         {
-            int hash = filter.GetHash();
+            var hash = filter.GetHash();
             int addressIndex = _getAddressIndex(hash);
 
             var block = _addresses[addressIndex].Block;
@@ -95,7 +96,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         #region Delete
         public void Delete(TData filter)
         {
-            int hash = filter.GetHash();
+            var hash = filter.GetHash();
             int deletionIndex = _getAddressIndex(hash);
             var deletionHashBlock = _addresses[deletionIndex];
 
@@ -177,17 +178,25 @@ namespace FRI.AUS2.Libs.Structures.Files
             _addresses[1] = new DynamicHashFileBlock<TData>(_heapFile.GetEmptyBlock(), _heapFile);
         }
 
-        public int _getAddressIndex(int hash) => _getAddressIndex(hash, Depth);
-        public int _getAddressIndex(int hash, int depth)
+        public int _getAddressIndex(BitArray hash) => _getAddressIndex(hash, Depth);
+        public int _getAddressIndex(BitArray hash, int depth)
         {
-            int mask = 0;
-
-            depth.Repeat(() =>
+            var mask = new BitArray(hash.Length);
+            for (int i = 0; i < depth; i++)
             {
-                mask = (mask << 1) | 1;
-            });
+                mask[i] = true;
+            }
+
+            BitArray result = hash.And(mask);
             
-            return hash & mask;
+            if (result.Length > 32)
+            {
+                throw new InvalidOperationException("Hash is too long. Maximum length is 32 bits.");
+            }
+
+            int[] array = new int[1];
+            result.CopyTo(array, 0);
+            return array[0];
         }
 
         public void _decreaseDepth()
@@ -255,7 +264,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             var targetBlockItems = new List<TData>();
             foreach (var item in items)
             {
-                int hash = item.GetHash();
+                var hash = item.GetHash();
                 int newIndex = _getAddressIndex(hash, newBlockDepth); // tuto pozor
 
                 if (newIndex == splittingIndex)
