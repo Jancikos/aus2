@@ -188,11 +188,6 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
 
             BitArray result = hash.And(mask);
-            
-            if (result.Length > 32)
-            {
-                throw new InvalidOperationException("Hash is too long. Maximum length is 32 bits.");
-            }
 
             int[] array = new int[1];
             result.CopyTo(array, 0);
@@ -225,9 +220,14 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         public void _increaseDepth()
         {
+            if (Depth >= 32)
+            {
+                throw new InvalidOperationException("Cannot increase depth above 32");
+            }
+
             _depth++;
             ExtendableHashFileBlock<TData>[] newAddresses = new ExtendableHashFileBlock<TData>[(int)Math.Pow(2, Depth)];
-            
+
             for (int i = 0; i < _addresses.Length; i++)
             {
                 int newIndexBase = i;
