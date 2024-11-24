@@ -58,6 +58,22 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
             }
         }
 
+        
+        private const int _ecvMax = 10;
+        private string _ecv = "";
+        public string ECV
+        {
+            get => _ecv;
+            set
+            {
+                if (value.Length > _ecvMax)
+                {
+                    throw new ArgumentException($"ecv is max {_ecvMax} characters long");
+                }
+                _ecv = value;
+            }
+        }
+
         /// <summary>
         /// Id (int) + Firstname (int length + _firstnameMax bytes) + Lastname (int length + _lastnameMax bytes) + Items (int actualLength + _itemsMax * NesteHeapDataItemSize)
         /// </summary>
@@ -84,6 +100,12 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
             offset += sizeof(int);
             Encoding.ASCII.GetBytes(Lastname.PadRight(_lastnameMax)).CopyTo(buffer, offset);
             offset += _lastnameMax;
+
+            // ECV (4 bytes (length) + 10 bytes)
+            BitConverter.GetBytes(ECV.Length).CopyTo(buffer, offset);
+            offset += sizeof(int);
+            Encoding.ASCII.GetBytes(ECV.PadRight(_ecvMax)).CopyTo(buffer, offset);
+            offset += _ecvMax;
 
             // Items (4 bytes actual length + 5 * NesteHeapDataItemSize)
             int actualItemsLength = Items.Count;
@@ -123,6 +145,12 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Models
             offset += sizeof(int);
             Lastname = Encoding.ASCII.GetString(bytes, offset, _lastnameMax)[..lastnameLength];
             offset += _lastnameMax;
+
+            // ECV (4 bytes actual length + 10 bytes)
+            int ecvLength = BitConverter.ToInt32(bytes, offset);
+            offset += sizeof(int);
+            ECV = Encoding.ASCII.GetString(bytes, offset, _ecvMax)[..ecvLength];
+            offset += _ecvMax;
 
             // Items (4 bytes actual length + 5 * NesteHeapDataItemSize)
             int actualItemsLength = BitConverter.ToInt32(bytes, offset);

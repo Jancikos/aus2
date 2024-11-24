@@ -22,6 +22,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
         private readonly string[] _firstnames = { "Jozef", "Ján", "Peter", "Marek", "Martin", "Michal", "Tomáš", "Lukáš", "Miroslav", "Ivan" };
         private readonly string[] _lastnames = { "Novák", "Horváth", "Kováč", "Varga", "Tóth", "Nagy", "Baláž", "Molnár", "Szabó", "Kovács" };
         private readonly string[] _itemDescriptions = { "Olej", "Filtre", "Brzdy", "Výfuk", "Pneumatiky", "Baterie", "Interiér", "Elektronika" };
+        private readonly string[] _ecvPrefix = { "BA", "KE", "NR", "PO", "PP", "TT", "MT", "ZV", "SL", "LV" };
 
         public HeapDataGenerator() : this(DateTime.Now.Millisecond) {}
         public HeapDataGenerator(int seed) : this(new Random(seed)) {}
@@ -37,6 +38,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
                 Id = _idCounter++,
                 Firstname = _firstnames[_random.Next(_firstnames.Length)],
                 Lastname = _lastnames[_random.Next(_lastnames.Length)],
+                ECV = GenerateECV(),
                 Items = GenerateNestedItems()
             };
         }
@@ -58,6 +60,12 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
             }
 
             return items;
+        }
+
+        public string GenerateECV()
+        {
+            // ECV format: <prefix><3 numbers><2 letters>
+            return $"{_ecvPrefix[_random.Next(_ecvPrefix.Length)]}{_random.Next(1000):D3}{(char)('A' + _random.Next(26))}{(char)('A' + _random.Next(26))}";
         }
     }
 }

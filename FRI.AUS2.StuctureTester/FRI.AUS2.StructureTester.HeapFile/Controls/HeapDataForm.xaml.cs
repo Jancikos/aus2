@@ -41,6 +41,12 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
             set { _txtb_Lastname.Text = value; }
         }
 
+        public string ECV
+        {
+            get { return _txtb_Ecv.Text; }
+            set { _txtb_Ecv.Text = value; }
+        }
+
         public HeapData HeapData
         {
             get
@@ -50,6 +56,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
                     Id = Id,
                     Firstname = Firstname,
                     Lastname = Lastname,
+                    ECV = ECV,
                     Items = Items
                 };
             }
@@ -58,6 +65,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
                 Id = value.Id;
                 Firstname = value.Firstname;
                 Lastname = value.Lastname;
+                ECV = value.ECV;
                 Items = value.Items;
             }
         }
