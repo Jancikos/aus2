@@ -9,7 +9,7 @@ using FRI.AUS2.Libs.Structures.Files;
 
 namespace FRI.AUS2.StructureTester.HeapFileTester.Models
 {
-    public class HeapData : IHeapFileData, IDynamicHashFileData
+    public class HeapData : IHeapFileData, IExtendableHashFileData
     {
         private const int _firstnameMax = 15;
         private string _firstname = "";

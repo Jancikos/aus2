@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FRI.AUS2.StructureTester.DynamicHashFileTester.Models
+namespace FRI.AUS2.StructureTester.ExtendableHashFileTester.Models
 {
-    public class DynamicHashFileData : IDynamicHashFileData
+    public class ExtendableHashFileData : IExtendableHashFileData
     {
         public int Size => 50;
 
@@ -28,7 +28,7 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester.Models
             throw new NotImplementedException();
         }
 
-        BitArray IDynamicHashFileData.GetHash()
+        BitArray IExtendableHashFileData.GetHash()
         {
             throw new NotImplementedException();
         }

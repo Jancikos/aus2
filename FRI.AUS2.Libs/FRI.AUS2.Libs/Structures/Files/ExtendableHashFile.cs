@@ -11,7 +11,7 @@ using FRI.AUS2.Libs.Helpers;
 
 namespace FRI.AUS2.Libs.Structures.Files
 {
-    public class DynamicHashFile<TData> where TData : class, IDynamicHashFileData, new()
+    public class ExtendableHashFile<TData> where TData : class, IExtendableHashFileData, new()
     {
         private int _depth = 0;
         public int Depth => _depth;
@@ -20,14 +20,14 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// array of addresses to the blocks
         /// </summary>
         /// <returns></returns>
-        private DynamicHashFileBlock<TData>[] _addresses = [];
+        private ExtendableHashFileBlock<TData>[] _addresses = [];
         public int AddressesCount => _addresses.Length;
-        public DynamicHashFileBlock<TData>[] Addresses => _addresses;
+        public ExtendableHashFileBlock<TData>[] Addresses => _addresses;
 
         private HeapFile<TData> _heapFile;
         public HeapFile<TData> HeapFile => _heapFile;
 
-        public DynamicHashFile(FileInfo file)
+        public ExtendableHashFile(FileInfo file)
         {
             _heapFile = new HeapFile<TData>(500, file)
             {
@@ -174,8 +174,8 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             _increaseDepth();
             
-            _addresses[0] = new DynamicHashFileBlock<TData>(_heapFile.GetEmptyBlock(), _heapFile);
-            _addresses[1] = new DynamicHashFileBlock<TData>(_heapFile.GetEmptyBlock(), _heapFile);
+            _addresses[0] = new ExtendableHashFileBlock<TData>(_heapFile.GetEmptyBlock(), _heapFile);
+            _addresses[1] = new ExtendableHashFileBlock<TData>(_heapFile.GetEmptyBlock(), _heapFile);
         }
 
         public int _getAddressIndex(BitArray hash) => _getAddressIndex(hash, Depth);
@@ -207,14 +207,14 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
 
             _depth--;
-            DynamicHashFileBlock<TData>[] newAddresses = new DynamicHashFileBlock<TData>[(int)Math.Pow(2, Depth)];
+            ExtendableHashFileBlock<TData>[] newAddresses = new ExtendableHashFileBlock<TData>[(int)Math.Pow(2, Depth)];
 
             for (int i = 0; i < newAddresses.Length; i++)
             {
                 int newIndexBase = i;
                 var adressBlock = _addresses[i];
                 
-                var newAddress = newAddresses[i] = new DynamicHashFileBlock<TData>(adressBlock.Address, _heapFile) 
+                var newAddress = newAddresses[i] = new ExtendableHashFileBlock<TData>(adressBlock.Address, _heapFile) 
                 {
                         BlockDepth = adressBlock.BlockDepth
                 };
@@ -226,7 +226,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         public void _increaseDepth()
         {
             _depth++;
-            DynamicHashFileBlock<TData>[] newAddresses = new DynamicHashFileBlock<TData>[(int)Math.Pow(2, Depth)];
+            ExtendableHashFileBlock<TData>[] newAddresses = new ExtendableHashFileBlock<TData>[(int)Math.Pow(2, Depth)];
             
             for (int i = 0; i < _addresses.Length; i++)
             {
@@ -239,7 +239,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                     (int)Math.Pow(2, Depth - 1)
                 })
                 {
-                    newAddresses[newIndexBase + offset] = new DynamicHashFileBlock<TData>(adressBlock.Address, _heapFile) 
+                    newAddresses[newIndexBase + offset] = new ExtendableHashFileBlock<TData>(adressBlock.Address, _heapFile) 
                     {
                          BlockDepth = adressBlock.BlockDepth
                     };
@@ -293,7 +293,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         #endregion
     }
 
-    public class DynamicHashFileBlock<TData> where TData : class, IDynamicHashFileData, new()
+    public class ExtendableHashFileBlock<TData> where TData : class, IExtendableHashFileData, new()
     {
         public int Address { get; set; }
         public int BlockDepth { get; set; } = 1;
@@ -301,7 +301,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         private HeapFile<TData> _heapFile;
 
-        public DynamicHashFileBlock(int address, HeapFile<TData> heapFile)
+        public ExtendableHashFileBlock(int address, HeapFile<TData> heapFile)
         {
             Address = address;
             _heapFile = heapFile;

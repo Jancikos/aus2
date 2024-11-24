@@ -8,16 +8,16 @@ using FRI.AUS2.StructureTester.HeapFileTester.Models;
 using FRI.AUS2.StructureTester.HeapFileTester.Utils;
 using FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator;
 
-namespace FRI.AUS2.StructureTester.DynamicHashFileTester.Utils
+namespace FRI.AUS2.StructureTester.ExtendableHashFileTester.Utils
 {
-    internal class DynamicHashFileOperationsGenerator : HeapFileOperationsGenerator
+    internal class ExtendableHashFileOperationsGenerator : HeapFileOperationsGenerator
     {
-        public DynamicHashFile<HeapData> Structure { get; init; }
+        public ExtendableHashFile<HeapData> Structure { get; init; }
 
 
-        public override string LogsFileNamePrefix => "dynamicHashFile";
+        public override string LogsFileNamePrefix => "ExtendableHashFile";
 
-        public DynamicHashFileOperationsGenerator(DynamicHashFile<HeapData> structure) : base(structure.HeapFile)
+        public ExtendableHashFileOperationsGenerator(ExtendableHashFile<HeapData> structure) : base(structure.HeapFile)
         {
             Structure = structure;
         }

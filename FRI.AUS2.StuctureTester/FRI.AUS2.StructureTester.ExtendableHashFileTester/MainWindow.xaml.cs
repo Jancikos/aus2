@@ -12,27 +12,27 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using FRI.AUS2.Libs.Helpers;
 using FRI.AUS2.Libs.Structures.Files;
-using FRI.AUS2.StructureTester.DynamicHashFileTester.Models;
-using FRI.AUS2.StructureTester.DynamicHashFileTester.Utils;
+using FRI.AUS2.StructureTester.ExtendableHashFileTester.Models;
+using FRI.AUS2.StructureTester.ExtendableHashFileTester.Utils;
 using FRI.AUS2.StructureTester.HeapFileTester.Models;
 using FRI.AUS2.StructureTester.HeapFileTester.Utils;
 
-namespace FRI.AUS2.StructureTester.DynamicHashFileTester
+namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Uri DefaultFilesFolder = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\DynamicHashFileTester\");
+        private Uri DefaultFilesFolder = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\ExtendableHashFileTester\");
 
-        private DynamicHashFile<HeapData> _structure;
+        private ExtendableHashFile<HeapData> _structure;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            _structure = new DynamicHashFile<HeapData>(new(DefaultFilesFolder.LocalPath + "DynamicHashFileTester.bin"));
+            _structure = new ExtendableHashFile<HeapData>(new(DefaultFilesFolder.LocalPath + "ExtendableHashFileTester.bin"));
 
             _frm_Insert.OnIdChanged = _setSelectedId;
             _frm_Insert.InitilizeDefaultValues();
@@ -64,9 +64,9 @@ namespace FRI.AUS2.StructureTester.DynamicHashFileTester
             _frm_OperationsGenerator.OpereationRatioDelete = 0;
             _frm_OperationsGenerator.OpereationRatioDeleteSpecific = 0;
 
-            _frm_OperationsGenerator.InitializeForm(new DynamicHashFileOperationsGenerator(_structure));
+            _frm_OperationsGenerator.InitializeForm(new ExtendableHashFileOperationsGenerator(_structure));
             _frm_OperationsGenerator.RunTest += (sender, e) => {
-                var operatiosnGenerator = new DynamicHashFileOperationsGenerator(_structure);
+                var operatiosnGenerator = new ExtendableHashFileOperationsGenerator(_structure);
 
                 _frm_OperationsGenerator.InitializeGenerator(operatiosnGenerator);
 

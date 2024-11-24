@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace FRI.AUS2.StructureTester.DynamicHashFileTester
+namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
 {
     /// <summary>
     /// Interaction logic for App.xaml

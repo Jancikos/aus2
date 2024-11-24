@@ -1,13 +1,13 @@
-﻿<Window x:Class="FRI.AUS2.StructureTester.DynamicHashFileTester.MainWindow"
+﻿<Window x:Class="FRI.AUS2.StructureTester.ExtendableHashFileTester.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:FRI.AUS2.StructureTester.DynamicHashFileTester"
+        xmlns:local="clr-namespace:FRI.AUS2.StructureTester.ExtendableHashFileTester"
         xmlns:libsuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls;assembly=FRI.AUS2.StructureTester.Libs"
         xmlns:hfuc="clr-namespace:FRI.AUS2.StructureTester.HeapFileTester.Controls;assembly=FRI.AUS2.StructureTester.HeapFileTester"
         mc:Ignorable="d"
-        Title="AUS2 Structure tester - DynamicHashFile" Height="750" Width="800" SizeToContent="WidthAndHeight">
+        Title="AUS2 Structure tester - ExtendableHashFile" Height="750" Width="800" SizeToContent="WidthAndHeight">
         
     <Window.Resources>
         <ResourceDictionary Source="/Dictionary.xaml" />

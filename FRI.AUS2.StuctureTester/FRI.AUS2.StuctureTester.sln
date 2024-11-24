@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FRI.AUS2.StructureTester.He
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FRI.AUS2.StructureTester.Libs", "FRI.AUS2.StructureTester.Libs\FRI.AUS2.StructureTester.Libs.csproj", "{FEB0BB59-7766-4199-AB53-587216A3E6C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FRI.AUS2.StructureTester.DynamicHashFileTester", "FRI.AUS2.StructureTester.DynamicHashFileTester\FRI.AUS2.StructureTester.DynamicHashFileTester.csproj", "{B67EC592-A3FD-48F6-AFBD-BE2EB7E6519F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FRI.AUS2.StructureTester.ExtendableHashFileTester", "FRI.AUS2.StructureTester.ExtendableHashFileTester\FRI.AUS2.StructureTester.ExtendableHashFileTester.csproj", "{B67EC592-A3FD-48F6-AFBD-BE2EB7E6519F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
