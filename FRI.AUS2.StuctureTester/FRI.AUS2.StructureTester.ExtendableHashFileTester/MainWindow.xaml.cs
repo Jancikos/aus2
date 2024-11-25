@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,6 +34,8 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
             InitializeComponent();
 
             _structure = new ExtendableHashFile<HeapData>(500, new(DefaultFilesFolder.LocalPath + "ExtendableHashFileTester.bin"));
+
+            _txtbx_GenerateCount.Value = "5";
 
             _frm_Insert.OnIdChanged = _setSelectedId;
             _frm_Insert.InitilizeDefaultValues();
@@ -198,6 +201,7 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
 
             foreach (var data in dataGenerator.GenerateItems(dataCount))
             {
+                Debug.WriteLine($"Inserting id: {data.Id}");
                 _structure.Insert(data);
             }
 

@@ -51,6 +51,12 @@ namespace FRI.AUS2.Libs.Structures.Files
                 int addressIndex = _getAddressIndex(hash);
                 var ehfBlock = _addresses[addressIndex];
 
+                if (ehfBlock.BlockDepth != Depth)
+                {
+                    addressIndex = _getAddressIndex(hash, ehfBlock.BlockDepth);
+                    ehfBlock = _addresses[addressIndex];
+                }
+
                 try
                 {
                     ehfBlock.InsertToBlock(data);
@@ -105,7 +111,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             int deletionIndex = _getAddressIndex(hash);
             var deletionHashBlock = _addresses[deletionIndex];
 
-            _heapFile.Delete(deletionHashBlock.Address!.Value, filter);
+            _heapFile.Delete(deletionHashBlock.Address, filter);
 
             // var deletionBlock = _heapFile.ActiveBlock;
             var deletionBlock = new HeapFileBlock<TData>(_heapFile.BlockSize);
@@ -129,7 +135,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                 {
                     siblingBlock.AddItem(item);
                 }
-                _heapFile._saveBlock(siblingHashBlock.Address!.Value, siblingBlock);
+                _heapFile._saveBlock(siblingHashBlock.Address, siblingBlock);
 
                 // delete deletion block items
                 deletionBlock.ClearItems();
@@ -164,7 +170,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                 }
             }
 
-            _heapFile._saveBlock(deletionAddress!.Value, deletionBlock);
+            _heapFile._saveBlock(deletionAddress, deletionBlock);
         }
         #endregion
 
@@ -179,8 +185,14 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             _increaseDepth();
 
-            _addresses[0] = new ExtendableHashFileBlock<TData>(_heapFile);
-            _addresses[1] = new ExtendableHashFileBlock<TData>(_heapFile);
+            _addresses[0] = new ExtendableHashFileBlock<TData>(_heapFile.GetEmptyBlock(), _heapFile)
+            {
+                RegenerateAddressBeforeInsert = false
+            };
+            _addresses[1] = new ExtendableHashFileBlock<TData>(_heapFile.GetEmptyBlock(), _heapFile)
+            {
+                RegenerateAddressBeforeInsert = false
+            };
         }
 
         public int _getAddressIndex(BitArray hash) => _getAddressIndex(hash, Depth);
@@ -213,9 +225,9 @@ namespace FRI.AUS2.Libs.Structures.Files
             {
                 var adressBlock = _addresses[i];
 
-                newAddresses[i] = new ExtendableHashFileBlock<TData>(_heapFile)
+                newAddresses[i] = new ExtendableHashFileBlock<TData>(adressBlock.Address, _heapFile)
                 {
-                    Address = adressBlock.Address,
+                    RegenerateAddressBeforeInsert = adressBlock.RegenerateAddressBeforeInsert,
                     BlockDepth = adressBlock.BlockDepth
                 };
             }
@@ -244,12 +256,12 @@ namespace FRI.AUS2.Libs.Structures.Files
                     (int)Math.Pow(2, Depth - 1)
                 })
                 {
-                    newAddresses[newIndexBase + offset] = new ExtendableHashFileBlock<TData>(_heapFile)
+                    newAddresses[newIndexBase + offset] = new ExtendableHashFileBlock<TData>(adressBlock.Address, _heapFile)
                     {
                         BlockDepth = adressBlock.BlockDepth
                     };
                 }
-                newAddresses[newIndexBase].Address = adressBlock.Address;
+                newAddresses[i].RegenerateAddressBeforeInsert = adressBlock.RegenerateAddressBeforeInsert;
             }
 
             _addresses = newAddresses;
@@ -257,10 +269,11 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         private void _splitBlock(int splittingBlockIndex)
         {
-            var splittingIndex = splittingBlockIndex % (int)Math.Pow(2, _addresses[splittingBlockIndex].BlockDepth); // todo - znovu premysliet preco to je takto
-            var splittingBlock = _addresses[splittingIndex];
+            //var splittingIndex = splittingBlockIndex % (int)Math.Pow(2, _addresses[splittingBlockIndex].BlockDepth); // todo - znovu premysliet preco to je takto
+            var splittingBlock = _addresses[splittingBlockIndex];
             var newBlockDepth = splittingBlock.BlockDepth + 1;
-            var targetBlock = _addresses[splittingIndex + (int)Math.Pow(2, splittingBlock.BlockDepth)];
+            var targetBlockIndex = splittingBlockIndex + (int)Math.Pow(2, splittingBlock.BlockDepth);
+            var targetBlock = _addresses[targetBlockIndex];
 
             // try reinsert items
             var items = splittingBlock.Block.ValidItems;
@@ -271,7 +284,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                 var hash = item.GetHash();
                 int newIndex = _getAddressIndex(hash, newBlockDepth); // tuto pozor
 
-                if (newIndex == splittingIndex)
+                if (newIndex == splittingBlockIndex)
                 {
                     // item stays in the same block
                     continue;
@@ -288,7 +301,8 @@ namespace FRI.AUS2.Libs.Structures.Files
                 if (splittingBlockItems.Count == 0)
                 {
                     targetBlock.Address = splittingBlock.Address;
-                    splittingBlock.Address = null;
+                    targetBlock.RegenerateAddressBeforeInsert = false;
+                    splittingBlock.RegenerateAddressBeforeInsert = true;
                     // nemusi sa volat ziadne zapisovanie do suboru, lebo sa iba zmenili adresy blokov v RAM
                 }
 
@@ -310,42 +324,48 @@ namespace FRI.AUS2.Libs.Structures.Files
 
     public class ExtendableHashFileBlock<TData> where TData : class, IExtendableHashFileData, new()
     {
-        public int? Address { get; set; } = null;
+        public bool RegenerateAddressBeforeInsert { get; set; } = true;
+        public int Address { get; set; }
         public int BlockDepth { get; set; } = 1;
         public HeapFileBlock<TData> Block =>
-            _heapFile.GetBlock(
-                    Address is null 
-                    ? throw new InvalidOperationException("Block address is not set")
-                    : Address.Value
-            );
+            _heapFile.GetBlock(Address);
+            // _heapFile.GetBlock(
+            //         Address is null 
+            //         ? throw new InvalidOperationException("Block address is not set")
+            //         : Address.Value
+            // );
 
         private HeapFile<TData> _heapFile;
 
-        public ExtendableHashFileBlock(HeapFile<TData> heapFile)
+        public ExtendableHashFileBlock(int address, HeapFile<TData> heapFile)
         {
+            Address = address;
             _heapFile = heapFile;
         }
 
         public void InsertToBlock(TData data)
         {
-            if (Address is null)
-            {
-                Address = _heapFile.GetEmptyBlock();
-            }
+            _checkAddressRegeneration();
 
-            _heapFile.InsertToBlock(Address.Value, data);
+            _heapFile.InsertToBlock(Address, data);
+            RegenerateAddressBeforeInsert = false;
         }
 
         public void SetBlockItems(TData[] items)
         {
-            if (Address is null)
+            _checkAddressRegeneration();
+
+            _heapFile.SetBlockItems(Address, items);
+            RegenerateAddressBeforeInsert = false;
+        }
+
+        private void _checkAddressRegeneration()
+        {
+            if (RegenerateAddressBeforeInsert)
             {
                 Address = _heapFile.GetEmptyBlock();
             }
-
-            _heapFile.SetBlockItems(Address.Value, items);
         }
-
         public override string ToString()
         {
             return $"[{BlockDepth}] {Address}";
