@@ -386,7 +386,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         }
 
         /// <summary>
-        /// O(n , 1) + operacie nad zasobnikmi, kde n je pocet prazdnych blokov na konci suboru
+        /// k * O(n , 1) + operacie nad zasobnikmi, kde n je pocet prazdnych blokov na konci suboru, kde k je pocet prazdnych blokov na konci suboru
         /// </summary>
         public void _deleteEmptyBlocksFromEnd(bool force = false)
         {

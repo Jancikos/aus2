@@ -29,6 +29,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         public ExtendableHashFile(FileInfo file)
         {
+            // todo vythianut aj block size 
             _heapFile = new HeapFile<TData>(500, file)
             {
                 ManageFreeBlocks = false,
