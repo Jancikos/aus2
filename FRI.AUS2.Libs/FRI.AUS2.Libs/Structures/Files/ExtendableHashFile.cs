@@ -278,7 +278,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                 targetBlockItems.Add(item);
             }
 
-            if (splittingBlockItems.Count != 0)
+            if (targetBlockItems.Count != 0)
             {
                 // zapise sa zmena do suboru
                 _heapFile.SetBlockItems(splittingBlock.Address, splittingBlockItems.ToArray());
