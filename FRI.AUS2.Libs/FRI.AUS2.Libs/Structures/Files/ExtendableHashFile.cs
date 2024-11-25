@@ -45,20 +45,20 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             var hash = data.GetHash();
 
-            bool inserted = false;
+            bool inserted;
             do {
                 int addressIndex = _getAddressIndex(hash);
-                var dhfBlock = _addresses[addressIndex];
+                var ehfBlock = _addresses[addressIndex];
 
                 try {
-                    _heapFile.InsertToBlock(dhfBlock.Address, data);
+                    _heapFile.InsertToBlock(ehfBlock.Address, data);
                     inserted = true;
                 } catch (InvalidOperationException) {
                     // block is full
                     // split block
                     
                     // blok uz je maximalnej hlbky, tak sa hlabka struktury musi zvacsit aby sa mohol blok rozdelit
-                    if (dhfBlock.BlockDepth == Depth) {
+                    if (ehfBlock.BlockDepth == Depth) {
                         _increaseDepth();
                     }
 
@@ -251,12 +251,12 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         private void _splitBlock(int splittingBlockIndex)
         {
-            var splittingIndex = splittingBlockIndex % (int)Math.Pow(2, _addresses[splittingBlockIndex].BlockDepth);
+            var splittingIndex = splittingBlockIndex % (int)Math.Pow(2, _addresses[splittingBlockIndex].BlockDepth); // todo - znovu premysliet preco to je takto
             var splittingBlock = _addresses[splittingIndex];
             var newBlockDepth = splittingBlock.BlockDepth + 1;
             var targetBlock = _addresses[splittingIndex + (int)Math.Pow(2, splittingBlock.BlockDepth)];
             // create new block
-            targetBlock.Address = _heapFile.GetEmptyBlock();
+            // targetBlock.Address = _heapFile.GetEmptyBlock(); // toto odlozit az na moment ked sa bude ozaivat zapisovat do daneho bloku
 
             // try reinsert items
             var items = splittingBlock.Block.ValidItems;
@@ -278,10 +278,28 @@ namespace FRI.AUS2.Libs.Structures.Files
                 targetBlockItems.Add(item);
             }
 
-            if (targetBlockItems.Count != 0)
+            var newBlockAddress = _heapFile.GetEmptyBlock();
+
+            // ak splittovany blok ostal prazdny, tak len prechod adresu do noveho bloku
+            if (splittingBlockItems.Count == 0)
+            {
+                targetBlock.Address = splittingBlock.Address;
+                splittingBlock.Address = newBlockAddress;
+                // nemusi sa volat ziadne zapisovanie do suboru, lebo sa iba zmenili adresy blokov
+            }
+
+            if (targetBlockItems.Count == 0) 
+            {
+                // tak netreba nic nove zapisovat, lebo nenastali ziadne zmeny 
+                targetBlock.Address = newBlockAddress; // doplnit tu moznost, aby tu nemusel vobec byt odkaz na ten prazdny blok
+            }
+            
+            if (splittingBlockItems.Count != 0 && targetBlockItems.Count != 0)
             {
                 // zapise sa zmena do suboru
                 _heapFile.SetBlockItems(splittingBlock.Address, splittingBlockItems.ToArray());
+
+                splittingBlock.Address = newBlockAddress;
                 _heapFile.SetBlockItems(targetBlock.Address, targetBlockItems.ToArray());
             }
 
@@ -297,7 +315,13 @@ namespace FRI.AUS2.Libs.Structures.Files
     {
         public int Address { get; set; }
         public int BlockDepth { get; set; } = 1;
-        public HeapFileBlock<TData> Block => _heapFile.GetBlock(Address);
+        public HeapFileBlock<TData> Block => 
+            _heapFile.GetBlock(
+                // Address is null 
+                    // ? 
+                    _heapFile.GetEmptyBlock()
+                    // : Address.Value
+            );
 
         private HeapFile<TData> _heapFile;
 
