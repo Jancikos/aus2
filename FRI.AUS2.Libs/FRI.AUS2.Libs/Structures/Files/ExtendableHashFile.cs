@@ -27,10 +27,9 @@ namespace FRI.AUS2.Libs.Structures.Files
         private HeapFile<TData> _heapFile;
         public HeapFile<TData> HeapFile => _heapFile;
 
-        public ExtendableHashFile(FileInfo file)
+        public ExtendableHashFile(int blockSize, FileInfo file)
         {
-            // todo vythianut aj block size 
-            _heapFile = new HeapFile<TData>(500, file)
+            _heapFile = new HeapFile<TData>(blockSize, file)
             {
                 ManageFreeBlocks = false,
                 DeleteEmptyBlocksFromEnd = false,

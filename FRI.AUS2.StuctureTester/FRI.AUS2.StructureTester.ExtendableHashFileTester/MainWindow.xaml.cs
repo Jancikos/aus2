@@ -32,7 +32,7 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
         {
             InitializeComponent();
 
-            _structure = new ExtendableHashFile<HeapData>(new(DefaultFilesFolder.LocalPath + "ExtendableHashFileTester.bin"));
+            _structure = new ExtendableHashFile<HeapData>(500, new(DefaultFilesFolder.LocalPath + "ExtendableHashFileTester.bin"));
 
             _frm_Insert.OnIdChanged = _setSelectedId;
             _frm_Insert.InitilizeDefaultValues();
