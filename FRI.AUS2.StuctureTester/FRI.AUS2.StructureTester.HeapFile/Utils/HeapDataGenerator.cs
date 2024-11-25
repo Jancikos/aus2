@@ -31,11 +31,27 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
             _random = random;
         }
 
-        public HeapData GenerateItem()
+        public IEnumerable<HeapData> GenerateItems(int count)
+        {
+            var newIds = Enumerable
+                .Range(_idCounter, count)
+                .OrderBy(_ => _random.Next());
+            _idCounter += count;
+
+            foreach (var id in newIds)
+            {
+                yield return GenerateItem(id);
+            }
+        }
+
+
+        public HeapData GenerateItem() => GenerateItem(_idCounter++);
+
+        public HeapData GenerateItem(int id)
         {
             return new HeapData
             {
-                Id = _idCounter++,
+                Id = id,
                 Firstname = _firstnames[_random.Next(_firstnames.Length)],
                 Lastname = _lastnames[_random.Next(_lastnames.Length)],
                 ECV = GenerateECV(),

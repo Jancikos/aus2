@@ -196,9 +196,9 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
             var dataGenerator = new HeapDataGenerator(int.Parse(_txtbx_GenerateSeed.Value));
             var dataCount = int.Parse(_txtbx_GenerateCount.Value);
 
-            for (int i = 0; i < dataCount; i++)
+            foreach (var data in dataGenerator.GenerateItems(dataCount))
             {
-                _structure.Insert(dataGenerator.GenerateItem());
+                _structure.Insert(data);
             }
 
             MessageBox.Show($"Generated {dataCount} records", Title);
