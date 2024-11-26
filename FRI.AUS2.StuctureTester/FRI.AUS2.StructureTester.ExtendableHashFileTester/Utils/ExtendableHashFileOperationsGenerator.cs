@@ -41,5 +41,10 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester.Utils
         {
             Structure.Delete(filter);
         }
+
+        protected override void _structureUpdate(HeapData filter, HeapData updateItem)
+        {
+            Structure.Update(filter, updateItem);
+        }
     }
 }
