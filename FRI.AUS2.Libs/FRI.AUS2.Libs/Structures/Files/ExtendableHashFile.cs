@@ -264,16 +264,19 @@ namespace FRI.AUS2.Libs.Structures.Files
         private void _splitBlock(int baseSplittingBlockIndex, int baseSplittingBlockDepth)
         {
             var depthsDifference = Depth - baseSplittingBlockDepth;
+            var actualGroupSize = (int)Math.Pow(2, depthsDifference);
+            var newGroupSize = (int)Math.Pow(2, depthsDifference - 1);
 
             // aby splittingBlockIndex ukazoval na prvy blok v adresari s danou hlbkou
-            var splittingBlockIndex = baseSplittingBlockIndex - (baseSplittingBlockIndex % (int)Math.Pow(2, depthsDifference));
+            var splittingBlockIndex = baseSplittingBlockIndex - (baseSplittingBlockIndex % actualGroupSize);
             var splittingBlock = _addresses[splittingBlockIndex];
 
             var newBlockDepth = splittingBlock.BlockDepth + 1;
 
-            var targetBlockIndex = splittingBlockIndex + 1;
+            var targetBlockIndex = splittingBlockIndex + newGroupSize;
             var targetBlock = _addresses[targetBlockIndex];
 
+            // debug
             Debug.WriteLine($"BASE Splitting index: {baseSplittingBlockIndex}");
             Debug.WriteLine($"Splitting index: {splittingBlockIndex} [{splittingBlock}]");
             Debug.WriteLine($"Target index: {targetBlockIndex} [{targetBlock}]");
@@ -321,9 +324,8 @@ namespace FRI.AUS2.Libs.Structures.Files
                 }
             }
 
-            // update siblings blocks
-            var siblingsCount = (int)Math.Pow(2, depthsDifference - 1) - 1;
-            for (int i = 0; i <= siblingsCount; i++)
+            // update group blocks
+            for (int i = 0; i < newGroupSize; i++)
             {
                 _addresses[splittingBlockIndex + i].Address = splittingBlock.Address;
                 _addresses[splittingBlockIndex + i].BlockDepth = newBlockDepth;

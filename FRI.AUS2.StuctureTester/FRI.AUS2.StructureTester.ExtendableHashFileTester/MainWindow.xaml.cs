@@ -33,9 +33,9 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
         {
             InitializeComponent();
 
-            _structure = new ExtendableHashFile<HeapData>(500, new(DefaultFilesFolder.LocalPath + "ExtendableHashFileTester.bin"));
+            _structure = new ExtendableHashFile<HeapData>(750, new(DefaultFilesFolder.LocalPath + "ExtendableHashFileTester.bin"));
 
-            _txtbx_GenerateCount.Value = "5";
+            _txtbx_GenerateCount.Value = "50";
 
             _frm_Insert.OnIdChanged = _setSelectedId;
             _frm_Insert.InitilizeDefaultValues();
@@ -90,7 +90,7 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
             _txt_StatsDepth.Value = _structure.Depth.ToString();
             _txt_StatsAddressesCount.Value = _structure.AddressesCount.ToString();
             int i = 0;
-            _lstbx_Addresses.ItemsSource = _structure.Addresses.Select(b => $"{i++.ToBinaryString(_structure.Depth, false)}: {b}");
+            _lstbx_Addresses.ItemsSource = _structure.Addresses.Select(b => $"{i}. {i++.ToBinaryString(_structure.Depth, false)}: {b}");
 
             _frm_HeapStats.UpdateStats(_structure.HeapFile);
             _frm_HeapBlocks.RerenderAllBlocks(_structure.HeapFile);
@@ -196,16 +196,20 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
 
         private void _btn_Generate_Click(object sender, RoutedEventArgs e)
         {
-            var dataGenerator = new HeapDataGenerator(int.Parse(_txtbx_GenerateSeed.Value));
-            var dataCount = int.Parse(_txtbx_GenerateCount.Value);
+            try {
+                var dataGenerator = new HeapDataGenerator(int.Parse(_txtbx_GenerateSeed.Value));
+                var dataCount = int.Parse(_txtbx_GenerateCount.Value);
 
-            foreach (var data in dataGenerator.GenerateItems(dataCount))
-            {
-                Debug.WriteLine($"Inserting id: {data.Id}");
-                _structure.Insert(data);
+                foreach (var data in dataGenerator.GenerateItems(dataCount))
+                {
+                    Debug.WriteLine($"Inserting id: {data.Id}");
+                    _structure.Insert(data);
+                }
+
+                MessageBox.Show($"Generated {dataCount} records", Title);
+            } catch (Exception ex) {
+                MessageBox.Show($"Error: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-            MessageBox.Show($"Generated {dataCount} records", Title);
             _updateStructureStats();
         }
 
