@@ -288,12 +288,19 @@ namespace FRI.AUS2.Libs.Structures.Files
             foreach (var item in items)
             {
                 var hash = item.GetHash();
-                int newIndex = _getAddressIndex(hash, newBlockDepth); // tuto pozor
+                int newIndexOrig = _getAddressIndex(hash);
+                int newIndex = newIndexOrig - (newIndexOrig % newGroupSize);
 
                 if (newIndex == splittingBlockIndex)
                 {
                     // item stays in the same block
                     continue;
+                }
+
+                if (targetBlockIndex != newIndex)
+                {
+                    // todo - toto by sa nemalo stat
+                    throw new InvalidOperationException("Invalid target block index durring split");
                 }
 
                 // do tychto zoznamov sa to uklada kvoli odlozenemu zapisu do suboru
@@ -322,6 +329,9 @@ namespace FRI.AUS2.Libs.Structures.Files
                     targetBlock.Address = _heapFile.GetEmptyBlock();
                     targetBlock.SetBlockItems(targetBlockItems.ToArray());
                 }
+            } else
+            {
+                targetBlock.Address = _heapFile.GetEmptyBlock();
             }
 
             // update group blocks
