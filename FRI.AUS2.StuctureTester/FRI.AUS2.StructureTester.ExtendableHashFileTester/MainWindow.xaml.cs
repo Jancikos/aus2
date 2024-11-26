@@ -89,8 +89,10 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
         {
             _txt_StatsDepth.Value = _structure.Depth.ToString();
             _txt_StatsAddressesCount.Value = _structure.AddressesCount.ToString();
-            int i = 0;
-            _lstbx_Addresses.ItemsSource = _structure.Addresses.Select(b => $"{i}. {i++.ToBinaryString(_structure.Depth, false)}: {b}");
+
+            _lstbx_Addresses.ItemsSource = _structure.Depth > 7
+                ? new List<string> { "Too many addresses to display" }
+                : _structure.Addresses.Select((b, i) => $"{i}. {i.ToBinaryString(_structure.Depth, false)}: {b}");
 
             _frm_HeapStats.UpdateStats(_structure.HeapFile);
             _frm_HeapBlocks.RerenderAllBlocks(_structure.HeapFile);

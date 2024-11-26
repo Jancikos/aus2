@@ -32,6 +32,12 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
         {
             _treeView_Blocks.Items.Clear();
 
+        if (structure.BlocksCount > 50)
+        {
+            _treeView_Blocks.Items.Add(new TreeViewItem() { Header = "Too many blocks to display.", IsExpanded = true });
+            return;
+        }
+
             int i = 0;
             foreach (var block in structure.GetAllDataBlocks())
             {
