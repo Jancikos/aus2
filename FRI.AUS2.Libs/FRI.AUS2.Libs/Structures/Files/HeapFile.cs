@@ -327,6 +327,30 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
         }
 
+        #endregion
+
+        #region Update
+
+        public void Update(int address, TData filter, TData newData)
+        {
+            _validateAddress(address);
+
+            if (!filter.Equals(newData))
+            {
+                throw new InvalidOperationException("Filter and new data are not equal. Update is not allowed when hash of the data is changed");
+            }
+
+            _loadActiveBlock(address);
+
+            if (!ActiveBlock.RemoveItem(filter))
+            {
+                throw new InvalidOperationException("Item not found");
+            }
+
+            ActiveBlock.AddItem(newData);
+
+            _saveActiveBlock();
+        }
 
         #endregion
 

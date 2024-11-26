@@ -14,5 +14,19 @@ namespace FRI.AUS2.Libs.Helpers
             }
             return reversed;
         }
+
+        public static bool IsSameAs(this BitArray a, BitArray b)
+        {
+            if (a.Length != b.Length)
+                return false;
+
+            for (int i = 0; i < a.Length; i++)
+            {
+                if (a[i] != b[i])
+                    return false;
+            }
+
+            return true;
+        }
     }
 }

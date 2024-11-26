@@ -171,6 +171,33 @@ namespace FRI.AUS2.Libs.Structures.Files
         }
         #endregion
 
+        #region Update
+
+        public void Update(TData filter, TData newData)
+        {
+            if (!filter.GetHash().IsSameAs(newData.GetHash()))
+            {
+                throw new InvalidOperationException("Cannot update item with different hash");
+            }
+
+            var hash = filter.GetHash();
+            int addressIndex = _getAddressIndex(hash);
+
+            var ehfBlock = _addresses[addressIndex];
+            var block = ehfBlock.Block;
+
+            if (!block.RemoveItem(filter))
+            {
+                throw new KeyNotFoundException("Item not found");
+            }
+
+            block.AddItem(newData);
+
+            _heapFile._saveBlock(_addresses[addressIndex].Address, block);
+        }
+
+        #endregion
+
         #region Management
 
         private bool _hasBlockWithStrucuteDepth()
@@ -348,6 +375,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         #endregion
     }
 
+    #region ExtendableHashFileBlock
     public class ExtendableHashFileBlock<TData> where TData : class, IExtendableHashFileData, new()
     {
         public int Address { get; set; }
@@ -382,4 +410,5 @@ namespace FRI.AUS2.Libs.Structures.Files
             return $"[{BlockDepth}] {Address}";
         }
     }
+    #endregion
 }
