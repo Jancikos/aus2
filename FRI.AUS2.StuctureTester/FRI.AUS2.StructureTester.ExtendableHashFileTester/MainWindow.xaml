@@ -73,7 +73,11 @@
                             <hfuc:HeapFindDataForm x:Name="_frm_FindFilter" ShowAddress="false" />
                         </GroupBox>
 
-                        <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_Find" Content="Find" Margin="0" Click="_btn_Find_Click" />
+
+                        <StackPanel Grid.Column="2">
+                            <Button  VerticalAlignment="Center" x:Name="_btn_Find" Content="Find" Click="_btn_Find_Click" />
+                            <Button  VerticalAlignment="Center" x:Name="_btn_Update" Content="Update" Click="_btn_Update_Click" />
+                        </StackPanel>
 
                         <!--data form-->
                         <GroupBox Grid.Row="1" Grid.ColumnSpan="3" Header="Result">

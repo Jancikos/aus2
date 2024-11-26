@@ -35,7 +35,7 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
 
             _structure = new ExtendableHashFile<HeapData>(750, new(DefaultFilesFolder.LocalPath + "ExtendableHashFileTester.bin"));
 
-            _txtbx_GenerateCount.Value = "50";
+            _txtbx_GenerateCount.Value = "5";
 
             _frm_Insert.OnIdChanged = _setSelectedId;
             _frm_Insert.InitilizeDefaultValues();
@@ -174,7 +174,6 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
 
         private void _btn_Find_Click(object sender, RoutedEventArgs e)
         {
-
             try
             {
                 var data = _structure.Find(
@@ -189,6 +188,24 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
 
                 MessageBox.Show($"Data found!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
                 _frm_FindResult.HeapData = data;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        
+        private void _btn_Update_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _structure.Update(
+                    new HeapData() { Id = _frm_FindFilter.Id },
+                    _frm_FindResult.HeapData
+                );
+
+                MessageBox.Show($"Data updated!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                _updateStructureStats();
             }
             catch (Exception ex)
             {
