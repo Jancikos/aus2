@@ -24,6 +24,12 @@ namespace FRI.AUS2.StructureTester.Libs.Controls
     {
         public string? _logFilePath {get; set;} = null;
 
+        public int Count 
+        {
+            get => int.Parse(_txtbx_Count.Value);
+            set => _txtbx_Count.Value = value.ToString();
+        }
+
         #region OperationsRatioUI
         Dictionary<OperationType, int> OperationsRatios
         {
@@ -36,7 +42,8 @@ namespace FRI.AUS2.StructureTester.Libs.Controls
                     { OperationType.Find, int.Parse(_txtbx_operationsFind.Value) },
                     { OperationType.FindSpecific, int.Parse(_txtbx_operationsFindSpecific.Value) },
                     { OperationType.Delete, int.Parse(_txtbx_operationsDelete.Value) },
-                    { OperationType.DeleteSpecific, int.Parse(_txtbx_operationsDeleteSpecific.Value) }
+                    { OperationType.DeleteSpecific, int.Parse(_txtbx_operationsDeleteSpecific.Value) },
+                    { OperationType.Update, int.Parse(_txtbx_operationsUpdate.Value) },
                 };
             }
         }
@@ -75,6 +82,12 @@ namespace FRI.AUS2.StructureTester.Libs.Controls
         {
             get => int.Parse(_txtbx_operationsDeleteSpecific.Value);
             set => _txtbx_operationsDeleteSpecific.Value = value.ToString();
+        }
+
+        public int OpereationRatioUpdate
+        {
+            get => int.Parse(_txtbx_operationsUpdate.Value);
+            set => _txtbx_operationsUpdate.Value = value.ToString();
         }
         #endregion
 

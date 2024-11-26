@@ -36,6 +36,8 @@
                 <uc:InlineTextBox x:Name="_txtbx_operationsDelete" Title="Delete all" Value="1" />
                 <uc:InlineTextBox x:Name="_txtbx_operationsDeleteSpecific" Title="Delete specific" Value="1" />
 
+                <uc:InlineTextBox x:Name="_txtbx_operationsUpdate" Title="Update" Value="0" />
+
                 <uc:InlineTextBox x:Name="_txtbx_operationsFind" Title="Find all" Value="1" />
                 <uc:InlineTextBox x:Name="_txtbx_operationsFindSpecific" Title="Find specific" Value="1" />
             </StackPanel>

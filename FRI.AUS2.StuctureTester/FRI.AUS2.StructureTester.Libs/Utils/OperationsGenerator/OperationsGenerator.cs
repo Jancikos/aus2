@@ -43,6 +43,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
 
         protected List<T> _structureData;
         private List<T> _structureDataWithFindProblems;
+        protected bool _foundUpdateProblem = false;
         private string? _structureDataStaticticsBefore;
         private int? _structureItemsCountBefore;
         private int _expectedItemsCount;
@@ -66,9 +67,16 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
         /// T? is used because when we are inserting new item with the specified key
         /// </summary>
         protected abstract T _createRandomT(Random random, T? filter);
+        /// <summary>
+        /// used for updating item not key parts of the item
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        protected T _changeItem(T item) => item;
 
         protected abstract void _structureRemove(T filter);
         protected abstract void _structureRemoveSpecific(T filter);
+        protected virtual void _structureUpdate(T item, T updatedItem) => throw new NotImplementedException("Update is not implemented");
 
         protected abstract IList<T> _findAllData(T filter, bool specific = false);
 
@@ -129,6 +137,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
                 { OperationType.InsertDuplicate, 0 },
                 { OperationType.Delete, 0 },
                 { OperationType.DeleteSpecific, 0 },
+                { OperationType.Update, 0 },
                 { OperationType.Find, 0 },
                 { OperationType.FindSpecific, 0 }
             };
@@ -196,6 +205,16 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
             {
                 _log("No find problems detected", 1);
             }
+
+            if (_foundUpdateProblem)
+            {
+                _log("!!! Find update problems !!!", 1);
+                _log("You should check which items failed to update", 2);
+            }
+            else
+            {
+                _log("No update problems detected", 1);
+            }
         }
 
         private void _beforeOperation(int index, OperationType operation)
@@ -224,6 +243,9 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
                     break;
                 case OperationType.FindSpecific:
                     _makeFind(true);
+                    break;
+                case OperationType.Update:
+                    _makeUpdate();
                     break;
                 default:
                     throw new NotImplementedException($"{operation} is not implemented");
@@ -302,6 +324,60 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
             }
         }
 
+        private void _makeUpdate()
+        {
+            var filter = _getRandomKey();
+            if (filter is null)
+            {
+                _log("No key to update", 1, 2);
+                // structure is empty
+                return;
+            }
+
+            _log($"Updating: {filter}", 1, 2);
+
+            var itemsFromList = _findAllData(filter, true);
+            _log($"Found {itemsFromList.Count} items in list with that key", 2, 2);
+
+            if (itemsFromList.Count == 0)
+            {
+                // key not found
+                _log("Key not found in help strucuture!!!", 1, 2);
+                return;
+            }
+
+            var item = itemsFromList.First();
+            var updatedItem = _changeItem(item);
+
+            _log($"Updating data: {item} -> {updatedItem}", 2, 2);
+
+            _structureUpdate(item, updatedItem);
+            
+            _structureData.Remove(item);
+            _structureData.Add(updatedItem);
+
+            _checkItemsCount(StructureItemsCount);
+
+            // try find updated item
+            var result = _structureFindSpecific(updatedItem);
+            if (result.Count == 0)
+            {
+                _log("Updated item not found !!!", 1, 2);
+                _foundUpdateProblem = true;
+                return;
+            }
+            _log("Updated item found", 1, 2);
+            _log(result.First().ToString() ?? "null", 2, 2);
+
+            // check if updated item is the same as in the list
+            if (!_compareItems(result.First(), updatedItem))
+            {
+                _log("Updated item is not the same as in the list !!!", 1, 2);
+                _foundUpdateProblem = true;
+                return;
+            }
+        }
+
         private void _makeFind(bool specific = false)
         {
             var filter = _getRandomKey();
@@ -342,7 +418,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
             {
                 result.ToList().ForEach(x =>
                 {
-                    if (!x.Equals(filter))
+                    if (!_compareItems(x, filter))
                     {
                         _log("Found item is not the same as searched item !!!", 1, 2);
                         _structureDataWithFindProblems.Add(filter);
@@ -350,6 +426,11 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
                 });
             }
 
+        }
+
+        protected virtual bool _compareItems(T item1, T item2)
+        {
+            return item1.Equals(item2);
         }
 
         private T? _getRandomKey()
@@ -392,6 +473,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
         Delete,
         DeleteSpecific,
         Find,
-        FindSpecific
+        FindSpecific,
+        Update
     }
 }

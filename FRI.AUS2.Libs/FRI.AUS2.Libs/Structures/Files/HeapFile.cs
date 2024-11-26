@@ -40,6 +40,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             get => _countStackItems(NextFreeBlock);
         }
+        public bool ManageFreeBlocks { get; set; } = true;
 
         private int? _nextEmptyBlock = null;
         public int? NextEmptyBlock { get => _nextEmptyBlock; protected set => _nextEmptyBlock = value; }
@@ -47,6 +48,8 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             get => _countStackItems(NextEmptyBlock);
         }
+        public bool EnqueueNewBlockToEmptyBlocks { get; set; } = true;
+        public bool DeleteEmptyBlocksFromEnd { get; set; } = true; 
 
         protected int ActiveBlockAddress { get; set; }
         public HeapFileBlock<TData> ActiveBlock { get; protected set; }
@@ -101,19 +104,75 @@ namespace FRI.AUS2.Libs.Structures.Files
             var (address, addressType) = _findAddressOfNextFreeBlock();
 
             _loadActiveBlock(address);
+            ActiveBlock.AddItem(data);
+
+            _postInsertToActiveBlock(addressType);
+
+            return address;
+        }
+
+        public int InsertToBlock(int address, TData data)
+        {
+            _validateAddress(address);
+
+            _loadActiveBlock(address);
+            var addressType = _getBlockAddressType(address, ActiveBlock);
+            if (addressType == BlockAdressType.FullBlock)
+            {
+                throw new InvalidOperationException("Block is full");
+            }
 
             ActiveBlock.AddItem(data);
 
+            _postInsertToActiveBlock(addressType);
+
+            return address;
+        }
+
+        public void SetBlockItems(int address, TData[] items)
+        {
+            _validateAddress(address);
+
+            _loadActiveBlock(address);
+
+            if (ActiveBlock.BlockFactor < items.Length)
+            {
+                throw new InvalidOperationException("Items count is greater than block factor");
+            }
+
+            var itemsCount = items.Length;
+            if (itemsCount < ActiveBlock.BlockFactor)
+            {
+                var itemsCopy = new TData[ActiveBlock.BlockFactor];
+                items.CopyTo(itemsCopy, 0);
+                items = itemsCopy;
+            }
+
+            var addressType = _getBlockAddressType(address, ActiveBlock);
+
+            ActiveBlock.Items = items;
+            ActiveBlock.ValidCount = itemsCount;
+
+            _postInsertToActiveBlock(addressType);
+        }
+
+        /// <summary>
+        /// it also saves the active block
+        /// </summary>
+        /// <param name="addressType">the state within the block was before inserting</param>
+        /// <returns></returns>
+        private void _postInsertToActiveBlock(BlockAdressType addressType)
+        {
             _saveActiveBlockDisabled = true;
             switch (addressType)
             {
-                case BlockAdressType.NextFreeBlock:
+                case BlockAdressType.FreeBlock:
                     if (ActiveBlock.IsFull)
                     {
                         _dequeNextFreeBlock();
                     }
                     break;
-                case BlockAdressType.NextEmptyBlock:
+                case BlockAdressType.EmptyBlock:
                     if (!ActiveBlock.IsEmpty)
                     {
                         _dequeNextEmptyBlock();
@@ -131,13 +190,51 @@ namespace FRI.AUS2.Libs.Structures.Files
                         _enqueNextFreeBlock();
                     }
                     break;
+                case BlockAdressType.FullBlock:
+                    if (ActiveBlock.IsEmpty)
+                    {
+                        _enqueNextEmptyBlock();
+                        break;
+                    }
+
+                    if (!ActiveBlock.IsFull)
+                    {
+                        _enqueNextFreeBlock();
+                    }
+                    break;
+            }
+
+            _saveActiveBlock(true);
+        }
+
+        public int CreateNewBlock()
+        {
+            _loadActiveBlock(_fileManager.Length);
+
+            if (EnqueueNewBlockToEmptyBlocks) 
+            {
+                _saveActiveBlockDisabled = true;
+                // lebo sa do noveho nepridali ziadne data
+                _enqueNextEmptyBlock();
             }
 
             _saveActiveBlock(true);
 
-            return address;
+            return ActiveBlockAddress;
         }
 
+        public int GetEmptyBlock()
+        {
+            var (address, addressType) = _findAddressOfNextFreeBlock();
+
+            if (addressType != BlockAdressType.EmptyBlock)
+            {
+                address = CreateNewBlock();
+            }
+
+            return address;
+        }
+        
         #endregion
 
         #region Find
@@ -170,7 +267,8 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// 
         /// <param name="address"></param>
         /// <param name="filter"></param>
-        public void Delete(int address, TData filter)
+        /// <param name="saveActiveBlock">if false, the active block will not be saved at the end of the method</param>
+        public void Delete(int address, TData filter, bool saveActiveBlock = true)
         {
             _validateAddress(address);
 
@@ -216,7 +314,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                 }
 
                 // ak je to posledny blok, tak spustime proces mazania blokov od konca
-                if (address == _getAddressByBlockIndex(BlocksCount - 1))
+                if (DeleteEmptyBlocksFromEnd && address == _getAddressByBlockIndex(BlocksCount - 1))
                 {
                     _deleteEmptyBlocksFromEnd();
                     return;
@@ -225,14 +323,45 @@ namespace FRI.AUS2.Libs.Structures.Files
                 // zaradime ho do zoznamu prazdnych blokov
                 _enqueNextEmptyBlock();
 
-                _saveActiveBlock(true);
+                _saveActiveBlock(saveActiveBlock);
             }
         }
 
+        #endregion
+
+        #region Update
+
+        public void Update(int address, TData filter, TData newData)
+        {
+            _validateAddress(address);
+
+            if (!filter.Equals(newData))
+            {
+                throw new InvalidOperationException("Filter and new data are not equal. Update is not allowed when hash of the data is changed");
+            }
+
+            _loadActiveBlock(address);
+
+            if (!ActiveBlock.RemoveItem(filter))
+            {
+                throw new InvalidOperationException("Item not found");
+            }
+
+            ActiveBlock.AddItem(newData);
+
+            _saveActiveBlock();
+        }
 
         #endregion
 
         #region Blocks management
+
+        public HeapFileBlock<TData> GetBlock(int address)
+        {
+            _validateAddress(address);
+
+            return _loadBlock(address);
+        }
         public List<HeapFileBlock<TData>> GetAllDataBlocks()
         {
             List<HeapFileBlock<TData>> blocks = new();
@@ -260,19 +389,45 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
         }
 
-        /// <summary>
-        /// O(n , 1) + operacie nad zasobnikmi, kde n je pocet prazdnych blokov na konci suboru
-        /// </summary>
-        private void _deleteEmptyBlocksFromEnd()
+        private BlockAdressType _getBlockAddressType(int adrress, HeapFileBlock<TData> block)
         {
+            if (adrress == FileSize)
+            {
+                return BlockAdressType.NewBlock;
+            }
+
+            if (block.IsEmpty)
+            {
+                return BlockAdressType.EmptyBlock;
+            }
+
+            if (block.IsFull)
+            {
+                return BlockAdressType.FullBlock;
+            }
+
+            return BlockAdressType.FreeBlock;
+        }
+
+        /// <summary>
+        /// k * O(n , 1) + operacie nad zasobnikmi, kde n je pocet prazdnych blokov na konci suboru, kde k je pocet prazdnych blokov na konci suboru
+        /// </summary>
+        public void _deleteEmptyBlocksFromEnd(bool force = false)
+        {
+            if (!DeleteEmptyBlocksFromEnd && !force)
+            {
+                return;
+            }
+
             int lastBlockIndex = BlocksCount - 1;
             int lastBlockAddress = _getAddressByBlockIndex(lastBlockIndex);
-            int lastDeletedBlockAddress = lastBlockAddress;
+            int? lastDeletedBlockAddress = null;
 
             while (lastBlockIndex > 0)
             {
                 _loadActiveBlock(lastBlockAddress);
 
+                
                 if (!ActiveBlock.IsEmpty)
                 {
                     break;
@@ -291,7 +446,10 @@ namespace FRI.AUS2.Libs.Structures.Files
             //     return;
             // }
 
-            _fileManager.Truncate(lastDeletedBlockAddress);
+            if (lastDeletedBlockAddress is not null)
+            {
+                _fileManager.Truncate(lastDeletedBlockAddress.Value);
+            }
         }
 
         private int _countStackItems(int? startAddress)
@@ -379,11 +537,21 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         private void _enqueNextFreeBlock()
         {
+            if (!ManageFreeBlocks) 
+            {
+                return;
+            }
+
             _enqueActiveBlock(ref _nextFreeBlock);
         }
 
         private void _dequeNextFreeBlock()
         {
+            if (!ManageFreeBlocks) 
+            {
+                return;
+            }
+
             _dequeActiveBlock(ref _nextFreeBlock);
         }
 
@@ -424,7 +592,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             return _loadBlock(address.Value);
         }
 
-        private void _saveBlock(int address, HeapFileBlock<TData> block)
+        public void _saveBlock(int address, HeapFileBlock<TData> block)
         {
             _fileManager.WriteBytes(address, block.ToBytes());
         }
@@ -432,7 +600,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// 
         /// </summary>
         /// <param name="force">saves even _saveActiveBlockDisabled is true, also sets _saveActiveBlockDisabled to false</param>
-        private void _saveActiveBlock(bool force = false)
+        public void _saveActiveBlock(bool force = false)
         {
             if (_saveActiveBlockDisabled) 
             {
@@ -449,12 +617,12 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             if (NextFreeBlock is not null)
             {
-                return (NextFreeBlock.Value, BlockAdressType.NextFreeBlock);
+                return (NextFreeBlock.Value, BlockAdressType.FreeBlock);
             }
 
             if (NextEmptyBlock is not null)
             {
-                return (NextEmptyBlock.Value, BlockAdressType.NextEmptyBlock);
+                return (NextEmptyBlock.Value, BlockAdressType.EmptyBlock);
             }
 
             return (_fileManager.Length, BlockAdressType.NewBlock);
@@ -517,9 +685,10 @@ namespace FRI.AUS2.Libs.Structures.Files
 
     public enum BlockAdressType
     {
-        NextFreeBlock,
-        NextEmptyBlock,
-        NewBlock
+        FreeBlock,
+        EmptyBlock,
+        NewBlock,
+        FullBlock
     }
 
     public class HeapFileBlock<TData> : IBinaryData where TData : class, IHeapFileData, new()
@@ -625,12 +794,14 @@ namespace FRI.AUS2.Libs.Structures.Files
                 throw new IndexOutOfRangeException("Index out of range");
             }
 
-            for (int i = index; i < ValidCount - 1; i++)
-            {
-                Items[i] = Items[i + 1];
-            }
+            Items[index] = Items[ValidCount - 1];
 
             ValidCount--;
+        }
+
+        public void ClearItems()
+        {
+            ValidCount = 0;
         }
 
 

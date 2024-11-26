@@ -1,0 +1,214 @@
+﻿<Window x:Class="FRI.AUS2.StructureTester.ExtendableHashFileTester.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FRI.AUS2.StructureTester.ExtendableHashFileTester"
+        xmlns:libsuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls;assembly=FRI.AUS2.StructureTester.Libs"
+        xmlns:hfuc="clr-namespace:FRI.AUS2.StructureTester.HeapFileTester.Controls;assembly=FRI.AUS2.StructureTester.HeapFileTester"
+        mc:Ignorable="d"
+        Title="AUS2 Structure tester - ExtendableHashFile" Height="750" Width="800" SizeToContent="WidthAndHeight">
+        
+    <Window.Resources>
+        <ResourceDictionary Source="/Dictionary.xaml" />
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <Menu>
+                <MenuItem Header="File">
+                    <MenuItem x:Name="_mnitem_FileClear" Header="Clear" Click="_mnitem_FileClear_Click" />
+                </MenuItem>
+                
+                <MenuItem x:Name="_mnitem_Close" Header="Close" Click="_mnitem_Close_Click" />
+            </Menu>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="5">
+            <StackPanel Orientation="Horizontal">
+                <!-- manual data insert -->
+                <GroupBox Header="Insert data">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="80" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <!--data form-->
+                        <hfuc:HeapDataForm x:Name="_frm_Insert" />
+
+                        <StackPanel Grid.Column="2" Orientation="Vertical">
+                            <Button x:Name="_btn_ManualInsertFormRefresh" Content="Refresh" Margin="0" Click="_btn_ManualInsertFormRefresh_Click" />
+                            <Button x:Name="_btn_ManualInsert" Content="Insert" Margin="0" Click="_btn_ManualInsert_Click" />
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+
+                <!-- manual data find -->
+                 <GroupBox Header="Find data">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="80" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        
+                        <GroupBox Header="Filter">
+                            <hfuc:HeapFindDataForm x:Name="_frm_FindFilter" ShowAddress="false" />
+                        </GroupBox>
+
+
+                        <StackPanel Grid.Column="2">
+                            <Button  VerticalAlignment="Center" x:Name="_btn_Find" Content="Find" Click="_btn_Find_Click" />
+                            <Button  VerticalAlignment="Center" x:Name="_btn_Update" Content="Update" Click="_btn_Update_Click" />
+                        </StackPanel>
+
+                        <!--data form-->
+                        <GroupBox Grid.Row="1" Grid.ColumnSpan="3" Header="Result">
+                            <hfuc:HeapDataForm x:Name="_frm_FindResult" />
+                        </GroupBox>
+                    </Grid>
+                </GroupBox>
+
+
+                <!-- generate data -->
+                <GroupBox Header="Generate data">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="80" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <libsuc:InlineTextBox x:Name="_txtbx_GenerateCount" Title="Count" Value="15" />
+                        <libsuc:InlineTextBox Grid.Row="1" x:Name="_txtbx_GenerateSeed" Title="Seed" Value="1" />
+
+                        <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_Generate" Content="Generate" Margin="0" Click="_btn_Generate_Click" />
+                    </Grid>
+                </GroupBox>
+
+                
+                <!-- manual data delete -->
+                <GroupBox Header="Delete data">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="80" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        
+                        <GroupBox Header="Filter">
+                            <hfuc:HeapFindDataForm x:Name="_frm_DeleteFilter" ShowAddress="false" />
+                        </GroupBox>
+
+                        <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_Delete" Content="Delete" Margin="0" Click="_btn_Delete_Click" />
+
+                        <!--data form-->
+                        <GroupBox Grid.Row="1" Grid.ColumnSpan="3" Header="Result">
+                            <TextBlock x:Name="_txt_DeleteResult" />
+                        </GroupBox>
+
+                    </Grid>
+                </GroupBox>
+                
+        </StackPanel>
+
+
+            <StackPanel Orientation="Horizontal">
+                <!-- hash to address test -->
+                 <GroupBox Header="Hash to address">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="80" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <libsuc:InlineTextBox x:Name="_txtbx_Hash" Title="Hash (dec)" Value="1" />
+
+                        <GroupBox Header="Result" Grid.Row="1" Grid.ColumnSpan="3" >
+                            <StackPanel>
+                                <libsuc:InlineText x:Name="_txt_HashBinary" Title="Hash (bin)" Value="00000001" />
+                                <libsuc:InlineText x:Name="_txt_StatsDepth" Title="Structure depth" Value="1" />
+                                <libsuc:InlineText x:Name="_txt_BlockIndexBinary" Title="Block index (bin)" Value="00000001" />
+                                <libsuc:InlineText x:Name="_txt_BlockIndex" Title="Block index (dec)" Value="1" />
+                            </StackPanel>
+                        </GroupBox>
+                        
+                        <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_HashToAddress" Content="Calc" Margin="0" Click="_btn_HashToAddress_Click" />
+                    </Grid>
+                </GroupBox>
+
+                <!-- addresses -->
+                <GroupBox Header="Addresses">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="_btn_IncreaseDepth" Content="Increase depth" Click="_btn_IncreaseDepth_Click" />
+                            <Button x:Name="_btn_DecreaseDepth" Content="Decrease depth" Click="_btn_DecreaseDepth_Click" />
+                        </StackPanel>
+
+                        <libsuc:InlineText x:Name="_txt_StatsAddressesCount" Title="AddressesCount" Value="1" />
+
+                        <GroupBox Header="Addresses" MaxHeight="150">
+                            <ScrollViewer>
+                                <ListBox x:Name="_lstbx_Addresses" />
+                            </ScrollViewer>
+                        </GroupBox>
+                    </StackPanel>
+                </GroupBox>
+
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" MaxHeight="300">
+                <!-- heap file stats -->
+                <GroupBox Header="HeapFile stats">
+                    <StackPanel Orientation="Horizontal">
+                        <GroupBox Header="Stats">
+                            <hfuc:HeapFileStats x:Name="_frm_HeapStats" />
+                        </GroupBox>
+
+                        <GroupBox Header="All Data Blocks"  MinWidth="250">
+                            <hfuc:HeapFileBlocks x:Name="_frm_HeapBlocks" />
+                        </GroupBox>
+                    </StackPanel>
+                </GroupBox>
+                
+                <!-- operations generator -->
+                <GroupBox Header="Operations generator">
+                    <libsuc:OperationsGeneratorForm x:Name="_frm_OperationsGenerator" />
+                </GroupBox>
+            </StackPanel>
+
+
+        </StackPanel>
+    
+    </Grid>
+</Window>

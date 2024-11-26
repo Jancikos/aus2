@@ -9,5 +9,22 @@
                 action();
             }
         }
+
+        public static string ToBinaryString(this int value, int padding = 8, bool spaceSeparated = true)
+        {
+            var binaryString = Convert.ToString(value, 2).PadLeft(padding, '0');
+
+            if (spaceSeparated && binaryString.Length > 4)
+            {
+                return string.Join(
+                    " ",
+                    Enumerable
+                        .Range(0, binaryString.Length / 4)
+                        .Select(i => binaryString.Substring(i * 4, 4))
+                    );
+            }
+
+            return binaryString;
+        }
     }
 }
