@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\FRI.AUS2.SP2\FRI.AUS2.SP2.Libs\FRI.AUS2.SP2.Libs.csproj" />
-  </ItemGroup>
-
 </Project>
