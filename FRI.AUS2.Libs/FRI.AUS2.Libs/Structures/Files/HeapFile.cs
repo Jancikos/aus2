@@ -794,12 +794,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                 throw new IndexOutOfRangeException("Index out of range");
             }
 
-            for (int i = index; i < ValidCount - 1; i++)
-            {
-                Items[i] = Items[i + 1];
-            }
-            // todo otestovat
-            // Items[index] = Items[ValidCount - 1]; // alternative k tomu for cyklu 
+            Items[index] = Items[ValidCount - 1];
 
             ValidCount--;
         }
