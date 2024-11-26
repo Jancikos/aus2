@@ -4,7 +4,7 @@ using System.Text;
 
 namespace FRI.AUS2.SP2.Libs.Models
 {
-    internal class Customer :  IExtendableHashFileData
+    public class Customer :  IExtendableHashFileData
     {private const int _firstnameMax = 15;
         private string _firstname = "";
         public string Firstname

@@ -1,0 +1,17 @@
+﻿<Window x:Class="FRI.AUS2.SP2.GUI.Windows.InputDialogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FRI.AUS2.SP2.GUI.Windows"
+        mc:Ignorable="d"
+        Title="InputDialogWindow" Height="150" Width="300" WindowStartupLocation="CenterScreen" SizeToContent="Height">
+    <StackPanel Margin="10">
+        <TextBlock x:Name="_txt_title" Text="Title:" Margin="0,0,0,5"/>
+        <TextBox x:Name="_txtb" Margin="0,0,0,5"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="OK" Width="75" Margin="5,0" Click="_btn_OK_Click"/>
+            <Button Content="Cancel" Width="75" Margin="5,0" Click="_btn_Cancel_Click"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

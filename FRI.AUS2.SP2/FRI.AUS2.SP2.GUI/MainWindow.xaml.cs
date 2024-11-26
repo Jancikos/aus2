@@ -54,6 +54,11 @@ namespace FRI.AUS2.SP2.GUI
 
             //RerenderTables();
         }
+
+        private void _btn_ManualInsert_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
     #endregion
 }

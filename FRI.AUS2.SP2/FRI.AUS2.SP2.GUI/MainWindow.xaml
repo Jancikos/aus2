@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FRI.AUS2.SP2.GUI"
+        xmlns:uc="clr-namespace:FRI.AUS2.SP2.GUI.Controls"
         mc:Ignorable="d"
         Title="AUS SP2" Height="450" Width="1100">
     <Window.Resources>
@@ -32,9 +33,30 @@
             </Menu>
         </StackPanel>
 
-        <Grid Grid.Row="1" Margin="5">
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="5">
+            <StackPanel Orientation="Horizontal">
+                <!-- manual data insert -->
+                <GroupBox Header="Insert customer">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="80" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
 
+                        <!--data form-->
+                        <uc:CustomerForm x:Name="_frm_Insert" />
 
-        </Grid>
+                        <Button Grid.Row="2" Grid.ColumnSpan="3" HorizontalAlignment="Center" x:Name="_btn_ManualInsert" Content="Insert" Margin="0" Click="_btn_ManualInsert_Click" />
+                    </Grid>
+                </GroupBox>
+            </StackPanel>
+        
+
+        </StackPanel>
     </Grid>
 </Window>
