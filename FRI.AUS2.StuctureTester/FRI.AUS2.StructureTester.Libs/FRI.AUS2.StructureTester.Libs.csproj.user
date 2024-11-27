@@ -26,6 +26,9 @@
     <Compile Update="Windows\EhfDetailWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Windows\HfDetailWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Controls\ExtendableHashFile\EhfAddresses.xaml">
@@ -50,6 +53,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Windows\EhfDetailWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Windows\HfDetailWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

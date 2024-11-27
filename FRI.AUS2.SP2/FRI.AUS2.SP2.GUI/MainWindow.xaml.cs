@@ -24,6 +24,7 @@ namespace FRI.AUS2.SP2.GUI
 
         private EhfDetailWindow? _ehfByIdsWindow = null;
         private EhfDetailWindow? _ehfByEcvWindow = null;
+        private HfDetailWindow? _hfWindow = null;
      
         public MainWindow()
         {
@@ -41,6 +42,7 @@ namespace FRI.AUS2.SP2.GUI
         {
             _ehfByEcvWindow?.UpdateStats(_backend._dataByEcv);
             _ehfByIdsWindow?.UpdateStats(_backend._dataById);
+            _hfWindow?.UpdateStats(_backend._allData);
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -112,6 +114,30 @@ namespace FRI.AUS2.SP2.GUI
             _ehfByEcvWindow.UpdateStats(_backend._dataByEcv);
 
             _ehfByEcvWindow.Activate();
+        }
+
+        private void _mnitem_TesterCustomers_Click(object sender, RoutedEventArgs e)
+        {
+            if (_hfWindow is null)
+            {
+                _hfWindow = new HfDetailWindow();
+                _hfWindow.Title = "HF detail - Customers";
+
+                _hfWindow.Closed += (s, e) => _hfWindow = null;
+
+                _hfWindow.Show();
+            }
+
+            _hfWindow.UpdateStats(_backend._allData);
+
+            _hfWindow.Activate();
+        }
+
+        private void _mnitem_TesterAll_Click(object sender, RoutedEventArgs e)
+        {
+            _mnitem_TesterIds_Click(sender, e);
+            _mnitem_TesterECVs_Click(sender, e);
+            _mnitem_TesterCustomers_Click(sender, e);
         }
 
         private void _btn_ManualInsert_Click(object sender, RoutedEventArgs e)
