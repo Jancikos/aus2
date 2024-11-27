@@ -76,6 +76,12 @@ namespace FRI.AUS2.StructureTester.Libs.Controls.HeapFile
 
                 ++i;
             }
+
+            
+            if (i == 0)
+            {
+                _treeView_Blocks.Items.Add(new TreeViewItem() { Header = "No data blocks.", IsExpanded = true });
+            }
         }
 
         private void _treeView_Blocks_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)

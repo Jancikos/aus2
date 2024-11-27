@@ -34,7 +34,8 @@
                 </MenuItem>
 
                 <MenuItem Header="Testers">
-                    <MenuItem x:Name="_mnitem_TesterIds" Header="Detail of EHF of IDs" Click="_mnitem_TesterIds_Click" />
+                    <MenuItem Header="Detail of EHF of IDs" Click="_mnitem_TesterIds_Click" />
+                    <MenuItem Header="Detail of EHF of ECVs" Click="_mnitem_TesterECVs_Click" />
                 </MenuItem>
 
                 <MenuItem x:Name="_mnitem_Close" Header="Zatvoriť" Click="_mnitem_Close_Click" />
