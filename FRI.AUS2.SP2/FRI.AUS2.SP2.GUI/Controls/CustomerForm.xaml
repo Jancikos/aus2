@@ -32,10 +32,10 @@
             </Grid.RowDefinitions>
 
             <TextBlock Text="EČV:" />
-            <TextBox x:Name="_txtb_Ecv" Grid.Column="2" TextAlignment="Right" />
+            <TextBox x:Name="_txtb_Ecv" Grid.Column="2" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Ecv" />
     
             <TextBlock Text="ID:" Grid.Row="2" />
-            <TextBox x:Name="_txtb_Id" Grid.Column="2" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" TextChanged="_txtb_Id_TextChanged" Grid.Row="2" />
+            <TextBox x:Name="_txtb_Id" Grid.Column="2" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Id" TextChanged="_txtb_Id_TextChanged" Grid.Row="2" />
     
             <TextBlock Text="Meno:" Grid.Row="4" />
             <TextBox x:Name="_txtb_Firstname" Grid.Column="2" Grid.Row="4" TextAlignment="Right" />

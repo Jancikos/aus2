@@ -23,6 +23,9 @@ namespace FRI.AUS2.SP2.GUI.Controls
     public partial class CustomerForm : UserControl
     {
         public Action<int>? OnIdChanged;
+        public Func<int>? GenerateId;
+        public Func<string>? GenerateEcv;
+
         public int Id
         {
             get { return int.Parse(_txtb_Id.Text); }
@@ -68,7 +71,7 @@ namespace FRI.AUS2.SP2.GUI.Controls
         public bool ManageIds
         {
             get => _txtb_Id.IsEnabled;
-            set 
+            set
             {
                 _txtb_Id.IsEnabled = value;
                 _txtb_Ecv.IsEnabled = value;
@@ -111,22 +114,27 @@ namespace FRI.AUS2.SP2.GUI.Controls
             }
         }
 
-        private void _txtb_Generate_Radnom_Int(object sender, MouseButtonEventArgs e)
+
+        private void _txtb_Generate_Id(object sender, MouseButtonEventArgs e)
         {
-            var random = new Random();
-            var txtb = (TextBox)sender;
-
-            if (txtb.Text == "")
+            if (GenerateId is null)
             {
-                txtb.Text = random.Next(0, 100).ToString();
+                Id = Random.Shared.Next(1000);
                 return;
             }
 
-            if (int.TryParse(txtb.Text, out int result))
+            Id = GenerateId();
+        }
+
+        private void _txtb_Generate_Ecv(object sender, MouseButtonEventArgs e)
+        {
+            if (GenerateEcv is null)
             {
-                txtb.Text = (result + 1).ToString();
+                ECV = Random.Shared.Next(1000).ToString();
                 return;
             }
+
+            ECV = GenerateEcv();
         }
 
         private void _grbx_Visits_MouseDoubleClick(object sender, MouseButtonEventArgs e)

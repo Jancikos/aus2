@@ -31,6 +31,9 @@ namespace FRI.AUS2.SP2.GUI
             _backend = new SP2Backend(10000, DefaultFilesFolder);
 
             InitializeComponent();
+
+            _frm_Insert.GenerateId = _backend.Generator.GenerateId;
+            _frm_Insert.GenerateEcv = _backend.Generator.GenerateECV;
         }
 
         private void _renderCustomer(Customer customer)
@@ -139,7 +142,10 @@ namespace FRI.AUS2.SP2.GUI
             _mnitem_TesterECVs_Click(sender, e);
             _mnitem_TesterCustomers_Click(sender, e);
         }
-
+        private void _btn_ManualRandom_Click(object sender, RoutedEventArgs e)
+        {
+            _frm_Insert.Customer = _backend.Generator.GenerateCustomer();
+        }
         private void _btn_ManualInsert_Click(object sender, RoutedEventArgs e)
         {
             var customer = _frm_Insert.Customer;

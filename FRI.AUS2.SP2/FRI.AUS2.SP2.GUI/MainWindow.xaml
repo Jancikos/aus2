@@ -63,7 +63,10 @@
                         <!--data form-->
                         <uc:CustomerForm x:Name="_frm_Insert" ManageItems="False" />
 
-                        <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_ManualInsert" Content="Insert" Margin="0" Click="_btn_ManualInsert_Click" />
+                        <StackPanel Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
+                            <Button x:Name="_btn_ManualRandom" Content="Random" Click="_btn_ManualRandom_Click" />
+                            <Button x:Name="_btn_ManualInsert" Content="Insert" Click="_btn_ManualInsert_Click" />
+                        </StackPanel>
                     </Grid>
                 </GroupBox>
 

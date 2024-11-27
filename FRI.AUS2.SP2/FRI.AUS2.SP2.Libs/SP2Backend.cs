@@ -1,5 +1,6 @@
 ﻿using FRI.AUS2.Libs.Structures.Files;
 using FRI.AUS2.SP2.Libs.Models;
+using FRI.AUS2.SP2.Libs.Utils;
 
 namespace FRI.AUS2.SP2.Libs
 {
@@ -10,12 +11,18 @@ namespace FRI.AUS2.SP2.Libs
         public ExtendableHashFile<CustomerAddressById> _dataById;
         public ExtendableHashFile<CustomerAddressByEcv> _dataByEcv;
 
+
+        private CustomersGenerator _generator;
+        public CustomersGenerator Generator => _generator;
+
         public SP2Backend(int blockSize, Uri dataFolder)
         {
             _allData = new HeapFile<Customer>(blockSize, new(dataFolder.LocalPath + "allData.bin"));
 
             _dataById = new ExtendableHashFile<CustomerAddressById>(blockSize, new(dataFolder.LocalPath), "ehfById");
             _dataByEcv = new ExtendableHashFile<CustomerAddressByEcv>(blockSize, new(dataFolder.LocalPath), "ehfByEcv");
+
+            _generator = new CustomersGenerator(_dataById, _dataByEcv);
         }
 
         public void AddCustomer(Customer customer)
