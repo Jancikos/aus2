@@ -76,7 +76,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
 
         protected abstract void _structureRemove(T filter);
         protected abstract void _structureRemoveSpecific(T filter);
-        protected virtual void _structureUpdate(T item, T updatedItem) => throw new NotImplementedException("Update is not implemented");
+        protected virtual void _structureUpdate(T item, T updatedItem) => throw new NotImplementedException("UpdateStats is not implemented");
 
         protected abstract IList<T> _findAllData(T filter, bool specific = false);
 

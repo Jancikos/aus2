@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FRI.AUS2.StructureTester.ExtendableHashFileTester"
         xmlns:libsuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls;assembly=FRI.AUS2.StructureTester.Libs"
+        xmlns:libsehfuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls.ExtendableHashFile;assembly=FRI.AUS2.StructureTester.Libs"
         xmlns:hfuc="clr-namespace:FRI.AUS2.StructureTester.HeapFileTester.Controls;assembly=FRI.AUS2.StructureTester.HeapFileTester"
         mc:Ignorable="d"
         Title="AUS2 Structure tester - ExtendableHashFile" Height="750" Width="800" SizeToContent="WidthAndHeight">
@@ -175,13 +176,7 @@
                             <Button x:Name="_btn_DecreaseDepth" Content="Decrease depth" Click="_btn_DecreaseDepth_Click" />
                         </StackPanel>
 
-                        <libsuc:InlineText x:Name="_txt_StatsAddressesCount" Title="AddressesCount" Value="1" />
-
-                        <GroupBox Header="Addresses" MaxHeight="150">
-                            <ScrollViewer>
-                                <ListBox x:Name="_lstbx_Addresses" />
-                            </ScrollViewer>
-                        </GroupBox>
+                        <libsehfuc:EhfAddresses x:Name="_frm_Addresses" />
                     </StackPanel>
                 </GroupBox>
 
