@@ -1,5 +1,6 @@
 ﻿using FRI.AUS2.SP2.Libs;
 using FRI.AUS2.SP2.Libs.Models;
+using FRI.AUS2.StructureTester.Libs.Windows;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -61,6 +62,15 @@ namespace FRI.AUS2.SP2.GUI
             MessageBox.Show("Data vygenerované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
 
             //RerenderTables();
+        }
+
+        private void _mnitem_TesterIds_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new EhfDetailWindow();
+
+            window.UpdateStats(_backend._dataById);
+
+            window.Show();
         }
 
         private void _btn_ManualInsert_Click(object sender, RoutedEventArgs e)

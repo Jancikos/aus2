@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:FRI.AUS2.StructureTester.Libs.Windows"
     xmlns:ehfuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls.ExtendableHashFile"
     mc:Ignorable="d"
+    SizeToContent="WidthAndHeight"
     Title="ExtendableHashFile detail" Height="450" Width="800">
 
     <Grid>
@@ -23,6 +24,6 @@
             </Menu>
         </StackPanel>
 
-        <ehfuc:EhfDetail x:Name="_frm_Detail" />
+        <ehfuc:EhfDetail Grid.Row="1" x:Name="_frm_Detail" />
     </Grid>
 </Window>

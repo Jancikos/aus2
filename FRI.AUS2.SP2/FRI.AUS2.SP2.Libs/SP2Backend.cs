@@ -5,10 +5,10 @@ namespace FRI.AUS2.SP2.Libs
 {
     public class SP2Backend
     {
-        private HeapFile<Customer> _allData;
+        public HeapFile<Customer> _allData;
 
-        private ExtendableHashFile<CustomerAddressById> _dataById;
-        private ExtendableHashFile<CustomerAddressByEcv> _dataByEcv;
+        public ExtendableHashFile<CustomerAddressById> _dataById;
+        public ExtendableHashFile<CustomerAddressByEcv> _dataByEcv;
 
         public SP2Backend(int blockSize, Uri dataFolder)
         {
