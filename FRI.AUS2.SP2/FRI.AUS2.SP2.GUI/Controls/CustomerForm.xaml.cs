@@ -90,10 +90,10 @@ namespace FRI.AUS2.SP2.GUI.Controls
             }
             set
             {
-                Id = value.Id;
+                Id = value.Id ?? -1;
                 Firstname = value.Firstname;
                 Lastname = value.Lastname;
-                ECV = value.ECV;
+                ECV = value.ECV ?? "";
                 Items = value.Visits;
             }
         }

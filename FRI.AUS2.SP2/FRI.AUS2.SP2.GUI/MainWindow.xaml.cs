@@ -23,7 +23,7 @@ namespace FRI.AUS2.SP2.GUI
         SP2Backend _backend;
         public MainWindow()
         {
-            _backend = new SP2Backend(1000, DefaultFilesFolder);
+            _backend = new SP2Backend(10000, DefaultFilesFolder);
 
             InitializeComponent();
         }
@@ -65,22 +65,68 @@ namespace FRI.AUS2.SP2.GUI
 
         private void _btn_ManualInsert_Click(object sender, RoutedEventArgs e)
         {
+            var customer = _frm_Insert.Customer;
 
+            if (!customer.IsValid())
+            {
+                MessageBox.Show("Vyplnte všetky polia!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try {
+                _backend.AddCustomer(customer);
+
+                MessageBox.Show("Zákazník pridaný!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+
+                _renderCustomer(customer);
+            } catch (Exception ex) {
+                MessageBox.Show($"Chyba: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void _btn_FindById_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Nájdené!" + _txtbx_FindId.Value, Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            try {
+                var customer = _backend.GetCustomerById(int.Parse(_txtbx_FindId.Value));
+
+                _renderCustomer(customer);
+
+                MessageBox.Show("Nájdené!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            } catch (Exception ex) {
+                MessageBox.Show($"Chyba: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
         
         private void _btn_FindByEcv_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Nájdené!" + _txtbx_FindEcv.Value, Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            try {
+                var customer = _backend.GetCustomerByEcv(_txtbx_FindEcv.Value);
+
+                _renderCustomer(customer);
+
+                MessageBox.Show("Nájdené!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            } catch (Exception ex) {
+                MessageBox.Show($"Chyba: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void _btn_Update_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Aktualizované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            try {
+                var customer = _frm_Display.Customer;
+
+                if (!customer.IsValid())
+                {
+                    MessageBox.Show("Vyplnte všetky polia!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                _backend.UpdateCustomer(customer);
+
+                MessageBox.Show("Zákazník upravený!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            } catch (Exception ex) {
+                MessageBox.Show($"Chyba: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
         
         private void _btn_Delete_Click(object sender, RoutedEventArgs e)

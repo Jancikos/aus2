@@ -154,7 +154,7 @@ namespace FRI.AUS2.SP2.Libs.Models
             // ECV (4 bytes actual length + 10 bytes)
             int ecvLength = BitConverter.ToInt32(bytes, offset);
             offset += sizeof(int);
-            ECV = ecvLength == 0 
+            ECV = ecvLength == 0
                     ? null
                     : Encoding.ASCII.GetString(bytes, offset, EcvMaxSize)[..ecvLength];
             offset += EcvMaxSize;
@@ -186,7 +186,25 @@ namespace FRI.AUS2.SP2.Libs.Models
                 return false;
             }
 
-            return Id == otherData.Id;
+            if (Id is not null) 
+            {
+                return Id == otherData.Id;
+            }
+
+            if (ECV is not null)
+            {
+                return ECV == otherData.ECV;
+            }
+
+            throw new ArgumentException("Id or ECV must be set to compare");
+        }
+
+        public bool IsValid()
+        {
+            return Id is not null && Id > 0
+                        && !string.IsNullOrWhiteSpace(ECV)
+                        && !string.IsNullOrWhiteSpace(Firstname)
+                        && !string.IsNullOrWhiteSpace(Lastname);
         }
 
         public override string ToString()
