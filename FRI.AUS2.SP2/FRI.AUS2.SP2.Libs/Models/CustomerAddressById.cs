@@ -42,5 +42,10 @@ namespace FRI.AUS2.SP2.Libs.Models
         {
             return new BitArray([Id]);
         }
+
+        public override string ToString()
+        {
+            return $"{Id}: {Addreess}";
+        }
     }
 }

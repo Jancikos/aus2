@@ -63,29 +63,38 @@ namespace FRI.AUS2.Libs.Structures.Files
         public HeapFile(int blockSize, FileInfo file)
         {
             _fileManager = new BinaryFileManager(file);
-            BlockSize = blockSize;
 
+            BlockSize = blockSize;
             ActiveBlock = new HeapFileBlock<TData>(BlockSize);
 
-            if (!file.Exists || _fileManager.Length == 0) {
-                // init structure metadata
-                _saveMetadata();
-            } else {
-                // load metadata from first file block
-                FromBytes(_fileManager.ReadBytes(0, BlockSize));
-            }
+            _initialize();
         }
 
-        public void Clear()
+        private void _initialize()
+        {
+            if (!_fileManager.IsEmpty)
+            {
+                FromBytes(_fileManager.ReadAllBytes());
+                return;
+            }
+
+            _initializeEmptyStructure();
+        }
+
+        private void _initializeEmptyStructure()
         {
             ActiveBlockAddress = 0;
             ActiveBlock.ResetBlock();
 
             NextFreeBlock = null;
             NextEmptyBlock = null;
+        }
 
-            _saveMetadata();
-            _fileManager.Truncate(BlockSize);
+        public void Clear()
+        {
+            _initializeEmptyStructure();
+
+            _fileManager.Truncate(0);
         }
 
         #region Insert
@@ -677,6 +686,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         public void Dispose()
         {
             _saveMetadata();
+            _fileManager.Dispose();
         }
         #endregion
     }

@@ -3,7 +3,7 @@ using FRI.AUS2.SP2.Libs.Models;
 
 namespace FRI.AUS2.SP2.Libs
 {
-    public class SP2Backend
+    public class SP2Backend :  IDisposable
     {
         public HeapFile<Customer> _allData;
 
@@ -14,8 +14,8 @@ namespace FRI.AUS2.SP2.Libs
         {
             _allData = new HeapFile<Customer>(blockSize, new(dataFolder.LocalPath + "allData.bin"));
 
-            _dataById = new ExtendableHashFile<CustomerAddressById>(blockSize, new(dataFolder.LocalPath + "dataById.bin"));
-            _dataByEcv = new ExtendableHashFile<CustomerAddressByEcv>(blockSize, new(dataFolder.LocalPath + "dataByEcv.bin"));
+            _dataById = new ExtendableHashFile<CustomerAddressById>(blockSize, new(dataFolder.LocalPath), "ehfById");
+            _dataByEcv = new ExtendableHashFile<CustomerAddressByEcv>(blockSize, new(dataFolder.LocalPath), "ehfByEcv");
         }
 
         public void AddCustomer(Customer customer)
@@ -79,6 +79,13 @@ namespace FRI.AUS2.SP2.Libs
             });
 
             _allData.Update(customerAddressById.Addreess, customer, customer);
+        }
+
+        public void Dispose()
+        {
+            _allData.Dispose();
+            _dataById.Dispose();
+            _dataByEcv.Dispose();
         }
     }
 }

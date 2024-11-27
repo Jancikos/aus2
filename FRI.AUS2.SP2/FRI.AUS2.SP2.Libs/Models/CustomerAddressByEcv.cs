@@ -54,5 +54,10 @@ namespace FRI.AUS2.SP2.Libs.Models
         {
             return new BitArray([ECV.GetHashCode()]);
         }
+
+        public override string ToString()
+        {
+            return $"{ECV}: {Addreess}";
+        }
     }
 }

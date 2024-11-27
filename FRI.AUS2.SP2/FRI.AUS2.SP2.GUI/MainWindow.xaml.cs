@@ -43,6 +43,13 @@ namespace FRI.AUS2.SP2.GUI
             _ehfByIdsWindow?.UpdateStats(_backend._dataById);
         }
 
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e);
+
+            _backend.Dispose();
+        }
+
         #region UI Event Handlers
         private void _mnitem_Close_Click(object sender, RoutedEventArgs e)
         {

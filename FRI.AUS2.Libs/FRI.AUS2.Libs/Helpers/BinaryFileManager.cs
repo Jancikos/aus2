@@ -15,6 +15,7 @@
         }
 
         public int Length => (int)_fileStream.Length;
+        public bool IsEmpty => Length == 0;
 
         public void Dispose()
         {
