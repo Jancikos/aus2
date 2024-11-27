@@ -5,8 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FRI.AUS2.SP2.GUI"
         xmlns:uc="clr-namespace:FRI.AUS2.SP2.GUI.Controls"
+        xmlns:libsuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls;assembly=FRI.AUS2.StructureTester.Libs"
         mc:Ignorable="d"
-        Title="AUS SP2" Height="450" Width="1100">
+        SizeToContent="WidthAndHeight"
+        Title="AUS SP2" Height="400" Width="400">
+    
+    
     <Window.Resources>
         <ResourceDictionary Source="Resources/Dictionary.xaml" />
     </Window.Resources>
@@ -34,6 +38,7 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Vertical" Margin="5">
+            <!-- data manipulation -->
             <StackPanel Orientation="Horizontal">
                 <!-- manual data insert -->
                 <GroupBox Header="Insert customer">
@@ -45,13 +50,73 @@
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
                         <!--data form-->
-                        <uc:CustomerForm x:Name="_frm_Insert" />
+                        <uc:CustomerForm x:Name="_frm_Insert" ManageItems="False" />
 
-                        <Button Grid.Row="2" Grid.ColumnSpan="3" HorizontalAlignment="Center" x:Name="_btn_ManualInsert" Content="Insert" Margin="0" Click="_btn_ManualInsert_Click" />
+                        <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_ManualInsert" Content="Insert" Margin="0" Click="_btn_ManualInsert_Click" />
+                    </Grid>
+                </GroupBox>
+
+                <StackPanel Orientation="Vertical" Margin="5 0">
+                    <!-- find by ID  -->
+                    <GroupBox Header="Find by ID" VerticalAlignment="Top">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" MinWidth="80" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+
+                            <libsuc:InlineTextBox x:Name="_txtbx_FindId" Title="ID" Value="1" VerticalAlignment="Center"/>
+
+                            <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_FindById" Content="Find" Margin="0" Click="_btn_FindById_Click" />
+                        </Grid>
+                    </GroupBox>
+                    
+                    <!-- find by ECV  -->
+                    <GroupBox Header="Find by ECV" VerticalAlignment="Bottom">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" MinWidth="80" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+
+                            <libsuc:InlineTextBox x:Name="_txtbx_FindEcv" Title="ECV" Value="1" VerticalAlignment="Center" />
+
+                            <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_FindByEcv" Content="Find" Margin="0" Click="_btn_FindByEcv_Click" />
+                        </Grid>
+                    </GroupBox>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- data display -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
+                <GroupBox Header="Customer">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" MinWidth="250" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                    
+                        <uc:CustomerForm x:Name="_frm_Display"  ManageIds="False" />
+
+                        <StackPanel Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
+                            <Button x:Name="_btn_Update" Content="Update" Click="_btn_Update_Click" />
+                            <Button x:Name="_btn_Delete" Content="Delete" Click="_btn_Delete_Click" />
+                        </StackPanel>
                     </Grid>
                 </GroupBox>
             </StackPanel>

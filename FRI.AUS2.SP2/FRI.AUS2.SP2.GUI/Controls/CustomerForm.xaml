@@ -30,9 +30,12 @@
                 <RowDefinition Height="2" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
+
+            <TextBlock Text="EČV:" />
+            <TextBox x:Name="_txtb_Ecv" Grid.Column="2" TextAlignment="Right" />
     
-            <TextBlock Text="ID:" />
-            <TextBox x:Name="_txtb_Id" Grid.Column="2" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" TextChanged="_txtb_Id_TextChanged" />
+            <TextBlock Text="ID:" Grid.Row="2" />
+            <TextBox x:Name="_txtb_Id" Grid.Column="2" TextAlignment="Right" MouseDoubleClick="_txtb_Generate_Radnom_Int" TextChanged="_txtb_Id_TextChanged" Grid.Row="2" />
     
             <TextBlock Text="Meno:" Grid.Row="4" />
             <TextBox x:Name="_txtb_Firstname" Grid.Column="2" Grid.Row="4" TextAlignment="Right" />
@@ -40,10 +43,7 @@
             <TextBlock Text="Priezvisko:" Grid.Row="6" />
             <TextBox x:Name="_txtb_Lastname" Grid.Column="2" Grid.Row="6" TextAlignment="Right" />
 
-            <TextBlock Text="EČV:" Grid.Row="8" />
-            <TextBox x:Name="_txtb_Ecv" Grid.Column="2" Grid.Row="8" TextAlignment="Right" />
-
-            <GroupBox Grid.Row="10" Grid.ColumnSpan="3" Header="Servisné úkony" MouseDoubleClick="_grbx_Visits_MouseDoubleClick">
+            <GroupBox x:Name="_grbx_Visits" Grid.Row="8" Grid.ColumnSpan="3" Header="Servisné úkony" MouseDoubleClick="_grbx_Visits_MouseDoubleClick">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Button x:Name="_btn_AddVisit" Content="➕" Click="_btn_AddVisit_Click"/>

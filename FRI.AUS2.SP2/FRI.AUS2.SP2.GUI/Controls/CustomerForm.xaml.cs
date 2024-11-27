@@ -59,6 +59,22 @@ namespace FRI.AUS2.SP2.GUI.Controls
             }
         }
 
+        public bool ManageItems
+        {
+            get => _grbx_Visits.Visibility == Visibility.Visible;
+            set => _grbx_Visits.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public bool ManageIds
+        {
+            get => _txtb_Id.IsEnabled;
+            set 
+            {
+                _txtb_Id.IsEnabled = value;
+                _txtb_Ecv.IsEnabled = value;
+            }
+        }
+
         public Customer Customer
         {
             get

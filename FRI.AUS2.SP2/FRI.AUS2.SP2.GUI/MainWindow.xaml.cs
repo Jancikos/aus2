@@ -59,6 +59,26 @@ namespace FRI.AUS2.SP2.GUI
         {
 
         }
+
+        private void _btn_FindById_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Nájdené!" + _txtbx_FindId.Value, Title, MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        
+        private void _btn_FindByEcv_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Nájdené!" + _txtbx_FindEcv.Value, Title, MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void _btn_Update_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Aktualizované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        
+        private void _btn_Delete_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Zatial neimplementovane!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
     #endregion
 }

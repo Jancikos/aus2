@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\FRI.AUS2.StuctureTester\FRI.AUS2.StructureTester.Libs\FRI.AUS2.StructureTester.Libs.csproj" />
     <ProjectReference Include="..\FRI.AUS2.SP2.Libs\FRI.AUS2.SP2.Libs.csproj" />
   </ItemGroup>
 
