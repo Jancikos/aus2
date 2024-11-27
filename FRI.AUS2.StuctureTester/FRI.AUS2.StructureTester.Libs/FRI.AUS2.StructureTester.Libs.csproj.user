@@ -23,6 +23,9 @@
     <Compile Update="Controls\OperationsGeneratorForm.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Windows\EhfDetailWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Controls\ExtendableHashFile\EhfAddresses.xaml">
@@ -44,6 +47,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Controls\OperationsGeneratorForm.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Windows\EhfDetailWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
