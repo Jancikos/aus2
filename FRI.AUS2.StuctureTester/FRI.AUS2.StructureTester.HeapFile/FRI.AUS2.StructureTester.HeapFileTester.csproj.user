@@ -10,24 +10,12 @@
     <Compile Update="Controls\HeapDataForm.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Controls\HeapFileBlocks.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Controls\HeapFileStats.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Update="Controls\HeapFindDataForm.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Controls\HeapDataForm.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Controls\HeapFileBlocks.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Controls\HeapFileStats.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Controls\HeapFindDataForm.xaml">
