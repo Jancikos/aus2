@@ -41,7 +41,7 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
             _frm_Insert.InitilizeDefaultValues();
 
             _frm_HeapBlocks.OnItemDoubleClicked += (address, data) => {
-                _setSelectedId(data.Id);
+                _setSelectedId(((HeapData)data).Id);
             };
 
             _initOperationsGenerator();

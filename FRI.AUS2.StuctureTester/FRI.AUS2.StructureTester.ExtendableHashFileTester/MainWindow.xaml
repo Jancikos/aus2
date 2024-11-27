@@ -192,7 +192,7 @@
                         </GroupBox>
 
                         <GroupBox Header="All Data Blocks"  MinWidth="250">
-                            <hfuc:HeapFileBlocks x:Name="_frm_HeapBlocks" />
+                            <libshfuc:HfBlocks x:Name="_frm_HeapBlocks" />
                         </GroupBox>
                     </StackPanel>
                 </GroupBox>

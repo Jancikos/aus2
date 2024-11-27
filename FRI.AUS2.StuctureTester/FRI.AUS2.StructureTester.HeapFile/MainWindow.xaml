@@ -144,7 +144,7 @@
 
                 <!-- all blocks -->
                 <GroupBox Header="All blocks" MinWidth="250" MinHeight="300">
-                    <uc:HeapFileBlocks x:Name="_frm_Blocks" />
+                    <libshfuc:HfBlocks x:Name="_frm_Blocks" />
                 </GroupBox>
 
                 <!-- operations generator -->
