@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:FRI.AUS2.StructureTester.ExtendableHashFileTester"
         xmlns:libsuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls;assembly=FRI.AUS2.StructureTester.Libs"
         xmlns:libsehfuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls.ExtendableHashFile;assembly=FRI.AUS2.StructureTester.Libs"
+        xmlns:libshfuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls.HeapFile;assembly=FRI.AUS2.StructureTester.Libs"
         xmlns:hfuc="clr-namespace:FRI.AUS2.StructureTester.HeapFileTester.Controls;assembly=FRI.AUS2.StructureTester.HeapFileTester"
         mc:Ignorable="d"
         Title="AUS2 Structure tester - ExtendableHashFile" Height="750" Width="800" SizeToContent="WidthAndHeight">
@@ -187,7 +188,7 @@
                 <GroupBox Header="HeapFile stats">
                     <StackPanel Orientation="Horizontal">
                         <GroupBox Header="Stats">
-                            <hfuc:HeapFileStats x:Name="_frm_HeapStats" />
+                            <libshfuc:HfStats x:Name="_frm_HeapStats" />
                         </GroupBox>
 
                         <GroupBox Header="All Data Blocks"  MinWidth="250">

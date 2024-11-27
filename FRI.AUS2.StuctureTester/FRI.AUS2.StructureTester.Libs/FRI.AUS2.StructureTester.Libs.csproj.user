@@ -5,6 +5,9 @@
     <Compile Update="Controls\ExtendableHashFile\EhfAddresses.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Controls\HeapFile\HfStats.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Controls\InlineText.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -17,6 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Controls\ExtendableHashFile\EhfAddresses.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Controls\HeapFile\HfStats.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Controls\InlineText.xaml">
