@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Text;
- using FRI.AUS2.Libs.Structures.Files;
+using FRI.AUS2.Libs.Structures.Files;
 
 namespace FRI.AUS2.SP2.Libs.Models
 {
-    public class Customer :  IHeapFileData
-    {private const int _firstnameMax = 15;
+    public class Customer : IHeapFileData
+    {
+        private const int _firstnameMax = 15;
         private string _firstname = "";
         public string Firstname
         {
@@ -38,7 +39,7 @@ namespace FRI.AUS2.SP2.Libs.Models
         /// <summary>
         /// pozor na unikatnost
         /// </summary>
-        public int Id;
+        public int? Id = null;
 
         public const int VisitsMaxCount = 5;
         private List<ServiceVisit> _visits = new List<ServiceVisit>(VisitsMaxCount);
@@ -55,14 +56,20 @@ namespace FRI.AUS2.SP2.Libs.Models
             }
         }
 
-        
+
         public const int EcvMaxSize = 10;
-        private string _ecv = "";
-        public string ECV
+        private string? _ecv = null;
+        public string? ECV
         {
             get => _ecv;
             set
             {
+                if (value is null)
+                {
+                    _ecv = null;
+                    return;
+                }
+
                 if (value.Length > EcvMaxSize)
                 {
                     throw new ArgumentException($"ecv is max {EcvMaxSize} characters long");
@@ -83,7 +90,7 @@ namespace FRI.AUS2.SP2.Libs.Models
             int offset = 0;
 
             // Id (4 bytes)
-            BitConverter.GetBytes(Id).CopyTo(buffer, offset);
+            BitConverter.GetBytes(Id ?? -1).CopyTo(buffer, offset);
             offset += sizeof(int);
 
             // Firstname (4 bytes (length) + 15 bytes)
@@ -99,9 +106,9 @@ namespace FRI.AUS2.SP2.Libs.Models
             offset += _lastnameMax;
 
             // ECV (4 bytes (length) + 10 bytes)
-            BitConverter.GetBytes(ECV.Length).CopyTo(buffer, offset);
+            BitConverter.GetBytes(ECV?.Length ?? 0).CopyTo(buffer, offset);
             offset += sizeof(int);
-            Encoding.ASCII.GetBytes(ECV.PadRight(EcvMaxSize)).CopyTo(buffer, offset);
+            Encoding.ASCII.GetBytes((ECV ?? "").PadRight(EcvMaxSize)).CopyTo(buffer, offset);
             offset += EcvMaxSize;
 
             // Items (4 bytes actual length + 5 * NesteHeapDataItemSize)
@@ -128,7 +135,8 @@ namespace FRI.AUS2.SP2.Libs.Models
             int offset = 0;
 
             // Id (4 bytes)
-            Id = BitConverter.ToInt32(bytes, offset);
+            var id = BitConverter.ToInt32(bytes, offset);
+            Id = id == -1 ? null : id;
             offset += sizeof(int);
 
             // Firstname (4 bytes actual length + 15 bytes)
@@ -146,7 +154,9 @@ namespace FRI.AUS2.SP2.Libs.Models
             // ECV (4 bytes actual length + 10 bytes)
             int ecvLength = BitConverter.ToInt32(bytes, offset);
             offset += sizeof(int);
-            ECV = Encoding.ASCII.GetString(bytes, offset, EcvMaxSize)[..ecvLength];
+            ECV = ecvLength == 0 
+                    ? null
+                    : Encoding.ASCII.GetString(bytes, offset, EcvMaxSize)[..ecvLength];
             offset += EcvMaxSize;
 
             // Items (4 bytes actual length + 5 * NesteHeapDataItemSize)

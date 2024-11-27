@@ -1,4 +1,5 @@
 ﻿using FRI.AUS2.SP2.Libs;
+using FRI.AUS2.SP2.Libs.Models;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,12 +18,19 @@ namespace FRI.AUS2.SP2.GUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Uri DefaultFilesFolder = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\AUS2\SP2\");
+     
         SP2Backend _backend;
         public MainWindow()
         {
-            _backend = new SP2Backend();
+            _backend = new SP2Backend(1000, DefaultFilesFolder);
 
             InitializeComponent();
+        }
+
+        private void _renderCustomer(Customer customer)
+        {
+            _frm_Display.Customer = customer;
         }
 
         #region UI Event Handlers
