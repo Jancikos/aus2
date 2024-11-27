@@ -4,7 +4,7 @@ using System.Text;
 
 namespace FRI.AUS2.SP2.Libs.Models
 {
-    public class Customer :  IExtendableHashFileData
+    public class Customer :  IHeapFileData
     {private const int _firstnameMax = 15;
         private string _firstname = "";
         public string Firstname
@@ -56,16 +56,16 @@ namespace FRI.AUS2.SP2.Libs.Models
         }
 
         
-        private const int _ecvMax = 10;
+        public const int EcvMaxSize = 10;
         private string _ecv = "";
         public string ECV
         {
             get => _ecv;
             set
             {
-                if (value.Length > _ecvMax)
+                if (value.Length > EcvMaxSize)
                 {
-                    throw new ArgumentException($"ecv is max {_ecvMax} characters long");
+                    throw new ArgumentException($"ecv is max {EcvMaxSize} characters long");
                 }
                 _ecv = value;
             }
@@ -75,7 +75,7 @@ namespace FRI.AUS2.SP2.Libs.Models
         /// Id (int) + Firstname (int length + _firstnameMax bytes) + Lastname (int length + _lastnameMax bytes) + ECV (int length + _ecvMax bytes) + Items (int actual length + VisitsMaxCount * (new ServiceVisit()).Size)
         /// </summary>
         /// <returns></returns>
-        public int Size => sizeof(int) + sizeof(int) + _firstnameMax + sizeof(int) + _lastnameMax + sizeof(int) + _ecvMax + sizeof(int) + VisitsMaxCount * (new ServiceVisit()).Size;
+        public int Size => sizeof(int) + sizeof(int) + _firstnameMax + sizeof(int) + _lastnameMax + sizeof(int) + EcvMaxSize + sizeof(int) + VisitsMaxCount * (new ServiceVisit()).Size;
 
         public byte[] ToBytes()
         {
@@ -101,8 +101,8 @@ namespace FRI.AUS2.SP2.Libs.Models
             // ECV (4 bytes (length) + 10 bytes)
             BitConverter.GetBytes(ECV.Length).CopyTo(buffer, offset);
             offset += sizeof(int);
-            Encoding.ASCII.GetBytes(ECV.PadRight(_ecvMax)).CopyTo(buffer, offset);
-            offset += _ecvMax;
+            Encoding.ASCII.GetBytes(ECV.PadRight(EcvMaxSize)).CopyTo(buffer, offset);
+            offset += EcvMaxSize;
 
             // Items (4 bytes actual length + 5 * NesteHeapDataItemSize)
             int actualVisitsLength = Visits.Count;
@@ -146,8 +146,8 @@ namespace FRI.AUS2.SP2.Libs.Models
             // ECV (4 bytes actual length + 10 bytes)
             int ecvLength = BitConverter.ToInt32(bytes, offset);
             offset += sizeof(int);
-            ECV = Encoding.ASCII.GetString(bytes, offset, _ecvMax)[..ecvLength];
-            offset += _ecvMax;
+            ECV = Encoding.ASCII.GetString(bytes, offset, EcvMaxSize)[..ecvLength];
+            offset += EcvMaxSize;
 
             // Items (4 bytes actual length + 5 * NesteHeapDataItemSize)
             int actualItemsLength = BitConverter.ToInt32(bytes, offset);
@@ -178,8 +178,6 @@ namespace FRI.AUS2.SP2.Libs.Models
 
             return Id == otherData.Id;
         }
-
-        public BitArray GetHash() => new BitArray(BitConverter.GetBytes(Id));
 
         public override string ToString()
         {
