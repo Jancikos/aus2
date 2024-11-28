@@ -101,10 +101,10 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
         private void _mnitem_FileClear_Click(object sender, RoutedEventArgs e)
         {
             // Clear the file
-            // _structure.Clear();
+            _structure.Clear();
 
             MessageBox.Show("Structure cleared!", Title);
-            // _rerenderAllStats();
+            _updateStructureStats();
         }
 
         private void _mnitem_Close_Click(object sender, RoutedEventArgs e)
