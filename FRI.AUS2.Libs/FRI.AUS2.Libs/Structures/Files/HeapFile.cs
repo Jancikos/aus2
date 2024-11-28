@@ -49,7 +49,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             get => _countStackItems(NextEmptyBlock);
         }
         public bool EnqueueNewBlockToEmptyBlocks { get; set; } = true;
-        public bool DeleteEmptyBlocksFromEnd { get; set; } = true; 
+        public bool DeleteEmptyBlocksFromEnd { get; set; } = true;
 
         protected int ActiveBlockAddress { get; set; }
         public HeapFileBlock<TData> ActiveBlock { get; protected set; }
@@ -74,7 +74,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             if (!_fileManager.IsEmpty)
             {
-                FromBytes(_fileManager.ReadAllBytes());
+                FromBytes(_fileManager.ReadBytes(0, BlockSize));
                 return;
             }
 
@@ -220,7 +220,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             _loadActiveBlock(_fileManager.Length);
 
-            if (EnqueueNewBlockToEmptyBlocks) 
+            if (EnqueueNewBlockToEmptyBlocks)
             {
                 _saveActiveBlockDisabled = true;
                 // lebo sa do noveho nepridali ziadne data
@@ -243,7 +243,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
             return address;
         }
-        
+
         #endregion
 
         #region Find
@@ -284,7 +284,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             _loadActiveBlock(address);
 
             // to znamena ze bol v zozname volnych blokov
-            bool wasInFreeBlockStack = ActiveBlock.IsChained || _nextFreeBlock == address; 
+            bool wasInFreeBlockStack = ActiveBlock.IsChained || _nextFreeBlock == address;
 
             bool itemDeleted = ActiveBlock.RemoveItem(filter);
             if (!itemDeleted)
@@ -302,7 +302,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             _saveActiveBlockDisabled = true;
 
             // ak je ciastocne naplneny
-            if (!ActiveBlock.IsEmpty) 
+            if (!ActiveBlock.IsEmpty)
             {
                 // ak nebol v zozname volnych blokov, tak ho tam pridame
                 if (!wasInFreeBlockStack)
@@ -327,7 +327,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                 {
                     _deleteEmptyBlocksFromEnd();
                     return;
-                } 
+                }
 
                 // zaradime ho do zoznamu prazdnych blokov
                 _enqueNextEmptyBlock();
@@ -436,7 +436,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             {
                 _loadActiveBlock(lastBlockAddress);
 
-                
+
                 if (!ActiveBlock.IsEmpty)
                 {
                     break;
@@ -546,7 +546,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         private void _enqueNextFreeBlock()
         {
-            if (!ManageFreeBlocks) 
+            if (!ManageFreeBlocks)
             {
                 return;
             }
@@ -556,7 +556,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         private void _dequeNextFreeBlock()
         {
-            if (!ManageFreeBlocks) 
+            if (!ManageFreeBlocks)
             {
                 return;
             }
@@ -611,9 +611,10 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// <param name="force">saves even _saveActiveBlockDisabled is true, also sets _saveActiveBlockDisabled to false</param>
         public void _saveActiveBlock(bool force = false)
         {
-            if (_saveActiveBlockDisabled) 
+            if (_saveActiveBlockDisabled)
             {
-                if (!force) {
+                if (!force)
+                {
                     return; // do not save if disabled
                 }
                 _saveActiveBlockDisabled = false;
@@ -634,7 +635,11 @@ namespace FRI.AUS2.Libs.Structures.Files
                 return (NextEmptyBlock.Value, BlockAdressType.EmptyBlock);
             }
 
-            return (_fileManager.Length, BlockAdressType.NewBlock);
+            return (_fileManager.IsEmpty
+                        ? BlockSize
+                        : _fileManager.Length,
+                    BlockAdressType.NewBlock
+                );
         }
 
         public int _getAddressByBlockIndex(int index)
@@ -675,11 +680,11 @@ namespace FRI.AUS2.Libs.Structures.Files
             int offset = 0;
 
             int nextFreeBlock = BitConverter.ToInt32(bytes, offset);
-            NextFreeBlock = (nextFreeBlock == -1 || nextFreeBlock ==  0) ? null : nextFreeBlock;
+            NextFreeBlock = (nextFreeBlock == -1 || nextFreeBlock == 0) ? null : nextFreeBlock;
             offset += sizeof(int);
 
             int nextEmptyBlock = BitConverter.ToInt32(bytes, offset);
-            NextEmptyBlock = (nextEmptyBlock == -1 || nextEmptyBlock ==  0) ? null : nextEmptyBlock;
+            NextEmptyBlock = (nextEmptyBlock == -1 || nextEmptyBlock == 0) ? null : nextEmptyBlock;
             offset += sizeof(int);
         }
 
@@ -716,7 +721,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// number of valid items in the block (from the beginning of the block)
         /// </summary>
         /// <value></value>
-        public int ValidCount { get;  set; }
+        public int ValidCount { get; set; }
 
         /// <summary>
         /// items stored in the block
@@ -730,7 +735,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         public bool IsChained => PreviousBlock is not null || NextBlock is not null;
 
         public int MetedataSize => 3 * sizeof(int);
-        public int TDataSize =>  (new TData()).Size;
+        public int TDataSize => (new TData()).Size;
         public int DataSize => BlockFactor * TDataSize;
 
         private int _blockSize;
@@ -827,7 +832,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             // metadata
             BitConverter.GetBytes(ValidCount).CopyTo(buffer, offset);
             offset += sizeof(int);
-                        
+
             BitConverter.GetBytes(PreviousBlock ?? -1).CopyTo(buffer, offset);
             offset += sizeof(int);
 
