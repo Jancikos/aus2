@@ -7,7 +7,7 @@
     xmlns:libshfuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls.HeapFile"
     mc:Ignorable="d"
     SizeToContent="WidthAndHeight"
-    Title="HeapFile detail" Height="450" Width="800">
+    Title="HeapFile detail" Height="450" Width="800" MaxHeight="450">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -23,7 +23,7 @@
             </Menu>
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5">
             <GroupBox Header="Statistics">
                 <libshfuc:HfStats x:Name="_frm_HfStats" />
             </GroupBox>

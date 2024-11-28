@@ -218,7 +218,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         public int CreateNewBlock()
         {
-            _loadActiveBlock(_fileManager.Length);
+            _loadActiveBlock(_fileManager.Length == 0 ? BlockSize : _fileManager.Length);
 
             if (EnqueueNewBlockToEmptyBlocks)
             {
@@ -714,7 +714,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// <value></value>
         public int BlockFactor
         {
-            get => Size / (TDataSize + 1);
+            get => (Size - MetedataSize)/ (TDataSize + 1);
         }
 
         /// <summary>

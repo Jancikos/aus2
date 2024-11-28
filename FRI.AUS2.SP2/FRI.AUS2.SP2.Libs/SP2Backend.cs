@@ -20,8 +20,8 @@ namespace FRI.AUS2.SP2.Libs
         {
             _allData = new HeapFile<Customer>(blockSize, new(dataFolder.LocalPath + "allData.bin"));
 
-            _dataById = new ExtendableHashFile<CustomerAddressById>(blockSize, new(dataFolder.LocalPath), "ehfById");
-            _dataByEcv = new ExtendableHashFile<CustomerAddressByEcv>(blockSize, new(dataFolder.LocalPath), "ehfByEcv");
+            _dataById = new ExtendableHashFile<CustomerAddressById>(blockSize / 100, new(dataFolder.LocalPath), "ehfById");
+            _dataByEcv = new ExtendableHashFile<CustomerAddressByEcv>(blockSize / 100, new(dataFolder.LocalPath), "ehfByEcv");
 
             _generator = new CustomersGenerator(_dataById, _dataByEcv);
         }

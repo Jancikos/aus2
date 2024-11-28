@@ -63,10 +63,9 @@ namespace FRI.AUS2.SP2.Libs.Models
                 if (i < Descriptions.Length)
                 {
                     buffer[offset] = (byte)_descriptions[i].Length;
-                    offset += sizeof(byte);
-                    Encoding.ASCII.GetBytes(_descriptions[i].PadRight(_descriptionLengthMax)).CopyTo(buffer, offset);
+                    Encoding.ASCII.GetBytes(_descriptions[i].PadRight(_descriptionLengthMax)).CopyTo(buffer, offset + sizeof(byte));
                 }
-                offset += _descriptionLengthMax;
+                offset += sizeof(byte) + _descriptionLengthMax;
             }
 
             return buffer;
@@ -87,11 +86,13 @@ namespace FRI.AUS2.SP2.Libs.Models
             // Description (4 bytes actual Count + 10 * (1 + 20 bytes))
             int actualDescriptionsCount = BitConverter.ToInt32(bytes, offset);
             offset += sizeof(int);
-            for (int i = 0; i < DescriptionsMaxCount; i++)
+            _descriptions = new string[actualDescriptionsCount];
+            for (int i = 0; i < actualDescriptionsCount; i++)
             {
                 if (i < actualDescriptionsCount)
                 {
-                    _descriptions[i] = Encoding.ASCII.GetString(bytes, offset + sizeof(byte), _descriptionLengthMax).TrimEnd();
+                    var descriptionLength = bytes[offset];
+                    _descriptions[i] = Encoding.ASCII.GetString(bytes, offset + sizeof(byte), descriptionLength).TrimEnd();
                 }
 
                 offset += _descriptionLengthMax + sizeof(byte);

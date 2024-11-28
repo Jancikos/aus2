@@ -25,7 +25,7 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Vertical" Margin="5">
-            <libsuc:InlineTextBox x:Name="_txtb_Count" Title="Count" Value="1000" />
+            <libsuc:InlineTextBox x:Name="_txtb_Count" Title="Count" Value="100" />
             <libsuc:InlineTextBox x:Name="_txtb_Seed" Title="Seed" Value="" />
         </StackPanel>
 

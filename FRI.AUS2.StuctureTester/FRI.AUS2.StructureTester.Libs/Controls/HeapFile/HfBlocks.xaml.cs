@@ -31,18 +31,18 @@ namespace FRI.AUS2.StructureTester.Libs.Controls.HeapFile
         {
             _treeView_Blocks.Items.Clear();
 
-            if (structure.BlocksCount > 50)
-            {
-                _treeView_Blocks.Items.Add(new TreeViewItem() { Header = "Too many blocks to display.", IsExpanded = true });
-                return;
-            }
 
             int i = 0;
             foreach (var block in structure.GetAllDataBlocks())
             {
+                if (i > 50)
+                {
+                    _treeView_Blocks.Items.Add(new TreeViewItem() { Header = "Too many blocks to display. Showing only first 50.", IsExpanded = true });
+                    return;
+                }
                 var blockItem = new TreeViewItem()
                 {
-                    Header = $"{i + 1}. block [{block.ValidCount}]",
+                    Header = $"{i + 1}. block",
                     IsExpanded = true
                 };
 
