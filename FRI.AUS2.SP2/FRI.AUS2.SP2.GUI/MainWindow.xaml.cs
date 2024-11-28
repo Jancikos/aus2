@@ -60,12 +60,18 @@ namespace FRI.AUS2.SP2.GUI
         private void _mnitem_Close_Click(object sender, RoutedEventArgs e)
         {
             Close();
+
+            _ehfByEcvWindow?.Close();
+            _ehfByIdsWindow?.Close();
+            _hfWindow?.Close();
         }
 
         private void _mnitem_Clear_Click(object sender, RoutedEventArgs e)
         {
-            //_backend.ClearData();
-            //RerenderTables();
+            _backend.Clear();
+            _rerenderStats();
+
+            MessageBox.Show("Dáta vyčistené!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void _mnitem_Generate_Click(object sender, RoutedEventArgs e)

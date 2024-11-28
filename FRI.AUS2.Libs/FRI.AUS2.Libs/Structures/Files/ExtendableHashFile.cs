@@ -239,8 +239,14 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
 
             // init from scratch
-            _increaseDepth();
+            _initializeFromScratch();
+        }
 
+        private void _initializeFromScratch()
+        {
+            _depth = 1;
+
+            _addresses = new ExtendableHashFileBlock<TData>[(int)Math.Pow(2, Depth)];
             _addresses[0] = new ExtendableHashFileBlock<TData>(_heapFile);
             _addresses[1] = new ExtendableHashFileBlock<TData>(_heapFile);
         }
@@ -445,6 +451,12 @@ namespace FRI.AUS2.Libs.Structures.Files
 
                 offset += address.Size;
             }
+        }
+
+        public void Clear()
+        {
+            _heapFile.Clear();
+            _initializeFromScratch();
         }
 
         public void Dispose()

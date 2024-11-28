@@ -104,6 +104,13 @@ namespace FRI.AUS2.SP2.Libs
             _allData.Update(customerAddressById.Addreess, customer, customer);
         }
 
+        public void Clear()
+        {
+            _allData.Clear();
+            _dataById.Clear();
+            _dataByEcv.Clear();
+        }
+
         public void Dispose()
         {
             _allData.Dispose();
