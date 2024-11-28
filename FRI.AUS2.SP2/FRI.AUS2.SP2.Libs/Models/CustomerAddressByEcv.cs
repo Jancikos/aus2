@@ -1,6 +1,7 @@
 ﻿using System.Collections;
+using System.Security.Cryptography;
 using System.Text;
- using FRI.AUS2.Libs.Structures.Files;
+using FRI.AUS2.Libs.Structures.Files;
 
 namespace FRI.AUS2.SP2.Libs.Models
 {
@@ -50,9 +51,20 @@ namespace FRI.AUS2.SP2.Libs.Models
         }
 
 
+        // todo - premysliet ci toto je spravne
         public BitArray GetHash()
         {
-            return new BitArray([ECV.GetHashCode()]);
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(ECV));
+
+                // Extract the first 4 bytes (32 bits) of the hash
+                byte[] firstFourBytes = new byte[4];
+                Array.Copy(hashBytes, 0, firstFourBytes, 0, 4);
+
+                // Create a BitArray from the 4 bytes
+                return new BitArray(firstFourBytes);
+            }
         }
 
         public override string ToString()
