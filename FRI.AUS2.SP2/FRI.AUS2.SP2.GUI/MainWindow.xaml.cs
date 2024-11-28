@@ -1,4 +1,5 @@
-﻿using FRI.AUS2.SP2.Libs;
+﻿using FRI.AUS2.SP2.GUI.Windows;
+using FRI.AUS2.SP2.Libs;
 using FRI.AUS2.SP2.Libs.Models;
 using FRI.AUS2.StructureTester.Libs.Windows;
 using System.Text;
@@ -69,20 +70,20 @@ namespace FRI.AUS2.SP2.GUI
 
         private void _mnitem_Generate_Click(object sender, RoutedEventArgs e)
         {
-            //var form = new GeoItemsGenerationFormWindow();
+            var form = new GenerateCustomersWindow();
 
-            //form.ShowDialog();
+            form.ShowDialog();
 
-            //if (form.DialogResult == false)
-            //{
-            //    return;
-            //}
+            if (form.DialogResult == false)
+            {
+               return;
+            }
 
-            //_backend.GenerateData(form.ParcelsCount, form.PropertiesCount, form.PropertiesOverlap, form.Seed, form.DoublePrecision);
+            _backend.GenerateCustomers(form.Count, form.Seed);
 
             MessageBox.Show("Data vygenerované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
 
-            //RerenderTables();
+            _rerenderStats();
         }
 
         private void _mnitem_TesterIds_Click(object sender, RoutedEventArgs e)

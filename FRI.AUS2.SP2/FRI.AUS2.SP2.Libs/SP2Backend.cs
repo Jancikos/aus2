@@ -1,4 +1,5 @@
-﻿using FRI.AUS2.Libs.Structures.Files;
+﻿using System.Diagnostics;
+using FRI.AUS2.Libs.Structures.Files;
 using FRI.AUS2.SP2.Libs.Models;
 using FRI.AUS2.SP2.Libs.Utils;
 
@@ -25,12 +26,27 @@ namespace FRI.AUS2.SP2.Libs
             _generator = new CustomersGenerator(_dataById, _dataByEcv);
         }
 
+        public void GenerateCustomers(int count, int? seed)
+        {
+            if (seed is not null)
+            {
+                _generator.SetSeed(seed.Value);
+            }
+
+            foreach (var customer in _generator.GenerateCustomers(count))
+            {
+                AddCustomer(customer);
+            }
+        }
+
         public void AddCustomer(Customer customer)
         {
             if (customer.Id is null || customer.ECV is null)
             {
                 throw new ArgumentException("Id and ECV must be set");
             }
+
+            Debug.WriteLine($"Adding customer: {customer}");
 
             var blockAddress = _allData.Insert(customer);
 

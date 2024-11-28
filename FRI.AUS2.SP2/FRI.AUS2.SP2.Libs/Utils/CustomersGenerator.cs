@@ -31,8 +31,21 @@ namespace FRI.AUS2.SP2.Libs.Utils
             _customersIds = customersIds;
             _customersECVs = customersECVs;
         }
-        public Customer GenerateCustomer() => GenerateCustomer(GenerateId(), GenerateECV());
 
+        public void SetSeed(int seed)
+        {
+            _random = new Random(seed);
+        }
+
+        public IEnumerable<Customer> GenerateCustomers(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                yield return GenerateCustomer();
+            }
+        }
+
+        public Customer GenerateCustomer() => GenerateCustomer(GenerateId(), GenerateECV());
         public Customer GenerateCustomer(int id, string ecv)
         {
             return new Customer

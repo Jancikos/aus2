@@ -60,9 +60,12 @@ namespace FRI.AUS2.SP2.Libs.Models
             offset += sizeof(int);
             for (int i = 0; i < DescriptionsMaxCount; i++)
             {
-                buffer[offset] = (byte)_descriptions[i].Length;
-                offset += sizeof(byte);
-                Encoding.ASCII.GetBytes(_descriptions[i].PadRight(_descriptionLengthMax)).CopyTo(buffer, offset);
+                if (i < Descriptions.Length)
+                {
+                    buffer[offset] = (byte)_descriptions[i].Length;
+                    offset += sizeof(byte);
+                    Encoding.ASCII.GetBytes(_descriptions[i].PadRight(_descriptionLengthMax)).CopyTo(buffer, offset);
+                }
                 offset += _descriptionLengthMax;
             }
 
