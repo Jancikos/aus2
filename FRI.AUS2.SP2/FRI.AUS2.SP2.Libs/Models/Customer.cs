@@ -96,19 +96,19 @@ namespace FRI.AUS2.SP2.Libs.Models
             // Firstname (4 bytes (length) + 15 bytes)
             BitConverter.GetBytes(Firstname.Length).CopyTo(buffer, offset);
             offset += sizeof(int);
-            Encoding.ASCII.GetBytes(Firstname.PadRight(_firstnameMax)).CopyTo(buffer, offset);
+            Encoding.UTF8.GetBytes(Firstname.PadRight(_firstnameMax)).CopyTo(buffer, offset);
             offset += _firstnameMax;
 
             // Lastname (4 bytes (length) + 20 bytes)
             BitConverter.GetBytes(Lastname.Length).CopyTo(buffer, offset);
             offset += sizeof(int);
-            Encoding.ASCII.GetBytes(Lastname.PadRight(_lastnameMax)).CopyTo(buffer, offset);
+            Encoding.UTF8.GetBytes(Lastname.PadRight(_lastnameMax)).CopyTo(buffer, offset);
             offset += _lastnameMax;
 
             // ECV (4 bytes (length) + 10 bytes)
             BitConverter.GetBytes(ECV?.Length ?? 0).CopyTo(buffer, offset);
             offset += sizeof(int);
-            Encoding.ASCII.GetBytes((ECV ?? "").PadRight(EcvMaxSize)).CopyTo(buffer, offset);
+            Encoding.UTF8.GetBytes((ECV ?? "").PadRight(EcvMaxSize)).CopyTo(buffer, offset);
             offset += EcvMaxSize;
 
             // Items (4 bytes actual length + 5 * NesteHeapDataItemSize)
@@ -142,13 +142,13 @@ namespace FRI.AUS2.SP2.Libs.Models
             // Firstname (4 bytes actual length + 15 bytes)
             int firstnameLength = BitConverter.ToInt32(bytes, offset);
             offset += sizeof(int);
-            Firstname = Encoding.ASCII.GetString(bytes, offset, _firstnameMax)[..firstnameLength];
+            Firstname = Encoding.UTF8.GetString(bytes, offset, _firstnameMax)[..firstnameLength];
             offset += _firstnameMax;
 
             // Lastname (4 bytes actual length + 20 bytes)
             int lastnameLength = BitConverter.ToInt32(bytes, offset);
             offset += sizeof(int);
-            Lastname = Encoding.ASCII.GetString(bytes, offset, _lastnameMax)[..lastnameLength];
+            Lastname = Encoding.UTF8.GetString(bytes, offset, _lastnameMax)[..lastnameLength];
             offset += _lastnameMax;
 
             // ECV (4 bytes actual length + 10 bytes)
@@ -156,7 +156,7 @@ namespace FRI.AUS2.SP2.Libs.Models
             offset += sizeof(int);
             ECV = ecvLength == 0
                     ? null
-                    : Encoding.ASCII.GetString(bytes, offset, EcvMaxSize)[..ecvLength];
+                    : Encoding.UTF8.GetString(bytes, offset, EcvMaxSize)[..ecvLength];
             offset += EcvMaxSize;
 
             // Items (4 bytes actual length + 5 * NesteHeapDataItemSize)
