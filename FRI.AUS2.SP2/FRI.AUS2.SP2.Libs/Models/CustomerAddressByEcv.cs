@@ -54,6 +54,8 @@ namespace FRI.AUS2.SP2.Libs.Models
         // todo - premysliet ci toto je spravne
         public BitArray GetHash()
         {
+            // return new BitArray(Encoding.ASCII.GetBytes(ECV)); // 10 * 8 = 80 bits
+            
             using (SHA256 sha256 = SHA256.Create())
             {
                 byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(ECV));

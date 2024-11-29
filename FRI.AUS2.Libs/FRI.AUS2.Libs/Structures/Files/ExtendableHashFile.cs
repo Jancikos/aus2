@@ -255,6 +255,11 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         public int _getAddressIndex(BitArray hash, int depth)
         {
+            if (hash.Length > 32)
+            {
+                throw new InvalidOperationException("Hash length have to be <= 32");
+            }
+
             // todo - vhodne pridat ako parameter ci sa ma hash reverznut alebo nie
             hash = hash.ReverseBits();
 
