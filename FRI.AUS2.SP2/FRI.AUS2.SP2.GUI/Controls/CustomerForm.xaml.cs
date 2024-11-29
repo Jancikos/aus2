@@ -93,11 +93,14 @@ namespace FRI.AUS2.SP2.GUI.Controls
             }
             set
             {
-                Id = value.Id ?? -1;
-                Firstname = value.Firstname;
-                Lastname = value.Lastname;
-                ECV = value.ECV ?? "";
-                Items = value.Visits;
+                var custCopy = new Customer();
+                custCopy.FromBytes(value.ToBytes());
+
+                Id = custCopy.Id ?? -1;
+                Firstname = custCopy.Firstname;
+                Lastname = custCopy.Lastname;
+                ECV = custCopy.ECV ?? "";
+                Items = custCopy.Visits;
             }
         }
 
