@@ -18,9 +18,9 @@ namespace FRI.AUS2.SP2.Libs.Utils
         private ExtendableHashFile<CustomerAddressById>? _customersIds;
         private ExtendableHashFile<CustomerAddressByEcv>? _customersECVs;
 
-        private readonly string[] _firstnames = { "Jozef", "Ján", "Peter", "Marek", "Martin", "Michal", "Tomáš", "Lukáš", "Miroslav", "Ivan" };
-        private readonly string[] _lastnames = { "Novák", "Horváth", "Kováč", "Varga", "Tóth", "Nagy", "Baláž", "Molnár", "Szabó", "Kovács" };
-        private readonly string[] _itemDescriptions = { "Olej", "Filtre", "Brzdy", "Výfuk", "Pneumatiky", "Baterie", "Interiér", "Elektronika" };
+        private readonly string[] _firstnames = { "Jozef", "Jan", "Peter", "Marek", "Martin", "Michal", "Tomas", "Lukas", "Miroslav", "Ivan" };
+        private readonly string[] _lastnames = { "Novak", "Horvath", "Kovac", "Varga", "Toth", "Nagy", "Balaz", "Molnar", "Szabo", "Kovacs" };
+        private readonly string[] _itemDescriptions = { "Olej", "Filtre", "Brzdy", "Vyfuk", "Pneumatiky", "Baterie", "Interier", "Elektronika" };
         private readonly string[] _ecvPrefix = { "BB", "KA", "BA", "KE", "NR", "PO", "PP", "TT", "MT", "ZV", "SL", "LV" };
 
         public CustomersGenerator(ExtendableHashFile<CustomerAddressById>? customersIds = null, ExtendableHashFile<CustomerAddressByEcv>? customersECVs = null) : this(DateTime.Now.Millisecond, customersIds, customersECVs) { }
