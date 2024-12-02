@@ -133,13 +133,7 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             var hash = filter.GetHash();
 
-            int baseDeletionIndex = _getAddressIndex(hash);
-            var baseDeletionEhfBlock = _addresses[baseDeletionIndex];
-
-            var depthsDifference = Depth - baseDeletionEhfBlock.BlockDepth;
-            var actualGroupSize = (int)Math.Pow(2, depthsDifference);
-
-            int deletionIndex = baseDeletionIndex - (baseDeletionIndex % actualGroupSize);
+            int deletionIndex = _getAddressIndex(hash);
             var deletionEhfBlock = _addresses[deletionIndex];
 
             if (deletionEhfBlock.Address is null || deletionEhfBlock.ValidCount == 0)
@@ -148,43 +142,14 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
 
             // delete item from block
+            _heapFile.Delete(deletionEhfBlock.Address.Value, filter);
+            deletionEhfBlock.ValidCount--;
 
-            var afterDeletionValidCount = deletionEhfBlock.ValidCount - 1;
+            // update all blocks in group
+            _updateAllBlocksInGoup(deletionIndex, deletionEhfBlock);
 
-            int neighbourIndex = deletionIndex + actualGroupSize;
-            if (afterDeletionValidCount == 0) 
-            {
-                if (neighbourIndex < _addresses.Length)
-                {
-                    var neighbourEhfBlock = _addresses[neighbourIndex];
-
-                    // spoj susedne bloky
-                    
-
-                    // vymaz blok z heap file
-                }
-            }
-
-            if (neighbourIndex < _addresses.Length)
-            {
-                var neighbourEhfBlock = _addresses[neighbourIndex];
-
-                if (neighbourEhfBlock.BlockDepth == deletionEhfBlock.BlockDepth && neighbourEhfBlock.Address is not null)
-                {
-                    // check if can be merged
-                    if (afterDeletionValidCount + neighbourEhfBlock.ValidCount <= neighbourEhfBlock.BlockFactor)
-                    {
-                        // spoj susedne bloky
-
-                        // zmaz blok z heap file
-                    }
-                }
-
-            }
-
-
-    
-            // _heapFile._saveBlock(deletionAddress, deletionBlock);
+            // try merge block
+            _tryMergeBlock(deletionIndex, deletionEhfBlock.BlockDepth);
         }
         #endregion
 
@@ -278,12 +243,14 @@ namespace FRI.AUS2.Libs.Structures.Files
                 throw new InvalidOperationException("Cannot decrease depth below 1");
             }
 
+            Debug.WriteLine($"Decreasing depth from {Depth} to {Depth - 1}");
+
             _depth--;
             ExtendableHashFileBlock<TData>[] newAddresses = new ExtendableHashFileBlock<TData>[(int)Math.Pow(2, Depth)];
 
             for (int i = 0; i < newAddresses.Length; i++)
             {
-                var adressBlock = _addresses[i];
+                var adressBlock = _addresses[i * 2];
 
                 newAddresses[i] = new ExtendableHashFileBlock<TData>(_heapFile)
                 {
@@ -419,6 +386,88 @@ namespace FRI.AUS2.Libs.Structures.Files
                 _addresses[targetBlockIndex + i].ValidCount = targetBlock.ValidCount;
                 _addresses[targetBlockIndex + i].BlockDepth = newBlockDepth;
             }
+        }
+
+        private void _tryMergeBlock(int baseMergingBlockIndex, int baseMergingBlockDepth)
+        {
+
+            bool hasBeedMerged = false;
+            do
+            {
+                Debug.WriteLine($"Try merge block: {baseMergingBlockIndex} ({baseMergingBlockDepth})");
+                int groupSize = (int)Math.Pow(2, Depth - baseMergingBlockDepth);
+                int groupStartIndex = baseMergingBlockIndex - (baseMergingBlockIndex % groupSize);
+                var groupStart = _addresses[groupStartIndex];
+
+                var neighbourIndex = groupStartIndex + groupSize;
+                if (neighbourIndex >= _addresses.Length || _addresses[neighbourIndex].BlockDepth != groupStart.BlockDepth)
+                {
+                    neighbourIndex = groupStartIndex - groupSize;
+
+                    if (neighbourIndex < 0 || _addresses[neighbourIndex].BlockDepth != groupStart.BlockDepth)
+                    {
+                        // neighbour does not exist
+                        Debug.WriteLine("Neighbour does not exist");
+                        break;
+                    }
+                }
+
+                var neighbour = _addresses[neighbourIndex];
+
+                if (groupStart.ValidCount + neighbour.ValidCount > groupStart.BlockFactor)
+                {
+                    // cannot merge
+                    Debug.WriteLine("Cannot merge - too many items");
+                    break;
+                }
+
+                //// merge
+                // merge blocks items
+                if (neighbour.Block is not null) 
+                {
+                    foreach (var item in groupStart.Block?.ValidItems ?? [])
+                    {
+                        neighbour.Block.AddItem(item);
+                        neighbour.ValidCount++;
+                    }
+
+                    // update neighbour block
+                    if (neighbour.Address is not null && neighbour.Block is not null) 
+                    {
+                        _heapFile._saveBlock(neighbour.Address.Value, neighbour.Block);
+                    }
+
+                    // remove group start block from heap file
+                    if (groupStart.Address is not null)
+                    {
+                        _heapFile.DeleteBlock(groupStart.Address.Value);
+                    }
+                }
+                // decrease depth
+                neighbour.BlockDepth--;
+                groupStart.BlockDepth--;
+
+                // update group blocks
+                _updateAllBlocksInGoup(neighbourIndex, neighbour);
+
+                hasBeedMerged = true;
+
+                // setup next iteration
+                baseMergingBlockIndex = neighbourIndex;
+                baseMergingBlockDepth = neighbour.BlockDepth;
+
+                // check if whole addresses should not be decreased
+                foreach (var address in _addresses)
+                {
+                    if (address.BlockDepth == Depth)
+                    {
+                        // cannot decrease depth
+                        continue;
+                    }
+                }
+                _decreaseDepth();
+                
+            } while (hasBeedMerged);
         }
 
         public byte[] ToBytes()

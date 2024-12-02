@@ -336,6 +336,37 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
         }
 
+
+        /// <summary>
+        /// empty the block
+        /// </summary>
+        /// <param name="address"></param>
+        public void DeleteBlock(int address)
+        {
+            _validateAddress(address);
+
+            _loadActiveBlock(address);
+
+            if (ActiveBlock.IsEmpty)
+            {
+                return;
+            }
+
+            ActiveBlock.ClearItems();
+
+            _saveActiveBlockDisabled = true;
+
+            if (address == _getAddressByBlockIndex(BlocksCount - 1))
+            {
+                _deleteEmptyBlocksFromEnd();
+                return;
+            }
+
+            _enqueNextEmptyBlock();
+
+            _saveActiveBlock(true);
+        }
+
         #endregion
 
         #region Update

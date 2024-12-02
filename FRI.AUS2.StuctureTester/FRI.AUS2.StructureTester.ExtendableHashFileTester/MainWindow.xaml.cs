@@ -33,7 +33,7 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
         {
             InitializeComponent();
 
-            _structure = new ExtendableHashFile<HeapData>(750, new(DefaultFilesFolder.LocalPath + "ExtendableHashFileTester.bin"));
+            _structure = new ExtendableHashFile<HeapData>(500, new(DefaultFilesFolder.LocalPath + "ExtendableHashFileTester.bin"));
 
             _txtbx_GenerateCount.Value = "5";
 
