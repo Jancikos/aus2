@@ -166,7 +166,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
             _log(_getStructureStatictics(), 1);
         }
 
-        private void _afterGeneration()
+        protected virtual void _afterGeneration()
         {
             _log("");
             _log("Operations generation finished");
@@ -452,7 +452,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
             }
         }
 
-        private void _log(string message, int indentLevel = 0, int verbosityLevel = 0)
+        protected void _log(string message, int indentLevel = 0, int verbosityLevel = 0)
         {
             var logMessage = $"{new string(' ', indentLevel * 2)}{message}" + Environment.NewLine;
 

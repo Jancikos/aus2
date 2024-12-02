@@ -60,12 +60,14 @@ namespace FRI.AUS2.Libs.Structures.Files
                 if (ehfBlock.Address is null)
                 {
                     ehfBlock.Address = _heapFile.GetEmptyBlock();
-                    _updateAddressOfAllBlocksInGoup(addressIndex, ehfBlock);
+                    _updateAllBlocksInGoup(addressIndex, ehfBlock);
                 }
 
                 try
                 {
                     _heapFile.InsertToBlock(ehfBlock.Address.Value, data);
+                    ehfBlock.ValidCount++;
+                    _updateAllBlocksInGoup(addressIndex, ehfBlock);
                     inserted = true;
                 }
                 catch (InvalidOperationException)
@@ -112,14 +114,15 @@ namespace FRI.AUS2.Libs.Structures.Files
             return data;
         }
 
-        private void _updateAddressOfAllBlocksInGoup(int addressIndex, ExtendableHashFileBlock<TData> block)
+        private void _updateAllBlocksInGoup(int addressIndex, ExtendableHashFileBlock<TData> masterBlock)
         {
-            var groupSize = (int)Math.Pow(2, Depth - block.BlockDepth);
+            var groupSize = (int)Math.Pow(2, Depth - masterBlock.BlockDepth);
             var groupStartIndex = addressIndex - (addressIndex % groupSize);
 
             for (int i = 0; i < groupSize; i++)
             {
-                _addresses[groupStartIndex + i].Address = block.Address;
+                _addresses[groupStartIndex + i].Address = masterBlock.Address;
+                _addresses[groupStartIndex + i].ValidCount = masterBlock.ValidCount;
             }
         }
 
@@ -129,68 +132,58 @@ namespace FRI.AUS2.Libs.Structures.Files
         public void Delete(TData filter)
         {
             var hash = filter.GetHash();
-            int deletionIndex = _getAddressIndex(hash);
-            var deletionHashBlock = _addresses[deletionIndex];
 
-            // _heapFile.Delete(deletionHashBlock.Address, filter);
+            int baseDeletionIndex = _getAddressIndex(hash);
+            var baseDeletionEhfBlock = _addresses[baseDeletionIndex];
 
-            // var deletionBlock = _heapFile.ActiveBlock;
-            var deletionBlock = new HeapFileBlock<TData>(_heapFile.BlockSize);
-            deletionBlock.FromBytes(_heapFile.ActiveBlock.ToBytes()); // aby sa tam nakopiaoval cely objekt, nie len odkaz nan
-            var deletionAddress = deletionHashBlock.Address;
+            var depthsDifference = Depth - baseDeletionEhfBlock.BlockDepth;
+            var actualGroupSize = (int)Math.Pow(2, depthsDifference);
 
-            var siblingIndex = deletionIndex % (int)Math.Pow(2, deletionHashBlock.BlockDepth - 1);
-            if (siblingIndex == deletionIndex)
+            int deletionIndex = baseDeletionIndex - (baseDeletionIndex % actualGroupSize);
+            var deletionEhfBlock = _addresses[deletionIndex];
+
+            if (deletionEhfBlock.Address is null || deletionEhfBlock.ValidCount == 0)
             {
-                siblingIndex += (int)Math.Pow(2, deletionHashBlock.BlockDepth - 1);
+                throw new KeyNotFoundException("Block is empty");
             }
 
-            // check if can be merged
-            var siblingHashBlock = _addresses[siblingIndex];
-            var siblingBlock = siblingHashBlock.Block;
-            // TODO - items in deletion block can be moved to sibling block
-            // if (deletionBlock.ValidCount + siblingBlock.ValidCount <= _heapFile.BlockSize)
-            // {
-            //     // merge blocks into one
-            //     foreach (var item in deletionBlock.ValidItems)
-            //     {
-            //         siblingBlock.AddItem(item);
-            //     }
-            //     // _heapFile._saveBlock(siblingHashBlock.Address, siblingBlock);
+            // delete item from block
 
-            //     // delete deletion block items
-            //     deletionBlock.ClearItems();
+            var afterDeletionValidCount = deletionEhfBlock.ValidCount - 1;
 
-            //     // TODO - doplnit to aby to bolo cyklicke...
-            // }
-
-            // HLAVNE TO UROBIT PODLA MATERIALOV !!!
-
-            // check if deletion block is empty
-            if (deletionBlock.IsEmpty && deletionHashBlock.BlockDepth > 1)
+            int neighbourIndex = deletionIndex + actualGroupSize;
+            if (afterDeletionValidCount == 0) 
             {
-                if (siblingHashBlock.BlockDepth == deletionHashBlock.BlockDepth)
+                if (neighbourIndex < _addresses.Length)
                 {
-                    // merge blocks
-                    deletionHashBlock.Address = siblingHashBlock.Address;
+                    var neighbourEhfBlock = _addresses[neighbourIndex];
 
-                    deletionHashBlock.BlockDepth--;
-                    siblingHashBlock.BlockDepth--;
+                    // spoj susedne bloky
+                    
 
-                    // shrink file size
-                    _heapFile._deleteEmptyBlocksFromEnd(true);
-
-
-                    if (deletionHashBlock.BlockDepth + 1 == Depth)
-                    {
-                        if (!_hasBlockWithStrucuteDepth())
-                        {
-                            _decreaseDepth();
-                        }
-                    }
+                    // vymaz blok z heap file
                 }
             }
 
+            if (neighbourIndex < _addresses.Length)
+            {
+                var neighbourEhfBlock = _addresses[neighbourIndex];
+
+                if (neighbourEhfBlock.BlockDepth == deletionEhfBlock.BlockDepth && neighbourEhfBlock.Address is not null)
+                {
+                    // check if can be merged
+                    if (afterDeletionValidCount + neighbourEhfBlock.ValidCount <= neighbourEhfBlock.BlockFactor)
+                    {
+                        // spoj susedne bloky
+
+                        // zmaz blok z heap file
+                    }
+                }
+
+            }
+
+
+    
             // _heapFile._saveBlock(deletionAddress, deletionBlock);
         }
         #endregion
@@ -295,7 +288,8 @@ namespace FRI.AUS2.Libs.Structures.Files
                 newAddresses[i] = new ExtendableHashFileBlock<TData>(_heapFile)
                 {
                     Address = adressBlock.Address,
-                    BlockDepth = adressBlock.BlockDepth
+                    BlockDepth = adressBlock.BlockDepth,
+                    ValidCount = adressBlock.ValidCount
                 };
             }
 
@@ -325,7 +319,8 @@ namespace FRI.AUS2.Libs.Structures.Files
                     newAddresses[newAddressesIndex++] = new ExtendableHashFileBlock<TData>(_heapFile)
                     {
                         Address = adressBlock.Address,
-                        BlockDepth = adressBlock.BlockDepth
+                        BlockDepth = adressBlock.BlockDepth,
+                        ValidCount = adressBlock.ValidCount
                     };
                 });
             }
@@ -390,6 +385,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                 if (splittingBlockItems.Count == 0)
                 {
                     splittingBlock.Address = null;
+                    splittingBlock.ValidCount = 0;
                 }
 
                 if (splittingBlockItems.Count != 0)
@@ -400,22 +396,27 @@ namespace FRI.AUS2.Libs.Structures.Files
                         throw new InvalidOperationException("Splitting block address is not set even after split");
                     }
                     _heapFile.SetBlockItems(splittingBlock.Address.Value, splittingBlockItems.ToArray());
+                    splittingBlock.ValidCount = splittingBlockItems.Count;
 
                     targetBlock.Address = _heapFile.GetEmptyBlock();
                     _heapFile.SetBlockItems(targetBlock.Address.Value, targetBlockItems.ToArray());
+                    targetBlock.ValidCount = targetBlockItems.Count;
                 }
             } else
             {
                 targetBlock.Address = null;
+                targetBlock.ValidCount = 0;
             }
 
             // update group blocks
             for (int i = 0; i < newGroupSize; i++)
             {
                 _addresses[splittingBlockIndex + i].Address = splittingBlock.Address;
+                _addresses[splittingBlockIndex + i].ValidCount = splittingBlock.ValidCount;
                 _addresses[splittingBlockIndex + i].BlockDepth = newBlockDepth;
             
                 _addresses[targetBlockIndex + i].Address = targetBlock.Address;
+                _addresses[targetBlockIndex + i].ValidCount = targetBlock.ValidCount;
                 _addresses[targetBlockIndex + i].BlockDepth = newBlockDepth;
             }
         }
@@ -479,12 +480,19 @@ namespace FRI.AUS2.Libs.Structures.Files
     {
         public int? Address { get; set; } = null;
         public int BlockDepth { get; set; } = 1;
+        public int ValidCount { get; set; } = 0;
+
+        /// <summary>
+        /// bez zapisu do suboru, lebo ActiveBlock je vzdy nejaky nacitany
+        /// </summary>
+        public int BlockFactor => _heapFile.ActiveBlock.BlockFactor;
+        
         public HeapFileBlock<TData>? Block =>
             Address is null
             ? null
             : _heapFile.GetBlock(Address.Value);
 
-        public int Size => 2 * sizeof(int);
+        public int Size => 3 * sizeof(int);
 
         private HeapFile<TData> _heapFile;
 
@@ -495,7 +503,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         public override string ToString()
         {
-            return $"[{BlockDepth}] {Address.ToString() ?? "NULL"}";
+            return $"({BlockDepth}) {Address.ToString() ?? "NULL"} [{ValidCount}]";
         }
 
         public byte[] ToBytes()
@@ -504,6 +512,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
             bytes.AddRange(BitConverter.GetBytes(Address ?? -1));
             bytes.AddRange(BitConverter.GetBytes(BlockDepth));
+            bytes.AddRange(BitConverter.GetBytes(ValidCount));
 
             return bytes.ToArray();
         }
@@ -517,6 +526,9 @@ namespace FRI.AUS2.Libs.Structures.Files
             offset += sizeof(int);
 
             BlockDepth = BitConverter.ToInt32(bytes, offset);
+            offset += sizeof(int);
+
+            ValidCount = BitConverter.ToInt32(bytes, offset);
         }
     }
     #endregion

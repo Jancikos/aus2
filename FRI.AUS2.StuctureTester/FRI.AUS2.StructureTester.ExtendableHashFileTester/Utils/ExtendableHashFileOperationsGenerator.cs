@@ -46,5 +46,33 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester.Utils
         {
             Structure.Update(filter, updateItem);
         }
+
+        protected override void _afterGeneration()
+        {
+            base._afterGeneration();
+
+            _checkValidCounts();
+        }
+
+        protected void _checkValidCounts()
+        {
+            bool problem = false;
+            int i = 0;
+            foreach (var ehfBlock in Structure.Addresses)
+            {
+                if (ehfBlock.ValidCount != (ehfBlock.Block?.ValidCount ?? 0))
+                {
+                    _log($"{i}. EhfBlock valid count mismatch: {ehfBlock.ValidCount} != {ehfBlock.Block?.ValidCount.ToString() ?? "NULL"}");
+                    problem = true;
+                }
+
+                i++;
+            }
+
+            _log(problem 
+                ? "!!! Valid counts mismatch"
+                : "Valid counts OK"
+            );
+        }
     }
 }
