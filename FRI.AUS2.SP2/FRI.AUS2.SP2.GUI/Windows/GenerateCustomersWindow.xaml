@@ -1,0 +1,33 @@
+﻿<Window x:Class="FRI.AUS2.SP2.GUI.Windows.GenerateCustomersWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:FRI.AUS2.SP2.GUI.Windows"
+    xmlns:libsuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls;assembly=FRI.AUS2.StructureTester.Libs"
+    mc:Ignorable="d"
+    SizeToContent="WidthAndHeight"
+    Title="Visitors Generator" Height="450" Width="800" MinWidth="250">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <Menu>
+                <MenuItem x:Name="_mnitem_Generate" Header="Generate" Click="_mnitem_Generate_Click" />
+                <MenuItem x:Name="_mnitem_Close" Header="Close" Click="_mnitem_Close_Click" />
+            </Menu>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="5">
+            <libsuc:InlineTextBox x:Name="_txtb_Count" Title="Count" Value="100" />
+            <libsuc:InlineTextBox x:Name="_txtb_Seed" Title="Seed" Value="" />
+        </StackPanel>
+
+    </Grid>
+</Window>

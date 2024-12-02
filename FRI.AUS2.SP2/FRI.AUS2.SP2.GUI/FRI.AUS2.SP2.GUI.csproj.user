@@ -7,24 +7,33 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Controls\HeapDataForm.xaml.cs">
+    <Compile Update="Controls\CustomerForm.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Controls\HeapFindDataForm.xaml.cs">
+    <Compile Update="Controls\ServiceVisitForm.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Windows\InputDialogWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Windows\ServiceVisitFormWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Controls\HeapDataForm.xaml">
+    <Page Update="Controls\CustomerForm.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Controls\HeapFindDataForm.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Dictionary.xaml">
+    <Page Update="Controls\ServiceVisitForm.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MainWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Windows\InputDialogWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Windows\ServiceVisitFormWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

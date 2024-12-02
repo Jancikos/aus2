@@ -41,7 +41,7 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
             _frm_Insert.InitilizeDefaultValues();
 
             _frm_HeapBlocks.OnItemDoubleClicked += (address, data) => {
-                _setSelectedId(data.Id);
+                _setSelectedId(((HeapData)data).Id);
             };
 
             _initOperationsGenerator();
@@ -90,13 +90,8 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
 
         private void _updateStructureStats()
         {
-            _txt_StatsDepth.Value = _structure.Depth.ToString();
-            _txt_StatsAddressesCount.Value = _structure.AddressesCount.ToString();
-
-            _lstbx_Addresses.ItemsSource = _structure.Depth > 7
-                ? new List<string> { "Too many addresses to display" }
-                : _structure.Addresses.Select((b, i) => $"{i}. {i.ToBinaryString(_structure.Depth, false)}: {b}");
-
+            _frm_Addresses.UpdateStats(_structure);
+            
             _frm_HeapStats.UpdateStats(_structure.HeapFile);
             _frm_HeapBlocks.RerenderAllBlocks(_structure.HeapFile);
         }
@@ -106,10 +101,10 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
         private void _mnitem_FileClear_Click(object sender, RoutedEventArgs e)
         {
             // Clear the file
-            // _structure.Clear();
+            _structure.Clear();
 
             MessageBox.Show("Structure cleared!", Title);
-            // _rerenderAllStats();
+            _updateStructureStats();
         }
 
         private void _mnitem_Close_Click(object sender, RoutedEventArgs e)

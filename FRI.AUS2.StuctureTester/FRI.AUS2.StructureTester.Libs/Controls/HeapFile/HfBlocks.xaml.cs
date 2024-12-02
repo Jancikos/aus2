@@ -13,57 +13,57 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using FRI.AUS2.Libs.Structures.Files;
-using FRI.AUS2.StructureTester.HeapFileTester.Models;
 
-namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
+namespace FRI.AUS2.StructureTester.Libs.Controls.HeapFile
 {
     /// <summary>
-    /// Interaction logic for HeapFileBlocks.xaml
+    /// Interaction logic for HfBlocks.xaml
     /// </summary>
-    public partial class HeapFileBlocks : UserControl
+    public partial class HfBlocks : UserControl
     {
-        public Action<int, HeapData> OnItemDoubleClicked;
+        public Action<int, object>? OnItemDoubleClicked = null;
 
-        public HeapFileBlocks()
+        public HfBlocks()
         {
             InitializeComponent();
         }
-        public void RerenderAllBlocks(HeapFile<HeapData> structure)
+        public void RerenderAllBlocks<T>(HeapFile<T> structure) where T : class, IHeapFileData, new()
         {
             _treeView_Blocks.Items.Clear();
 
-        if (structure.BlocksCount > 50)
-        {
-            _treeView_Blocks.Items.Add(new TreeViewItem() { Header = "Too many blocks to display.", IsExpanded = true });
-            return;
-        }
 
             int i = 0;
             foreach (var block in structure.GetAllDataBlocks())
             {
+                if (i > 50)
+                {
+                    _treeView_Blocks.Items.Add(new TreeViewItem() { Header = "Too many blocks to display. Showing only first 50.", IsExpanded = true });
+                    return;
+                }
                 var blockItem = new TreeViewItem()
                 {
-                    Header = $"{i + 1}. block [{block.ValidCount}]",
+                    Header = $"{i + 1}. block",
                     IsExpanded = true
                 };
 
-                var items = new List<TreeViewItem>() 
+                var items = new List<TreeViewItem>()
                 {
                     new TreeViewItem() { Header = $"Address: {(i+1) * structure.BlockSize}", Tag = (i+1) * structure.BlockSize  },
                     new TreeViewItem() { Header = $"Prev: {block.PreviousBlock?.ToString() ?? "?"}, Next: {block.NextBlock?.ToString() ?? "?"}" }
                 };
 
-                var dataItems = new TreeViewItem() { 
+                var dataItems = new TreeViewItem()
+                {
                     Header = "Data [" + block.ValidCount + "]",
                     Tag = "Data"
                 };
-                
+
                 for (int j = 0; j < block.ValidCount; j++)
                 {
                     var data = block.Items[j];
 
-                    dataItems.Items.Add(new TreeViewItem() 
-                    { 
+                    dataItems.Items.Add(new TreeViewItem()
+                    {
                         Header = data.ToString(),
                         Tag = data
                     });
@@ -76,13 +76,19 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
 
                 ++i;
             }
+
+            
+            if (i == 0)
+            {
+                _treeView_Blocks.Items.Add(new TreeViewItem() { Header = "No data blocks.", IsExpanded = true });
+            }
         }
 
         private void _treeView_Blocks_OnItemDoubleClicked(object sender, MouseButtonEventArgs e)
         {
             var parentItem = (TreeViewItem)sender;
 
-            TreeViewItem? AddressItem = null; 
+            TreeViewItem? AddressItem = null;
             foreach (var item in parentItem.Items)
             {
                 if (((TreeViewItem)item).Header.ToString().StartsWith("Address:"))
@@ -92,7 +98,7 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
                 }
             }
 
-            TreeViewItem? dataItem = null; 
+            TreeViewItem? dataItem = null;
             foreach (var item in parentItem.Items)
             {
                 if (((TreeViewItem)item).Tag == "Data")
@@ -108,14 +114,14 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
             }
 
             TreeViewItem? selectedItem = null;
-            HeapData? selectedData = null;
+            object? selectedData = null;
             int i = 0;
             while (selectedData is null && i < dataItem.Items.Count)
             {
                 selectedItem = (TreeViewItem)dataItem.Items[i++];
                 if (selectedItem.IsSelected)
                 {
-                    selectedData = (HeapData)selectedItem.Tag;
+                    selectedData = (object)selectedItem.Tag;
                 }
             }
 

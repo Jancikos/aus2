@@ -13,21 +13,20 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using FRI.AUS2.Libs.Structures.Files;
-using FRI.AUS2.StructureTester.HeapFileTester.Models;
 
-namespace FRI.AUS2.StructureTester.HeapFileTester.Controls
+namespace FRI.AUS2.StructureTester.Libs.Controls.HeapFile
 {
     /// <summary>
-    /// Interaction logic for HeapFileStats.xaml
+    /// Interaction logic for HfStats.xaml
     /// </summary>
-    public partial class HeapFileStats : UserControl
+    public partial class HfStats : UserControl
     {
-        public HeapFileStats()
+        public HfStats()
         {
             InitializeComponent();
         }
 
-        public void UpdateStats(HeapFile<HeapData> structure)
+        public void UpdateStats<T>(HeapFile<T> structure) where T : class, IHeapFileData, new()
         {
             _txt_FileSize.Value = structure.FileSize.ToString();
             _txt_BlockSize.Value = structure.BlockSize.ToString();

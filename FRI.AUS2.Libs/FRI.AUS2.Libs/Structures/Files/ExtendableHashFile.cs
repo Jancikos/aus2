@@ -11,8 +11,10 @@ using FRI.AUS2.Libs.Helpers;
 
 namespace FRI.AUS2.Libs.Structures.Files
 {
-    public class ExtendableHashFile<TData> where TData : class, IExtendableHashFileData, new()
+    public class ExtendableHashFile<TData> : IBinaryData, IDisposable where TData : class, IExtendableHashFileData, new()
     {
+        protected BinaryFileManager _fileManager;
+
         private int _depth = 0;
         public int Depth => _depth;
 
@@ -27,17 +29,21 @@ namespace FRI.AUS2.Libs.Structures.Files
         private HeapFile<TData> _heapFile;
         public HeapFile<TData> HeapFile => _heapFile;
 
-        public ExtendableHashFile(int blockSize, FileInfo file)
+        public int Size => sizeof(int) + _addresses.Length * new ExtendableHashFileBlock<TData>(_heapFile).Size;
+
+        public ExtendableHashFile(int blockSize, Uri dataFolder, string fileNamesPrefix = "ehf")
         {
-            _heapFile = new HeapFile<TData>(blockSize, file)
+            _heapFile = new HeapFile<TData>(blockSize, new($"{dataFolder.LocalPath}{fileNamesPrefix}-data.bin"))
             {
                 ManageFreeBlocks = false,
                 DeleteEmptyBlocksFromEnd = false,
                 EnqueueNewBlockToEmptyBlocks = false
             };
-            _heapFile.Clear();
 
-            _initializeAddresses();
+
+            _fileManager = new BinaryFileManager(new($"{dataFolder.LocalPath}{fileNamesPrefix}-meta.bin"));
+
+            _initialize();
         }
 
         #region Insert
@@ -223,10 +229,24 @@ namespace FRI.AUS2.Libs.Structures.Files
             return _addresses.Any(a => a.BlockDepth == Depth);
         }
 
-        private void _initializeAddresses()
+        private void _initialize()
         {
-            _increaseDepth();
+            // init from if file is not empty
+            if (!_fileManager.IsEmpty)
+            {
+                FromBytes(_fileManager.ReadAllBytes());
+                return;
+            }
 
+            // init from scratch
+            _initializeFromScratch();
+        }
+
+        private void _initializeFromScratch()
+        {
+            _depth = 1;
+
+            _addresses = new ExtendableHashFileBlock<TData>[(int)Math.Pow(2, Depth)];
             _addresses[0] = new ExtendableHashFileBlock<TData>(_heapFile);
             _addresses[1] = new ExtendableHashFileBlock<TData>(_heapFile);
         }
@@ -235,6 +255,11 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         public int _getAddressIndex(BitArray hash, int depth)
         {
+            if (hash.Length > 32)
+            {
+                throw new InvalidOperationException("Hash length have to be <= 32");
+            }
+
             // todo - vhodne pridat ako parameter ci sa ma hash reverznut alebo nie
             hash = hash.ReverseBits();
 
@@ -395,11 +420,62 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
         }
 
+        public byte[] ToBytes()
+        {
+            var bytes = new List<byte>();
+
+            // write depth
+            bytes.AddRange(BitConverter.GetBytes(Depth));
+
+            // write addresses
+            foreach (var address in _addresses)
+            {
+                bytes.AddRange(address.ToBytes());
+            }
+
+            return bytes.ToArray();
+        }
+
+        public void FromBytes(byte[] bytes)
+        {
+            int offset = 0;
+
+            // read depth
+            _depth = BitConverter.ToInt32(bytes, offset);
+            offset += sizeof(int);
+
+            // read addresses
+            var addressesCount = (int)Math.Pow(2, Depth);
+            var ehfBlockSize = new ExtendableHashFileBlock<TData>(_heapFile).Size;
+            _addresses = new ExtendableHashFileBlock<TData>[addressesCount];
+            for (int i = 0; i < addressesCount; i++)
+            {
+                var address = new ExtendableHashFileBlock<TData>(_heapFile);
+                address.FromBytes(bytes[offset..(offset + ehfBlockSize)]);
+                _addresses[i] = address;
+
+                offset += address.Size;
+            }
+        }
+
+        public void Clear()
+        {
+            _heapFile.Clear();
+            _initializeFromScratch();
+        }
+
+        public void Dispose()
+        {
+            _fileManager.WriteBytes(0, ToBytes());
+            _fileManager.Dispose();
+
+            _heapFile.Dispose();
+        }
         #endregion
     }
 
     #region ExtendableHashFileBlock
-    public class ExtendableHashFileBlock<TData> where TData : class, IExtendableHashFileData, new()
+    public class ExtendableHashFileBlock<TData> : IBinaryData where TData : class, IExtendableHashFileData, new()
     {
         public int? Address { get; set; } = null;
         public int BlockDepth { get; set; } = 1;
@@ -407,6 +483,8 @@ namespace FRI.AUS2.Libs.Structures.Files
             Address is null
             ? null
             : _heapFile.GetBlock(Address.Value);
+
+        public int Size => 2 * sizeof(int);
 
         private HeapFile<TData> _heapFile;
 
@@ -418,6 +496,27 @@ namespace FRI.AUS2.Libs.Structures.Files
         public override string ToString()
         {
             return $"[{BlockDepth}] {Address.ToString() ?? "NULL"}";
+        }
+
+        public byte[] ToBytes()
+        {
+            var bytes = new List<byte>();
+
+            bytes.AddRange(BitConverter.GetBytes(Address ?? -1));
+            bytes.AddRange(BitConverter.GetBytes(BlockDepth));
+
+            return bytes.ToArray();
+        }
+
+        public void FromBytes(byte[] bytes)
+        {
+            int offset = 0;
+
+            int address = BitConverter.ToInt32(bytes, offset);
+            Address = address == -1 ? null : address;
+            offset += sizeof(int);
+
+            BlockDepth = BitConverter.ToInt32(bytes, offset);
         }
     }
     #endregion

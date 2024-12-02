@@ -45,7 +45,32 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
         }
 
 
-        public HeapData GenerateItem() => GenerateItem(_idCounter++);
+
+        private static int _maxId = 10000;
+        private static HashSet<int> _usedIds = new HashSet<int>();
+        public int GenerateId() 
+        {
+            var failedAttempts = 0;
+            while (true)
+            {
+                if (failedAttempts > 5)
+                {
+                    _maxId *= 10;
+                    failedAttempts = 0;
+                    continue;
+                }
+
+                var id = _random.Next(_maxId);
+                if (!_usedIds.Contains(id))
+                {
+                    _usedIds.Add(id);
+                    return id;
+                }
+                failedAttempts++;
+            }
+        }
+
+        public HeapData GenerateItem() => GenerateItem(GenerateId());
 
         public HeapData GenerateItem(int id)
         {

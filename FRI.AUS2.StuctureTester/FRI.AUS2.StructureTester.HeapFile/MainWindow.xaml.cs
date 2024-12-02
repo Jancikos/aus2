@@ -38,10 +38,10 @@ namespace FRI.AUS2.StructureTester.HeapFileTester
 
             _frm_Blocks.OnItemDoubleClicked += (address, data) => {
                 _frm_FindFilter.Address = address;
-                _frm_FindFilter.HeapData = data;
+                _frm_FindFilter.HeapData = (HeapData)data;
 
                 _frm_DeleteFilter.Address = address;
-                _frm_DeleteFilter.HeapData = data;
+                _frm_DeleteFilter.HeapData = (HeapData)data;
             };
 
             _initOperationsGenerator();

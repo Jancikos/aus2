@@ -6,10 +6,16 @@
 
         public BinaryFileManager(FileInfo file)
         {
+            if (!(file.Directory?.Exists ?? true))
+            {
+                file.Directory.Create();
+            }
+
             _fileStream = new FileStream(file.FullName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
         }
 
         public int Length => (int)_fileStream.Length;
+        public bool IsEmpty => Length == 0;
 
         public void Dispose()
         {

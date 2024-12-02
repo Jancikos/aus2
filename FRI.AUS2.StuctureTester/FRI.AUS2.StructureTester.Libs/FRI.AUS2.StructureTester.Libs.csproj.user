@@ -2,6 +2,18 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup />
   <ItemGroup>
+    <Compile Update="Controls\ExtendableHashFile\EhfAddresses.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\ExtendableHashFile\EhfDetail.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\HeapFile\HfBlocks.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\HeapFile\HfStats.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Controls\InlineText.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -11,8 +23,26 @@
     <Compile Update="Controls\OperationsGeneratorForm.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Windows\EhfDetailWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Windows\HfDetailWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Controls\ExtendableHashFile\EhfAddresses.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Controls\ExtendableHashFile\EhfDetail.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Controls\HeapFile\HfBlocks.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Controls\HeapFile\HfStats.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Controls\InlineText.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -20,6 +50,12 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Controls\OperationsGeneratorForm.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Windows\EhfDetailWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Windows\HfDetailWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

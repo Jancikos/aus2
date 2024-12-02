@@ -1,0 +1,28 @@
+﻿<UserControl x:Class="FRI.AUS2.StructureTester.Libs.Controls.HeapFile.HfStats"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls.HeapFile"
+    xmlns:libsuc="clr-namespace:FRI.AUS2.StructureTester.Libs.Controls"
+    mc:Ignorable="d"
+    d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <libsuc:InlineText x:Name="_txt_FileSize" Title="FileSize" Value="" />
+            <libsuc:InlineText x:Name="_txt_BlockSize" Title="BlockSize" Value="" />
+            <libsuc:InlineText x:Name="_txt_BlockMetaSize" Title="BlockMetaSize" Value="" />
+            <libsuc:InlineText x:Name="_txt_BlockDataSize" Title="BlockDataSize" Value="" />
+            <libsuc:InlineText x:Name="_txt_TDataSize" Title="TDataSize" Value="" />
+            <libsuc:InlineText x:Name="_txt_BlockFactor" Title="BlockFactor" Value="" />
+
+            <libsuc:InlineText x:Name="_txt_BlockCount" Title="BlocksCount" Value=""
+                Margin="0,4,0,0" />
+            <libsuc:InlineText x:Name="_txt_NextFreeBlock" Title="NextFreeBlock" Value="" />
+            <libsuc:InlineText x:Name="_txt_NextEmptyBlock" Title="NextEmptyBlock" Value="" />
+
+            <libsuc:InlineText x:Name="_txt_ValidItemsCount" Title="ValidItemsCount" Value=""
+                Margin="0,4,0,0" />
+        </StackPanel>
+    </Grid>
+</UserControl>
