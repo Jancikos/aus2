@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -41,6 +42,7 @@ namespace FRI.AUS2.SP2.Libs.Utils
         {
             for (int i = 0; i < count; i++)
             {
+                Debug.WriteLine($"Generating customer {i + 1}/{count}");
                 yield return GenerateCustomer();
             }
         }

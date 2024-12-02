@@ -18,9 +18,13 @@ namespace FRI.AUS2.SP2.Libs
 
         public SP2Backend(int blockSize, Uri dataFolder)
         {
-            _allData = new HeapFile<Customer>(blockSize, new(dataFolder.LocalPath + "allData.bin"));
+            // _allData = new HeapFile<Customer>(2405, new(dataFolder.LocalPath + "allData.bin")); // BlockFactor = 2
+            _allData = new HeapFile<Customer>(blockSize, new(dataFolder.LocalPath + "allData.bin")); 
 
-            _dataById = new ExtendableHashFile<CustomerAddressById>(blockSize / 100, new(dataFolder.LocalPath), "ehfById");
+            // _dataById = new ExtendableHashFile<CustomerAddressById>(30, new(dataFolder.LocalPath), "ehfById"); // BlockFactor = 2
+            _dataById = new ExtendableHashFile<CustomerAddressById>(blockSize / 100, new(dataFolder.LocalPath), "ehfById"); 
+
+            // _dataByEcv = new ExtendableHashFile<CustomerAddressByEcv>(45, new(dataFolder.LocalPath), "ehfByEcv"); // BlockFactor = 2
             _dataByEcv = new ExtendableHashFile<CustomerAddressByEcv>(blockSize / 100, new(dataFolder.LocalPath), "ehfByEcv");
 
             _generator = new CustomersGenerator(_dataById, _dataByEcv);
