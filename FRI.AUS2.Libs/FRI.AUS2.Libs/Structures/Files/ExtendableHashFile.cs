@@ -466,8 +466,10 @@ namespace FRI.AUS2.Libs.Structures.Files
                     var neighbourHfBlock = neighbour.Block;
                     foreach (var item in groupStart.Block?.ValidItems ?? [])
                     {
-                        neighbourHfBlock?.AddItem(item);
-                        neighbour.ValidCount++;
+                        if (neighbourHfBlock is not null) {
+                            neighbourHfBlock.AddItem(item);
+                            neighbour.ValidCount++;
+                        }
                     }
 
                     // update neighbour block
@@ -481,6 +483,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                     {
                         _heapFile.DeleteBlock(groupStart.Address.Value);
                     }
+                    groupStart.ValidCount = 0;
                 }
                 // decrease depth
                 neighbour.BlockDepth--;

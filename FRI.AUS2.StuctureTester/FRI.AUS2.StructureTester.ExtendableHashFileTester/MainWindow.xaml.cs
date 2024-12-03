@@ -35,7 +35,7 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
 
             _structure = new ExtendableHashFile<HeapData>(500, new(DefaultFilesFolder.LocalPath + "ExtendableHashFileTester.bin"));
 
-            _txtbx_GenerateCount.Value = "5";
+            _txtbx_GenerateCount.Value = "105";
 
             _frm_Insert.OnIdChanged = _setSelectedId;
             _frm_Insert.InitilizeDefaultValues();
@@ -61,14 +61,14 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
 
         private void _initOperationsGenerator()
         {
-            _frm_OperationsGenerator.Count = 10;
+            _frm_OperationsGenerator.Count = 70;
             _frm_OperationsGenerator.OpereationRatioInsert = 0;
             _frm_OperationsGenerator.OpereationRatioInsertDuplicate = 0;
             _frm_OperationsGenerator.OpereationRatioFind = 0;
             _frm_OperationsGenerator.OpereationRatioFindSpecific = 1;
             _frm_OperationsGenerator.OpereationRatioDelete = 0;
-            _frm_OperationsGenerator.OpereationRatioDeleteSpecific = 0;
-            _frm_OperationsGenerator.OpereationRatioUpdate = 1;
+            _frm_OperationsGenerator.OpereationRatioDeleteSpecific = 1;
+            _frm_OperationsGenerator.OpereationRatioUpdate = 0;
 
 
             _frm_OperationsGenerator.InitializeForm(new ExtendableHashFileOperationsGenerator(_structure));
