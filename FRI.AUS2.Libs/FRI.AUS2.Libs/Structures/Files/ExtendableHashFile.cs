@@ -123,6 +123,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             {
                 _addresses[groupStartIndex + i].Address = masterBlock.Address;
                 _addresses[groupStartIndex + i].ValidCount = masterBlock.ValidCount;
+                _addresses[groupStartIndex + i].BlockDepth = masterBlock.BlockDepth;
             }
         }
 
