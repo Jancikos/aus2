@@ -26,5 +26,10 @@
 
             return binaryString;
         }
+
+        public static bool GetNthBit(this int value, int n)
+        {
+            return (value & (1 << n)) != 0;
+        }
     }
 }

@@ -145,6 +145,13 @@ namespace FRI.AUS2.Libs.Structures.Files
             _heapFile.Delete(deletionEhfBlock.Address.Value, filter);
             deletionEhfBlock.ValidCount--;
 
+            if (deletionEhfBlock.ValidCount == 0)
+            {
+                // block is empty
+                _heapFile.DeleteBlock(deletionEhfBlock.Address.Value);
+                deletionEhfBlock.Address = null;
+            }
+
             // update all blocks in group
             _updateAllBlocksInGoup(deletionIndex, deletionEhfBlock);
 
@@ -395,16 +402,28 @@ namespace FRI.AUS2.Libs.Structures.Files
             do
             {
                 Debug.WriteLine($"Try merge block: {baseMergingBlockIndex} ({baseMergingBlockDepth})");
+                hasBeedMerged = false;
+
+                if (baseMergingBlockDepth == 1) 
+                {
+                    // cannot merge
+                    Debug.WriteLine("Cannot merge - depth is 1");
+                    break;
+                }
+
                 int groupSize = (int)Math.Pow(2, Depth - baseMergingBlockDepth);
                 int groupStartIndex = baseMergingBlockIndex - (baseMergingBlockIndex % groupSize);
                 var groupStart = _addresses[groupStartIndex];
+                bool grupStartIndexDthBit = groupStartIndex.GetNthBit(baseMergingBlockDepth - 1);
 
                 var neighbourIndex = groupStartIndex + groupSize;
-                if (neighbourIndex >= _addresses.Length || _addresses[neighbourIndex].BlockDepth != groupStart.BlockDepth)
+                bool neighbourIndexDthBit = neighbourIndex.GetNthBit(baseMergingBlockDepth - 1);
+                if (neighbourIndex >= _addresses.Length || neighbourIndexDthBit != grupStartIndexDthBit || _addresses[neighbourIndex].BlockDepth != groupStart.BlockDepth)
                 {
                     neighbourIndex = groupStartIndex - groupSize;
+                    neighbourIndexDthBit = neighbourIndex.GetNthBit(baseMergingBlockDepth - 1);
 
-                    if (neighbourIndex < 0 || _addresses[neighbourIndex].BlockDepth != groupStart.BlockDepth)
+                    if (neighbourIndex < 0 || neighbourIndexDthBit != grupStartIndexDthBit || _addresses[neighbourIndex].BlockDepth != groupStart.BlockDepth)
                     {
                         // neighbour does not exist
                         Debug.WriteLine("Neighbour does not exist");
@@ -448,7 +467,8 @@ namespace FRI.AUS2.Libs.Structures.Files
                 groupStart.BlockDepth--;
 
                 // update group blocks
-                _updateAllBlocksInGoup(neighbourIndex, neighbour);
+                var newGroupStartIndex = neighbourIndex - (int)(neighbourIndex % Math.Pow(2, Depth - neighbour.BlockDepth));
+                _updateAllBlocksInGoup(newGroupStartIndex, neighbour);
 
                 hasBeedMerged = true;
 
@@ -457,6 +477,12 @@ namespace FRI.AUS2.Libs.Structures.Files
                 baseMergingBlockDepth = neighbour.BlockDepth;
 
                 // check if whole addresses should not be decreased
+                if (Depth == 1)
+                {
+                    // cannot decrease depth
+                    continue;
+                }
+
                 foreach (var address in _addresses)
                 {
                     if (address.BlockDepth == Depth)

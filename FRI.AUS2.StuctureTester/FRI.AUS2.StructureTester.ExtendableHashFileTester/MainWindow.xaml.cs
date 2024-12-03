@@ -46,6 +46,7 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
 
             _initOperationsGenerator();
 
+            _structure.Clear();
             _updateStructureStats();
         }
 
