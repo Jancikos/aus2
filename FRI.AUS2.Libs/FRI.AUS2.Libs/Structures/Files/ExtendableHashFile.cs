@@ -36,7 +36,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             _heapFile = new HeapFile<TData>(blockSize, new($"{dataFolder.LocalPath}{fileNamesPrefix}-data.bin"))
             {
                 ManageFreeBlocks = false,
-                DeleteEmptyBlocksFromEnd = false,
+                DeleteEmptyBlocksFromEnd = true,
                 EnqueueNewBlockToEmptyBlocks = false
             };
 
@@ -148,7 +148,6 @@ namespace FRI.AUS2.Libs.Structures.Files
             if (deletionEhfBlock.ValidCount == 0)
             {
                 // block is empty
-                _heapFile.DeleteBlock(deletionEhfBlock.Address.Value);
                 deletionEhfBlock.Address = null;
             }
 
@@ -241,6 +240,23 @@ namespace FRI.AUS2.Libs.Structures.Files
             int[] array = new int[1];
             result.CopyTo(array, 0);
             return array[0];
+        }
+
+        public bool _tryDecreaseDepth()
+        {
+            if (_hasBlockWithStrucuteDepth())
+            {
+                return false;
+            }
+
+            try {
+                _decreaseDepth();
+            } catch (InvalidOperationException)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public void _decreaseDepth()
@@ -433,6 +449,9 @@ namespace FRI.AUS2.Libs.Structures.Files
 
                 var neighbour = _addresses[neighbourIndex];
 
+                Debug.WriteLine($"Group start index: {groupStartIndex} [{groupStart}]");
+                Debug.WriteLine($"Neighbour index: {neighbourIndex} [{neighbour}]");
+
                 if (groupStart.ValidCount + neighbour.ValidCount > groupStart.BlockFactor)
                 {
                     // cannot merge
@@ -444,16 +463,17 @@ namespace FRI.AUS2.Libs.Structures.Files
                 // merge blocks items
                 if (neighbour.Block is not null) 
                 {
+                    var neighbourHfBlock = neighbour.Block;
                     foreach (var item in groupStart.Block?.ValidItems ?? [])
                     {
-                        neighbour.Block.AddItem(item);
+                        neighbourHfBlock?.AddItem(item);
                         neighbour.ValidCount++;
                     }
 
                     // update neighbour block
-                    if (neighbour.Address is not null && neighbour.Block is not null) 
+                    if (neighbour.Address is not null && neighbourHfBlock is not null) 
                     {
-                        _heapFile._saveBlock(neighbour.Address.Value, neighbour.Block);
+                        _heapFile._saveBlock(neighbour.Address.Value, neighbourHfBlock);
                     }
 
                     // remove group start block from heap file
@@ -471,28 +491,18 @@ namespace FRI.AUS2.Libs.Structures.Files
                 _updateAllBlocksInGoup(newGroupStartIndex, neighbour);
 
                 hasBeedMerged = true;
+                Debug.WriteLine("Block merged");
 
                 // setup next iteration
                 baseMergingBlockIndex = neighbourIndex;
                 baseMergingBlockDepth = neighbour.BlockDepth;
 
                 // check if whole addresses should not be decreased
-                if (Depth == 1)
+                if (_tryDecreaseDepth())
                 {
-                    // cannot decrease depth
-                    continue;
+                    // depth has been decreased, index also changed
+                    baseMergingBlockIndex >>= 1;
                 }
-
-                foreach (var address in _addresses)
-                {
-                    if (address.BlockDepth == Depth)
-                    {
-                        // cannot decrease depth
-                        continue;
-                    }
-                }
-                _decreaseDepth();
-                
             } while (hasBeedMerged);
         }
 
