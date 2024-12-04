@@ -158,10 +158,11 @@
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
-                        <uc:CustomerForm x:Name="_frm_Display"  ManageIds="False" />
+                        <uc:CustomerForm x:Name="_frm_Display" />
 
                         <StackPanel Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
-                            <Button x:Name="_btn_Update" Content="Update" Click="_btn_Update_Click" />
+                            <Button x:Name="_btn_UpdateById" Content="Update by ID" Click="_btn_UpdateById_Click" />
+                            <Button x:Name="_btn_UpdateByEcv" Content="Update by ECV" Click="_btn_UpdateByEcv_Click" />
                         </StackPanel>
                     </Grid>
                 </GroupBox>

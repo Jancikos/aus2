@@ -226,7 +226,7 @@ namespace FRI.AUS2.SP2.GUI
             }
         }
 
-        private void _btn_Update_Click(object sender, RoutedEventArgs e)
+        private void _btn_UpdateById_Click(object sender, RoutedEventArgs e)
         {
             try {
                 var customer = _frm_Display.Customer;
@@ -237,7 +237,28 @@ namespace FRI.AUS2.SP2.GUI
                     return;
                 }
 
-                _backend.UpdateCustomer(customer);
+                _backend.UpdateCustomerById(customer);
+
+                MessageBox.Show("Zákazník upravený!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            } catch (Exception ex) {
+                MessageBox.Show($"Chyba: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            _rerenderStats();
+        }
+
+        private void _btn_UpdateByEcv_Click(object sender, RoutedEventArgs e)
+        {
+            try {
+                var customer = _frm_Display.Customer;
+
+                if (!customer.IsValid())
+                {
+                    MessageBox.Show("Vyplnte všetky polia!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                _backend.UpdateCustomerByEcv(customer);
 
                 MessageBox.Show("Zákazník upravený!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
             } catch (Exception ex) {
