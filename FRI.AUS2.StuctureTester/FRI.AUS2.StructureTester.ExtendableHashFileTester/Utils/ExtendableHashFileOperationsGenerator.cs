@@ -65,8 +65,8 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester.Utils
                 return;
             }
 
-            _printAddress();
-            _checkValidCounts();
+            // _printAddress();
+            // _checkValidCounts();
         }
 
         protected override void _afterGeneration()
@@ -78,11 +78,11 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester.Utils
 
         private void _printAddress()
         {
-            _log($"Addresses ({Structure.Depth}):", 1);
+            _log($"Addresses ({Structure.Depth}):", 1, 3);
             int i = 0;
             foreach (var ehfBlock in Structure.Addresses)
             {
-                _log($"{i}. {i.ToBinaryString(Structure.Depth, false)}: {ehfBlock}", 2);
+                _log($"{i}. {i.ToBinaryString(Structure.Depth, false)}: {ehfBlock}", 2, 3);
                 i++;
             }
         }

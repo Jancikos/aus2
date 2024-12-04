@@ -48,9 +48,6 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
 
             _structure.Clear();
 
-            // press genreate button
-            _btn_Generate.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
-
             _updateStructureStats();
         }
 
@@ -65,7 +62,7 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester
 
         private void _initOperationsGenerator()
         {
-            _frm_OperationsGenerator.Count = 55;
+            _frm_OperationsGenerator.Count = 100;
             _frm_OperationsGenerator.OpereationRatioInsert = 1;
             _frm_OperationsGenerator.OpereationRatioInsertDuplicate = 0;
             _frm_OperationsGenerator.OpereationRatioFind = 0;
