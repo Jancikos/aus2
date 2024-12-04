@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FRI.AUS2.Libs.Helpers;
 using FRI.AUS2.Libs.Structures.Files;
 using FRI.AUS2.StructureTester.HeapFileTester.Models;
 using FRI.AUS2.StructureTester.HeapFileTester.Utils;
@@ -34,12 +35,20 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester.Utils
 
         protected override void _structureInsert(HeapData t)
         {
+            _logAddressIndex(t);
             Structure.Insert(t);
         }
 
         protected override void _structureRemoveSpecific(HeapData filter)
         {
+            _logAddressIndex(filter);
             Structure.Delete(filter);
+        }
+
+        private void _logAddressIndex(HeapData filter)
+        {
+            var index = Structure._getAddressIndex(filter.GetHash());
+            _log($"Address index: {index}", 1);
         }
 
         protected override void _structureUpdate(HeapData filter, HeapData updateItem)
@@ -47,11 +56,35 @@ namespace FRI.AUS2.StructureTester.ExtendableHashFileTester.Utils
             Structure.Update(filter, updateItem);
         }
 
+        protected override void _afterOperation(int index, OperationType operation)
+        {
+            base._afterOperation(index, operation);
+
+            if (operation == OperationType.Find || operation == OperationType.FindSpecific)
+            {
+                return;
+            }
+
+            _printAddress();
+            _checkValidCounts();
+        }
+
         protected override void _afterGeneration()
         {
             base._afterGeneration();
 
             _checkValidCounts();
+        }
+
+        private void _printAddress()
+        {
+            _log($"Addresses ({Structure.Depth}):", 1);
+            int i = 0;
+            foreach (var ehfBlock in Structure.Addresses)
+            {
+                _log($"{i}. {i.ToBinaryString(Structure.Depth, false)}: {ehfBlock}", 2);
+                i++;
+            }
         }
 
         protected void _checkValidCounts()

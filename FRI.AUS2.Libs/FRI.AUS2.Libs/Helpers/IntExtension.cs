@@ -1,4 +1,6 @@
-﻿namespace FRI.AUS2.Libs.Helpers
+﻿using System.Collections;
+
+namespace FRI.AUS2.Libs.Helpers
 {
     public static class IntExtension
     {
@@ -30,6 +32,18 @@
         public static bool GetNthBit(this int value, int n)
         {
             return (value & (1 << n)) != 0;
+        }
+
+        // TODO - prerobit na bitove operacie
+        public static int ResetNthBit(this int value, int n)
+        {
+            BitArray bits = new BitArray(new int[] { value });
+
+            bits.Set(n, !bits.Get(n));
+
+            int[] array = new int[1];
+            bits.CopyTo(array, 0);
+            return array[0];
         }
     }
 }

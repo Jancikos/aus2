@@ -431,24 +431,26 @@ namespace FRI.AUS2.Libs.Structures.Files
                 int groupSize = (int)Math.Pow(2, Depth - baseMergingBlockDepth);
                 int groupStartIndex = baseMergingBlockIndex - (baseMergingBlockIndex % groupSize);
                 var groupStart = _addresses[groupStartIndex];
-                bool grupStartIndexDthBit = groupStartIndex.GetNthBit(baseMergingBlockDepth - 1);
+                bool grupStartIndexDthBit = groupStartIndex.GetNthBit(Depth - 1);
 
-                var neighbourIndex = groupStartIndex + groupSize;
-                bool neighbourIndexDthBit = neighbourIndex.GetNthBit(baseMergingBlockDepth - 1);
-                if (neighbourIndex >= _addresses.Length || neighbourIndexDthBit != grupStartIndexDthBit || _addresses[neighbourIndex].BlockDepth != groupStart.BlockDepth)
+                // TODO - preverit ci toto je ozaj spravne / lepsie to ako bolo pred tym
+                var neighbourIndex = groupStartIndex.ResetNthBit(Depth - baseMergingBlockDepth);
+                bool neighbourIndexDthBit = neighbourIndex.GetNthBit(Depth - 1);
+
+                if (neighbourIndexDthBit != grupStartIndexDthBit)
                 {
-                    neighbourIndex = groupStartIndex - groupSize;
-                    neighbourIndexDthBit = neighbourIndex.GetNthBit(baseMergingBlockDepth - 1);
-
-                    if (neighbourIndex < 0 || neighbourIndexDthBit != grupStartIndexDthBit || _addresses[neighbourIndex].BlockDepth != groupStart.BlockDepth)
-                    {
-                        // neighbour does not exist
-                        Debug.WriteLine("Neighbour does not exist");
-                        break;
-                    }
+                    // dth bit is different - should not happen
+                    Debug.WriteLine("Neighbour does not exist - dth bit is different");
+                    break;
                 }
 
                 var neighbour = _addresses[neighbourIndex];
+                if (neighbour.BlockDepth != groupStart.BlockDepth)
+                {
+                    // neighbour has different depth
+                    Debug.WriteLine("Neighbour does not exist - different depth");
+                    break;
+                }
 
                 Debug.WriteLine($"Group start index: {groupStartIndex} [{groupStart}]");
                 Debug.WriteLine($"Neighbour index: {neighbourIndex} [{neighbour}]");

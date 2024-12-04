@@ -254,7 +254,7 @@ namespace FRI.AUS2.StructureTester.Libs.Utils.OperationsGenerator
             _operationStatistics[operation]++;
         }
 
-        private void _afterOperation(int index, OperationType operation)
+        protected virtual void _afterOperation(int index, OperationType operation)
         {
             if (LogsStatsFrequency > 0)
             {
