@@ -45,5 +45,22 @@ namespace FRI.AUS2.Libs.Helpers
             bits.CopyTo(array, 0);
             return array[0];
         }
+
+        public static int CutFirtsNBits(this int value, int n)
+        {
+            var bits = new BitArray(new int[] { value });
+
+            var mask = new BitArray(sizeof(int) * 8);
+            for (int i = 0; i < mask.Length; i++)
+            {
+                mask.Set(i, i >= n);
+            }
+
+            var result = bits.And(mask);
+
+            int[] array = new int[1];
+            result.CopyTo(array, 0);
+            return array[0];
+        }
     }
 }

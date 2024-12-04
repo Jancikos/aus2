@@ -428,15 +428,12 @@ namespace FRI.AUS2.Libs.Structures.Files
                     break;
                 }
 
-                int groupSize = (int)Math.Pow(2, Depth - baseMergingBlockDepth);
-                int groupStartIndex = baseMergingBlockIndex - (baseMergingBlockIndex % groupSize);
-                var groupStart = _addresses[groupStartIndex];
+                int depthDifference = Depth - baseMergingBlockDepth;
+                var groupStartIndex = baseMergingBlockIndex.CutFirtsNBits(depthDifference);
+                var neighbourIndex = groupStartIndex.ResetNthBit(depthDifference);
+
                 bool grupStartIndexDthBit = groupStartIndex.GetNthBit(Depth - 1);
-
-                // TODO - preverit ci toto je ozaj spravne / lepsie to ako bolo pred tym
-                var neighbourIndex = groupStartIndex.ResetNthBit(Depth - baseMergingBlockDepth);
                 bool neighbourIndexDthBit = neighbourIndex.GetNthBit(Depth - 1);
-
                 if (neighbourIndexDthBit != grupStartIndexDthBit)
                 {
                     // dth bit is different - should not happen
@@ -444,6 +441,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                     break;
                 }
 
+                var groupStart = _addresses[groupStartIndex];
                 var neighbour = _addresses[neighbourIndex];
                 if (neighbour.BlockDepth != groupStart.BlockDepth)
                 {
@@ -486,7 +484,12 @@ namespace FRI.AUS2.Libs.Structures.Files
                     {
                         _heapFile.DeleteBlock(groupStart.Address.Value);
                     }
-                    groupStart.ValidCount = 0;
+                } else 
+                {
+                    Debug.WriteLine("Neighbour block is null");
+                    
+                    neighbour.Address = groupStart.Address;
+                    neighbour.ValidCount = groupStart.ValidCount;
                 }
                 // decrease depth
                 neighbour.BlockDepth--;
