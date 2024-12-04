@@ -375,11 +375,6 @@ namespace FRI.AUS2.Libs.Structures.Files
         {
             _validateAddress(address);
 
-            if (!filter.Equals(newData))
-            {
-                throw new InvalidOperationException("Filter and new data are not equal. Update is not allowed when hash of the data is changed");
-            }
-
             _loadActiveBlock(address);
 
             if (!ActiveBlock.RemoveItem(filter))

@@ -164,11 +164,6 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         public void Update(TData filter, TData newData)
         {
-            if (!filter.GetHash().IsSameAs(newData.GetHash()))
-            {
-                throw new InvalidOperationException("Cannot update item with different hash");
-            }
-
             var hash = filter.GetHash();
             int addressIndex = _getAddressIndex(hash);
 
@@ -180,7 +175,15 @@ namespace FRI.AUS2.Libs.Structures.Files
                 throw new KeyNotFoundException("Item not found");
             }
 
-            block.AddItem(newData);
+            if (filter.GetHash().IsSameAs(newData.GetHash()))
+            {
+                block.AddItem(newData);
+            }
+            else 
+            {
+                // needs to be inserted to different block
+                Insert(newData);
+            }
 
             _heapFile._saveBlock(ehfBlock.Address.Value, block);
         }
