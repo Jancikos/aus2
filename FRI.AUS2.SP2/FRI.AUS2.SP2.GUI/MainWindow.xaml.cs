@@ -202,6 +202,30 @@ namespace FRI.AUS2.SP2.GUI
             }
         }
 
+        private void _btn_DeleteById_Click(object sender, RoutedEventArgs e)
+        {
+            try {
+                _backend.DeleteCustomer(int.Parse(_txtbx_FindId.Value));
+
+                MessageBox.Show("Zákazník zmazaný!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                _rerenderStats();
+            } catch (Exception ex) {
+                MessageBox.Show($"Chyba: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void _btn_DeleteByEcv_Click(object sender, RoutedEventArgs e)
+        {
+            try {
+                _backend.DeleteCustomer(_txtbx_FindEcv.Value);
+
+                MessageBox.Show("Zákazník zmazaný!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                _rerenderStats();
+            } catch (Exception ex) {
+                MessageBox.Show($"Chyba: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void _btn_Update_Click(object sender, RoutedEventArgs e)
         {
             try {
@@ -221,11 +245,6 @@ namespace FRI.AUS2.SP2.GUI
             }
 
             _rerenderStats();
-        }
-        
-        private void _btn_Delete_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Zatial neimplementovane!", Title, MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
     #endregion

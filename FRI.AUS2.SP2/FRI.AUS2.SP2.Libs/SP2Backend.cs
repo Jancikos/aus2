@@ -108,6 +108,64 @@ namespace FRI.AUS2.SP2.Libs
             _allData.Update(customerAddressById.Addreess, customer, customer);
         }
 
+        public void DeleteCustomer(int id)
+        {
+            var customerAddressById = _dataById.Find(new CustomerAddressById
+            {
+                Id = id
+            });
+
+            var customer = _allData.Find(customerAddressById.Addreess, new Customer()
+            {
+                Id = id
+            });
+
+            if (customer is null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            _allData.Delete(customerAddressById.Addreess, customer);
+
+            _dataById.Delete(customerAddressById);
+            if (customer.ECV is not null)
+            {
+                _dataByEcv.Delete(new CustomerAddressByEcv
+                {
+                    ECV = customer.ECV 
+                });
+            }
+        }
+
+        public void DeleteCustomer(string ecv)
+        {
+            var customerAddressByEcv = _dataByEcv.Find(new CustomerAddressByEcv
+            {
+                ECV = ecv
+            });
+
+            var customer = _allData.Find(customerAddressByEcv.Addreess, new Customer()
+            {
+                ECV = ecv
+            });
+
+            if (customer is null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            _allData.Delete(customerAddressByEcv.Addreess, customer);
+
+            _dataByEcv.Delete(customerAddressByEcv);
+            if (customer.Id is not null)
+            {
+                _dataById.Delete(new CustomerAddressById
+                {
+                    Id = customer.Id.Value
+                });
+            }
+        }
+
         public void Clear()
         {
             _allData.Clear();
