@@ -30,14 +30,14 @@ namespace FRI.AUS2.SP2.Libs
             _generator = new CustomersGenerator(_dataById, _dataByEcv);
         }
 
-        public void GenerateCustomers(int count, int? seed)
+        public void GenerateCustomers(int count, int? seed, bool fast)
         {
             if (seed is not null)
             {
                 _generator.SetSeed(seed.Value);
             }
 
-            foreach (var customer in _generator.GenerateCustomers(count))
+            foreach (var customer in _generator.GenerateCustomers(count, fast))
             {
                 AddCustomer(customer);
             }

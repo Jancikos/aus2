@@ -85,7 +85,7 @@ namespace FRI.AUS2.SP2.GUI
                return;
             }
 
-            _backend.GenerateCustomers(form.Count, form.Seed);
+            _backend.GenerateCustomers(form.Count, form.Seed, form.Fast);
 
             MessageBox.Show("Data vygenerované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
 
