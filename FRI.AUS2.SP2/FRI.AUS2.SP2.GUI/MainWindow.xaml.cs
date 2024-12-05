@@ -205,7 +205,7 @@ namespace FRI.AUS2.SP2.GUI
         private void _btn_DeleteById_Click(object sender, RoutedEventArgs e)
         {
             try {
-                _backend.DeleteCustomer(int.Parse(_txtbx_FindId.Value));
+                _backend.DeleteCustomer(int.Parse(_txtbx_DeleteId.Value));
 
                 MessageBox.Show("Zákazník zmazaný!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
                 _rerenderStats();
@@ -217,7 +217,7 @@ namespace FRI.AUS2.SP2.GUI
         private void _btn_DeleteByEcv_Click(object sender, RoutedEventArgs e)
         {
             try {
-                _backend.DeleteCustomer(_txtbx_FindEcv.Value);
+                _backend.DeleteCustomer(_txtbx_DeleteEcv.Value);
 
                 MessageBox.Show("Zákazník zmazaný!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
                 _rerenderStats();
