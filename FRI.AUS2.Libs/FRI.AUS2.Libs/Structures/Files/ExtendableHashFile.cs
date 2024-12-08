@@ -181,6 +181,11 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
             else 
             {
+                if (block.IsEmpty)
+                {
+                    _heapFile.DeleteBlock(ehfBlock.Address.Value, false);
+                }
+
                 // needs to be inserted to different block
                 Insert(newData);
             }
@@ -473,7 +478,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                         if (neighbourHfBlock is not null) {
                             neighbourHfBlock.AddItem(item);
                             neighbour.ValidCount++;
-                        }
+                        }   
                     }
 
                     // update neighbour block

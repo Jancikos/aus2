@@ -341,13 +341,13 @@ namespace FRI.AUS2.Libs.Structures.Files
         /// empty the block
         /// </summary>
         /// <param name="address"></param>
-        public void DeleteBlock(int address)
+        public void DeleteBlock(int address, bool checkIfEmpty = true)
         {
             _validateAddress(address);
 
             _loadActiveBlock(address);
 
-            if (ActiveBlock.IsEmpty)
+            if (checkIfEmpty && ActiveBlock.IsEmpty)
             {
                 return;
             }
