@@ -54,17 +54,36 @@ namespace FRI.AUS2.SP2.Libs
 
             var blockAddress = _allData.Insert(customer);
 
-            _dataById.Insert(new CustomerAddressById
+            try
             {
-                Id = customer.Id.Value,
-                Addreess = blockAddress
-            });
+                _dataById.Insert(new CustomerAddressById
+                {
+                    Id = customer.Id.Value,
+                    Addreess = blockAddress
+                });
+            } catch (ArgumentException)
+            {   
+                _allData.Delete(blockAddress, customer);
 
-            _dataByEcv.Insert(new CustomerAddressByEcv
+                throw new ArgumentException("Customer with this ID already exists");
+            }
+
+            try {
+                _dataByEcv.Insert(new CustomerAddressByEcv
+                {
+                    ECV = customer.ECV,
+                    Addreess = blockAddress
+                });
+            } catch (ArgumentException)
             {
-                ECV = customer.ECV,
-                Addreess = blockAddress
-            });
+                _allData.Delete(blockAddress, customer);
+                _dataById.Delete(new CustomerAddressById
+                {
+                    Id = customer.Id.Value
+                });
+
+                throw new ArgumentException("Customer with this ECV already exists");
+            }
         }
 
         public Customer GetCustomerById(int id)
