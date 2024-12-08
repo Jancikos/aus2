@@ -85,9 +85,14 @@ namespace FRI.AUS2.SP2.GUI
                return;
             }
 
-            _backend.GenerateCustomers(form.Count, form.Seed, form.Fast);
+            try {
+                _backend.GenerateCustomers(form.Count, form.Seed, form.Fast);
 
-            MessageBox.Show("Data vygenerované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Data vygenerované!", Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            } catch (Exception ex) {
+                MessageBox.Show($"Chyba: {ex.Message}", Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
 
             _rerenderStats();
         }
