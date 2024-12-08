@@ -600,7 +600,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             _dequeActiveBlock(ref _nextEmptyBlock);
         }
 
-        private void _loadActiveBlock(int address)
+        public void _loadActiveBlock(int address)
         {
             if (ActiveBlockAddress == address)
             {

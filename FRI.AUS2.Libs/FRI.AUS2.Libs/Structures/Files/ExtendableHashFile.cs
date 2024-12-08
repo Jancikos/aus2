@@ -65,6 +65,12 @@ namespace FRI.AUS2.Libs.Structures.Files
 
                 try
                 {
+                    _heapFile._loadActiveBlock(ehfBlock.Address.Value);
+                    if (_heapFile.ActiveBlock.GetItem(data) is not null)
+                    {
+                        throw new ArgumentException("Item already exists. Duplicate key is not supported.");
+                    }
+
                     _heapFile.InsertToBlock(ehfBlock.Address.Value, data);
                     ehfBlock.ValidCount++;
                     _updateAllBlocksInGoup(addressIndex, ehfBlock);
@@ -169,6 +175,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
             var ehfBlock = _addresses[addressIndex];
             var block = ehfBlock.Block;
+            var oldData = block?.GetItem(filter);
 
             if (ehfBlock.Address is null || block is null || !block.RemoveItem(filter))
             {
@@ -186,8 +193,17 @@ namespace FRI.AUS2.Libs.Structures.Files
                     _heapFile.DeleteBlock(ehfBlock.Address.Value, false);
                 }
 
-                // needs to be inserted to different block
-                Insert(newData);
+                try {
+                    // needs to be inserted to different block
+                    Insert(newData);
+                } catch (ArgumentException)
+                {
+                    // trying to insert duplicate key, so insert back old data
+                    if (oldData is not null)
+                    {
+                        block.AddItem(oldData);
+                    }
+                }
             }
 
             _heapFile._saveBlock(ehfBlock.Address.Value, block);
