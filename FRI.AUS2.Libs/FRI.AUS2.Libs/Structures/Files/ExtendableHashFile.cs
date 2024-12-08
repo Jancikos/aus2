@@ -36,7 +36,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             _heapFile = new HeapFile<TData>(blockSize, new($"{dataFolder.LocalPath}{fileNamesPrefix}-data.bin"))
             {
                 ManageFreeBlocks = false,
-                DeleteEmptyBlocksFromEnd = false,
+                DeleteEmptyBlocksFromEnd = true,
                 EnqueueNewBlockToEmptyBlocks = false
             };
 
@@ -60,12 +60,20 @@ namespace FRI.AUS2.Libs.Structures.Files
                 if (ehfBlock.Address is null)
                 {
                     ehfBlock.Address = _heapFile.GetEmptyBlock();
-                    _updateAddressOfAllBlocksInGoup(addressIndex, ehfBlock);
+                    _updateAllBlocksInGoup(addressIndex, ehfBlock);
                 }
 
                 try
                 {
+                    _heapFile._loadActiveBlock(ehfBlock.Address.Value);
+                    if (_heapFile.ActiveBlock.GetItem(data) is not null)
+                    {
+                        throw new ArgumentException("Item already exists. Duplicate key is not supported.");
+                    }
+
                     _heapFile.InsertToBlock(ehfBlock.Address.Value, data);
+                    ehfBlock.ValidCount++;
+                    _updateAllBlocksInGoup(addressIndex, ehfBlock);
                     inserted = true;
                 }
                 catch (InvalidOperationException)
@@ -112,14 +120,16 @@ namespace FRI.AUS2.Libs.Structures.Files
             return data;
         }
 
-        private void _updateAddressOfAllBlocksInGoup(int addressIndex, ExtendableHashFileBlock<TData> block)
+        private void _updateAllBlocksInGoup(int addressIndex, ExtendableHashFileBlock<TData> masterBlock)
         {
-            var groupSize = (int)Math.Pow(2, Depth - block.BlockDepth);
+            var groupSize = (int)Math.Pow(2, Depth - masterBlock.BlockDepth);
             var groupStartIndex = addressIndex - (addressIndex % groupSize);
 
             for (int i = 0; i < groupSize; i++)
             {
-                _addresses[groupStartIndex + i].Address = block.Address;
+                _addresses[groupStartIndex + i].Address = masterBlock.Address;
+                _addresses[groupStartIndex + i].ValidCount = masterBlock.ValidCount;
+                _addresses[groupStartIndex + i].BlockDepth = masterBlock.BlockDepth;
             }
         }
 
@@ -129,69 +139,30 @@ namespace FRI.AUS2.Libs.Structures.Files
         public void Delete(TData filter)
         {
             var hash = filter.GetHash();
+
             int deletionIndex = _getAddressIndex(hash);
-            var deletionHashBlock = _addresses[deletionIndex];
+            var deletionEhfBlock = _addresses[deletionIndex];
 
-            // _heapFile.Delete(deletionHashBlock.Address, filter);
-
-            // var deletionBlock = _heapFile.ActiveBlock;
-            var deletionBlock = new HeapFileBlock<TData>(_heapFile.BlockSize);
-            deletionBlock.FromBytes(_heapFile.ActiveBlock.ToBytes()); // aby sa tam nakopiaoval cely objekt, nie len odkaz nan
-            var deletionAddress = deletionHashBlock.Address;
-
-            var siblingIndex = deletionIndex % (int)Math.Pow(2, deletionHashBlock.BlockDepth - 1);
-            if (siblingIndex == deletionIndex)
+            if (deletionEhfBlock.Address is null || deletionEhfBlock.ValidCount == 0)
             {
-                siblingIndex += (int)Math.Pow(2, deletionHashBlock.BlockDepth - 1);
+                throw new KeyNotFoundException("Block is empty");
             }
 
-            // check if can be merged
-            var siblingHashBlock = _addresses[siblingIndex];
-            var siblingBlock = siblingHashBlock.Block;
-            // TODO - items in deletion block can be moved to sibling block
-            // if (deletionBlock.ValidCount + siblingBlock.ValidCount <= _heapFile.BlockSize)
-            // {
-            //     // merge blocks into one
-            //     foreach (var item in deletionBlock.ValidItems)
-            //     {
-            //         siblingBlock.AddItem(item);
-            //     }
-            //     // _heapFile._saveBlock(siblingHashBlock.Address, siblingBlock);
+            // delete item from block
+            _heapFile.Delete(deletionEhfBlock.Address.Value, filter);
+            deletionEhfBlock.ValidCount--;
 
-            //     // delete deletion block items
-            //     deletionBlock.ClearItems();
-
-            //     // TODO - doplnit to aby to bolo cyklicke...
-            // }
-
-            // HLAVNE TO UROBIT PODLA MATERIALOV !!!
-
-            // check if deletion block is empty
-            if (deletionBlock.IsEmpty && deletionHashBlock.BlockDepth > 1)
+            if (deletionEhfBlock.ValidCount == 0)
             {
-                if (siblingHashBlock.BlockDepth == deletionHashBlock.BlockDepth)
-                {
-                    // merge blocks
-                    deletionHashBlock.Address = siblingHashBlock.Address;
-
-                    deletionHashBlock.BlockDepth--;
-                    siblingHashBlock.BlockDepth--;
-
-                    // shrink file size
-                    _heapFile._deleteEmptyBlocksFromEnd(true);
-
-
-                    if (deletionHashBlock.BlockDepth + 1 == Depth)
-                    {
-                        if (!_hasBlockWithStrucuteDepth())
-                        {
-                            _decreaseDepth();
-                        }
-                    }
-                }
+                // block is empty
+                deletionEhfBlock.Address = null;
             }
 
-            // _heapFile._saveBlock(deletionAddress, deletionBlock);
+            // update all blocks in group
+            _updateAllBlocksInGoup(deletionIndex, deletionEhfBlock);
+
+            // try merge block
+            _tryMergeBlock(deletionIndex, deletionEhfBlock.BlockDepth);
         }
         #endregion
 
@@ -199,23 +170,41 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         public void Update(TData filter, TData newData)
         {
-            if (!filter.GetHash().IsSameAs(newData.GetHash()))
-            {
-                throw new InvalidOperationException("Cannot update item with different hash");
-            }
-
             var hash = filter.GetHash();
             int addressIndex = _getAddressIndex(hash);
 
             var ehfBlock = _addresses[addressIndex];
             var block = ehfBlock.Block;
+            var oldData = block?.GetItem(filter);
 
             if (ehfBlock.Address is null || block is null || !block.RemoveItem(filter))
             {
                 throw new KeyNotFoundException("Item not found");
             }
 
-            block.AddItem(newData);
+            if (filter.GetHash().IsSameAs(newData.GetHash()))
+            {
+                block.AddItem(newData);
+            }
+            else 
+            {
+                if (block.IsEmpty)
+                {
+                    _heapFile.DeleteBlock(ehfBlock.Address.Value, false);
+                }
+
+                try {
+                    // needs to be inserted to different block
+                    Insert(newData);
+                } catch (ArgumentException)
+                {
+                    // trying to insert duplicate key, so insert back old data
+                    if (oldData is not null)
+                    {
+                        block.AddItem(oldData);
+                    }
+                }
+            }
 
             _heapFile._saveBlock(ehfBlock.Address.Value, block);
         }
@@ -278,6 +267,23 @@ namespace FRI.AUS2.Libs.Structures.Files
             return array[0];
         }
 
+        public bool _tryDecreaseDepth()
+        {
+            if (_hasBlockWithStrucuteDepth())
+            {
+                return false;
+            }
+
+            try {
+                _decreaseDepth();
+            } catch (InvalidOperationException)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public void _decreaseDepth()
         {
             if (Depth <= 1)
@@ -285,17 +291,20 @@ namespace FRI.AUS2.Libs.Structures.Files
                 throw new InvalidOperationException("Cannot decrease depth below 1");
             }
 
+            Debug.WriteLine($"Decreasing depth from {Depth} to {Depth - 1}");
+
             _depth--;
             ExtendableHashFileBlock<TData>[] newAddresses = new ExtendableHashFileBlock<TData>[(int)Math.Pow(2, Depth)];
 
             for (int i = 0; i < newAddresses.Length; i++)
             {
-                var adressBlock = _addresses[i];
+                var adressBlock = _addresses[i * 2];
 
                 newAddresses[i] = new ExtendableHashFileBlock<TData>(_heapFile)
                 {
                     Address = adressBlock.Address,
-                    BlockDepth = adressBlock.BlockDepth
+                    BlockDepth = adressBlock.BlockDepth,
+                    ValidCount = adressBlock.ValidCount
                 };
             }
 
@@ -325,7 +334,8 @@ namespace FRI.AUS2.Libs.Structures.Files
                     newAddresses[newAddressesIndex++] = new ExtendableHashFileBlock<TData>(_heapFile)
                     {
                         Address = adressBlock.Address,
-                        BlockDepth = adressBlock.BlockDepth
+                        BlockDepth = adressBlock.BlockDepth,
+                        ValidCount = adressBlock.ValidCount
                     };
                 });
             }
@@ -390,6 +400,7 @@ namespace FRI.AUS2.Libs.Structures.Files
                 if (splittingBlockItems.Count == 0)
                 {
                     splittingBlock.Address = null;
+                    splittingBlock.ValidCount = 0;
                 }
 
                 if (splittingBlockItems.Count != 0)
@@ -400,24 +411,132 @@ namespace FRI.AUS2.Libs.Structures.Files
                         throw new InvalidOperationException("Splitting block address is not set even after split");
                     }
                     _heapFile.SetBlockItems(splittingBlock.Address.Value, splittingBlockItems.ToArray());
+                    splittingBlock.ValidCount = splittingBlockItems.Count;
 
                     targetBlock.Address = _heapFile.GetEmptyBlock();
                     _heapFile.SetBlockItems(targetBlock.Address.Value, targetBlockItems.ToArray());
+                    targetBlock.ValidCount = targetBlockItems.Count;
                 }
             } else
             {
                 targetBlock.Address = null;
+                targetBlock.ValidCount = 0;
             }
 
             // update group blocks
             for (int i = 0; i < newGroupSize; i++)
             {
                 _addresses[splittingBlockIndex + i].Address = splittingBlock.Address;
+                _addresses[splittingBlockIndex + i].ValidCount = splittingBlock.ValidCount;
                 _addresses[splittingBlockIndex + i].BlockDepth = newBlockDepth;
             
                 _addresses[targetBlockIndex + i].Address = targetBlock.Address;
+                _addresses[targetBlockIndex + i].ValidCount = targetBlock.ValidCount;
                 _addresses[targetBlockIndex + i].BlockDepth = newBlockDepth;
             }
+        }
+
+        private void _tryMergeBlock(int baseMergingBlockIndex, int baseMergingBlockDepth)
+        {
+
+            bool hasBeedMerged = false;
+            do
+            {
+                Debug.WriteLine($"Try merge block: {baseMergingBlockIndex} ({baseMergingBlockDepth})");
+                hasBeedMerged = false;
+
+                if (baseMergingBlockDepth == 1) 
+                {
+                    // cannot merge
+                    Debug.WriteLine("Cannot merge - depth is 1");
+                    break;
+                }
+
+                int depthDifference = Depth - baseMergingBlockDepth;
+                var groupStartIndex = baseMergingBlockIndex.CutFirtsNBits(depthDifference);
+                var neighbourIndex = groupStartIndex.ResetNthBit(depthDifference);
+
+                bool grupStartIndexDthBit = groupStartIndex.GetNthBit(Depth - 1);
+                bool neighbourIndexDthBit = neighbourIndex.GetNthBit(Depth - 1);
+                if (neighbourIndexDthBit != grupStartIndexDthBit)
+                {
+                    // dth bit is different - should not happen
+                    Debug.WriteLine("Neighbour does not exist - dth bit is different");
+                    break;
+                }
+
+                var groupStart = _addresses[groupStartIndex];
+                var neighbour = _addresses[neighbourIndex];
+                if (neighbour.BlockDepth != groupStart.BlockDepth)
+                {
+                    // neighbour has different depth
+                    Debug.WriteLine("Neighbour does not exist - different depth");
+                    break;
+                }
+
+                Debug.WriteLine($"Group start index: {groupStartIndex} [{groupStart}]");
+                Debug.WriteLine($"Neighbour index: {neighbourIndex} [{neighbour}]");
+
+                if (groupStart.ValidCount + neighbour.ValidCount > groupStart.BlockFactor)
+                {
+                    // cannot merge
+                    Debug.WriteLine("Cannot merge - too many items");
+                    break;
+                }
+
+                //// merge
+                // merge blocks items
+                if (neighbour.Block is not null) 
+                {
+                    var neighbourHfBlock = neighbour.Block;
+                    foreach (var item in groupStart.Block?.ValidItems ?? [])
+                    {
+                        if (neighbourHfBlock is not null) {
+                            neighbourHfBlock.AddItem(item);
+                            neighbour.ValidCount++;
+                        }   
+                    }
+
+                    // update neighbour block
+                    if (neighbour.Address is not null && neighbourHfBlock is not null) 
+                    {
+                        _heapFile._saveBlock(neighbour.Address.Value, neighbourHfBlock);
+                    }
+
+                    // remove group start block from heap file
+                    if (groupStart.Address is not null)
+                    {
+                        _heapFile.DeleteBlock(groupStart.Address.Value);
+                    }
+                } else 
+                {
+                    Debug.WriteLine("Neighbour block is null");
+                    
+                    neighbour.Address = groupStart.Address;
+                    neighbour.ValidCount = groupStart.ValidCount;
+                }
+                // decrease depth
+                neighbour.BlockDepth--;
+                groupStart.BlockDepth--;
+
+                // update group blocks
+                var newGroupStartIndex = neighbourIndex - (int)(neighbourIndex % Math.Pow(2, Depth - neighbour.BlockDepth));
+                _updateAllBlocksInGoup(newGroupStartIndex, neighbour);
+
+                hasBeedMerged = true;
+                Debug.WriteLine("Block merged");
+
+                // setup next iteration
+                baseMergingBlockIndex = neighbourIndex;
+                baseMergingBlockDepth = neighbour.BlockDepth;
+
+                // check if whole addresses should not be decreased
+                if (_tryDecreaseDepth())
+                {
+                    // depth has been decreased, index also changed
+                    baseMergingBlockIndex >>= 1;
+                }
+            } while (hasBeedMerged);
         }
 
         public byte[] ToBytes()
@@ -479,12 +598,19 @@ namespace FRI.AUS2.Libs.Structures.Files
     {
         public int? Address { get; set; } = null;
         public int BlockDepth { get; set; } = 1;
+        public int ValidCount { get; set; } = 0;
+
+        /// <summary>
+        /// bez zapisu do suboru, lebo ActiveBlock je vzdy nejaky nacitany
+        /// </summary>
+        public int BlockFactor => _heapFile.ActiveBlock.BlockFactor;
+        
         public HeapFileBlock<TData>? Block =>
             Address is null
             ? null
             : _heapFile.GetBlock(Address.Value);
 
-        public int Size => 2 * sizeof(int);
+        public int Size => 3 * sizeof(int);
 
         private HeapFile<TData> _heapFile;
 
@@ -495,7 +621,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
         public override string ToString()
         {
-            return $"[{BlockDepth}] {Address.ToString() ?? "NULL"}";
+            return $"({BlockDepth}) {Address.ToString() ?? "NULL"} [{ValidCount}]";
         }
 
         public byte[] ToBytes()
@@ -504,6 +630,7 @@ namespace FRI.AUS2.Libs.Structures.Files
 
             bytes.AddRange(BitConverter.GetBytes(Address ?? -1));
             bytes.AddRange(BitConverter.GetBytes(BlockDepth));
+            bytes.AddRange(BitConverter.GetBytes(ValidCount));
 
             return bytes.ToArray();
         }
@@ -517,6 +644,9 @@ namespace FRI.AUS2.Libs.Structures.Files
             offset += sizeof(int);
 
             BlockDepth = BitConverter.ToInt32(bytes, offset);
+            offset += sizeof(int);
+
+            ValidCount = BitConverter.ToInt32(bytes, offset);
         }
     }
     #endregion

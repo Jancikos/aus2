@@ -336,6 +336,37 @@ namespace FRI.AUS2.Libs.Structures.Files
             }
         }
 
+
+        /// <summary>
+        /// empty the block
+        /// </summary>
+        /// <param name="address"></param>
+        public void DeleteBlock(int address, bool checkIfEmpty = true)
+        {
+            _validateAddress(address);
+
+            _loadActiveBlock(address);
+
+            if (checkIfEmpty && ActiveBlock.IsEmpty)
+            {
+                return;
+            }
+
+            ActiveBlock.ClearItems();
+
+            _saveActiveBlockDisabled = true;
+
+            if (address == _getAddressByBlockIndex(BlocksCount - 1))
+            {
+                _deleteEmptyBlocksFromEnd();
+                return;
+            }
+
+            _enqueNextEmptyBlock();
+
+            _saveActiveBlock(true);
+        }
+
         #endregion
 
         #region Update
@@ -343,11 +374,6 @@ namespace FRI.AUS2.Libs.Structures.Files
         public void Update(int address, TData filter, TData newData)
         {
             _validateAddress(address);
-
-            if (!filter.Equals(newData))
-            {
-                throw new InvalidOperationException("Filter and new data are not equal. Update is not allowed when hash of the data is changed");
-            }
 
             _loadActiveBlock(address);
 
@@ -574,7 +600,7 @@ namespace FRI.AUS2.Libs.Structures.Files
             _dequeActiveBlock(ref _nextEmptyBlock);
         }
 
-        private void _loadActiveBlock(int address)
+        public void _loadActiveBlock(int address)
         {
             if (ActiveBlockAddress == address)
             {

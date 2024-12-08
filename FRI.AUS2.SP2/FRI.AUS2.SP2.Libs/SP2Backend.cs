@@ -5,7 +5,7 @@ using FRI.AUS2.SP2.Libs.Utils;
 
 namespace FRI.AUS2.SP2.Libs
 {
-    public class SP2Backend :  IDisposable
+    public class SP2Backend : IDisposable
     {
         public HeapFile<Customer> _allData;
 
@@ -19,10 +19,10 @@ namespace FRI.AUS2.SP2.Libs
         public SP2Backend(int blockSize, Uri dataFolder)
         {
             // _allData = new HeapFile<Customer>(2405, new(dataFolder.LocalPath + "allData.bin")); // BlockFactor = 2
-            _allData = new HeapFile<Customer>(blockSize, new(dataFolder.LocalPath + "allData.bin")); 
+            _allData = new HeapFile<Customer>(blockSize, new(dataFolder.LocalPath + "allData.bin"));
 
             // _dataById = new ExtendableHashFile<CustomerAddressById>(30, new(dataFolder.LocalPath), "ehfById"); // BlockFactor = 2
-            _dataById = new ExtendableHashFile<CustomerAddressById>(blockSize / 100, new(dataFolder.LocalPath), "ehfById"); 
+            _dataById = new ExtendableHashFile<CustomerAddressById>(blockSize / 100, new(dataFolder.LocalPath), "ehfById");
 
             // _dataByEcv = new ExtendableHashFile<CustomerAddressByEcv>(45, new(dataFolder.LocalPath), "ehfByEcv"); // BlockFactor = 2
             _dataByEcv = new ExtendableHashFile<CustomerAddressByEcv>(blockSize / 100, new(dataFolder.LocalPath), "ehfByEcv");
@@ -30,14 +30,14 @@ namespace FRI.AUS2.SP2.Libs
             _generator = new CustomersGenerator(_dataById, _dataByEcv);
         }
 
-        public void GenerateCustomers(int count, int? seed)
+        public void GenerateCustomers(int count, int? seed, bool fast)
         {
             if (seed is not null)
             {
                 _generator.SetSeed(seed.Value);
             }
 
-            foreach (var customer in _generator.GenerateCustomers(count))
+            foreach (var customer in _generator.GenerateCustomers(count, fast))
             {
                 AddCustomer(customer);
             }
@@ -54,17 +54,36 @@ namespace FRI.AUS2.SP2.Libs
 
             var blockAddress = _allData.Insert(customer);
 
-            _dataById.Insert(new CustomerAddressById
+            try
             {
-                Id = customer.Id.Value,
-                Addreess = blockAddress
-            });
+                _dataById.Insert(new CustomerAddressById
+                {
+                    Id = customer.Id.Value,
+                    Addreess = blockAddress
+                });
+            } catch (ArgumentException)
+            {   
+                _allData.Delete(blockAddress, customer);
 
-            _dataByEcv.Insert(new CustomerAddressByEcv
+                throw new ArgumentException("Customer with this ID already exists");
+            }
+
+            try {
+                _dataByEcv.Insert(new CustomerAddressByEcv
+                {
+                    ECV = customer.ECV,
+                    Addreess = blockAddress
+                });
+            } catch (ArgumentException)
             {
-                ECV = customer.ECV,
-                Addreess = blockAddress
-            });
+                _allData.Delete(blockAddress, customer);
+                _dataById.Delete(new CustomerAddressById
+                {
+                    Id = customer.Id.Value
+                });
+
+                throw new ArgumentException("Customer with this ECV already exists");
+            }
         }
 
         public Customer GetCustomerById(int id)
@@ -93,7 +112,7 @@ namespace FRI.AUS2.SP2.Libs
             }) ?? throw new KeyNotFoundException();
         }
 
-        public void UpdateCustomer(Customer customer)
+        public void UpdateCustomerById(Customer customer)
         {
             if (customer.Id is null || customer.ECV is null)
             {
@@ -105,7 +124,164 @@ namespace FRI.AUS2.SP2.Libs
                 Id = customer.Id.Value
             });
 
-            _allData.Update(customerAddressById.Addreess, customer, customer);
+            try
+            {
+                var customerAddressByEcv = _dataByEcv.Find(new CustomerAddressByEcv
+                {
+                    ECV = customer.ECV
+                });
+
+                if (customerAddressById.Addreess != customerAddressByEcv.Addreess)
+                {
+                    throw new ArgumentException("Customer with this ECV already exists");
+                }
+            }
+            catch (KeyNotFoundException)
+            {
+                // OK - need to update ECV
+                var oldCustomer = _allData.Find(customerAddressById.Addreess, new Customer()
+                {
+                    Id = customer.Id.Value
+                });
+
+                if (oldCustomer?.ECV is not null)
+                {
+                    _dataByEcv.Delete(new CustomerAddressByEcv
+                    {
+                        ECV = oldCustomer.ECV
+                    });
+                }
+
+                _dataByEcv.Insert(new CustomerAddressByEcv
+                {
+                    ECV = customer.ECV,
+                    Addreess = customerAddressById.Addreess
+                });
+            }
+
+            _allData.Update(
+                customerAddressById.Addreess,
+                 new Customer()
+                 {
+                     Id = customer.Id
+                 },
+                 customer
+            );
+        }
+
+        public void UpdateCustomerByEcv(Customer customer)
+        {
+            if (customer.Id is null || customer.ECV is null)
+            {
+                throw new ArgumentException("Id and ECV must be set");
+            }
+
+            var customerAddressByEcv = _dataByEcv.Find(new CustomerAddressByEcv
+            {
+                ECV = customer.ECV
+            });
+
+            try
+            {
+                var customerAddressById = _dataById.Find(new CustomerAddressById
+                {
+                    Id = customer.Id.Value
+                });
+
+                if (customerAddressByEcv.Addreess != customerAddressById.Addreess)
+                {
+                    throw new ArgumentException("Customer with this ID already exists");
+                }
+            }
+            catch (KeyNotFoundException)
+            {
+                // OK - need to update ID
+                var oldCustomer = _allData.Find(customerAddressByEcv.Addreess, new Customer()
+                {
+                    ECV = customer.ECV
+                });
+
+                if (oldCustomer?.Id is not null)
+                {
+                    _dataById.Delete(new CustomerAddressById
+                    {
+                        Id = oldCustomer.Id.Value
+                    });
+                }
+
+                _dataById.Insert(new CustomerAddressById
+                {
+                    Id = customer.Id.Value,
+                    Addreess = customerAddressByEcv.Addreess
+                });
+            }
+
+            _allData.Update(
+                customerAddressByEcv.Addreess,
+                 new Customer()
+                 {
+                     ECV = customer.ECV
+                 },
+                 customer
+            );
+        }
+
+        public void DeleteCustomer(int id)
+        {
+            var customerAddressById = _dataById.Find(new CustomerAddressById
+            {
+                Id = id
+            });
+
+            var customer = _allData.Find(customerAddressById.Addreess, new Customer()
+            {
+                Id = id
+            });
+
+            if (customer is null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            _allData.Delete(customerAddressById.Addreess, customer);
+
+            _dataById.Delete(customerAddressById);
+            if (customer.ECV is not null)
+            {
+                _dataByEcv.Delete(new CustomerAddressByEcv
+                {
+                    ECV = customer.ECV
+                });
+            }
+        }
+
+        public void DeleteCustomer(string ecv)
+        {
+            var customerAddressByEcv = _dataByEcv.Find(new CustomerAddressByEcv
+            {
+                ECV = ecv
+            });
+
+            var customer = _allData.Find(customerAddressByEcv.Addreess, new Customer()
+            {
+                ECV = ecv
+            });
+
+            if (customer is null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            _allData.Delete(customerAddressByEcv.Addreess, customer);
+
+            _dataByEcv.Delete(customerAddressByEcv);
+            if (customer.Id is not null)
+            {
+                _dataById.Delete(new CustomerAddressById
+                {
+                    Id = customer.Id.Value
+                });
+            }
         }
 
         public void Clear()

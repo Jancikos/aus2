@@ -13,12 +13,6 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
     {
         private Random _random;
 
-        private static int _idCounter = 0;
-        public static void SetIdCounter(int id)
-        {
-            _idCounter = id;
-        }
-
         private readonly string[] _firstnames = { "Jozef", "Ján", "Peter", "Marek", "Martin", "Michal", "Tomáš", "Lukáš", "Miroslav", "Ivan" };
         private readonly string[] _lastnames = { "Novák", "Horváth", "Kováč", "Varga", "Tóth", "Nagy", "Baláž", "Molnár", "Szabó", "Kovács" };
         private readonly string[] _itemDescriptions = { "Olej", "Filtre", "Brzdy", "Výfuk", "Pneumatiky", "Baterie", "Interiér", "Elektronika" };
@@ -33,18 +27,11 @@ namespace FRI.AUS2.StructureTester.HeapFileTester.Utils
 
         public IEnumerable<HeapData> GenerateItems(int count)
         {
-            var newIds = Enumerable
-                .Range(_idCounter, count)
-                .OrderBy(_ => _random.Next());
-            _idCounter += count;
-
-            foreach (var id in newIds)
+            foreach (var _ in Enumerable.Range(0, count))
             {
-                yield return GenerateItem(id);
+                yield return GenerateItem();
             }
         }
-
-
 
         private static int _maxId = 10000;
         private static HashSet<int> _usedIds = new HashSet<int>();

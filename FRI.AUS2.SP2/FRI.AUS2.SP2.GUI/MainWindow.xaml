@@ -106,6 +106,42 @@
                             <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_FindByEcv" Content="Find" Margin="0" Click="_btn_FindByEcv_Click" />
                         </Grid>
                     </GroupBox>
+
+                    <!-- Delete by ID  -->
+                    <GroupBox Header="Delete by ID" VerticalAlignment="Top">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" MinWidth="80" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+
+                            <libsuc:InlineTextBox x:Name="_txtbx_DeleteId" Title="ID" Value="1" VerticalAlignment="Center"/>
+
+                            <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_DeleteById" Content="Delete" Margin="0" Click="_btn_DeleteById_Click" />
+                        </Grid>
+                    </GroupBox>
+                    
+                    <!-- Delete by ECV  -->
+                    <GroupBox Header="Delete by ECV" VerticalAlignment="Bottom">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" MinWidth="80" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+
+                            <libsuc:InlineTextBox x:Name="_txtbx_DeleteEcv" Title="ECV" Value="1" VerticalAlignment="Center" />
+
+                            <Button Grid.Column="2" VerticalAlignment="Center" x:Name="_btn_DeleteByEcv" Content="Delete" Margin="0" Click="_btn_DeleteByEcv_Click" />
+                        </Grid>
+                    </GroupBox>
                 </StackPanel>
             </StackPanel>
 
@@ -121,12 +157,12 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
-                    
-                        <uc:CustomerForm x:Name="_frm_Display"  ManageIds="False" />
+
+                        <uc:CustomerForm x:Name="_frm_Display" />
 
                         <StackPanel Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
-                            <Button x:Name="_btn_Update" Content="Update" Click="_btn_Update_Click" />
-                            <Button x:Name="_btn_Delete" Content="Delete" Click="_btn_Delete_Click" />
+                            <Button x:Name="_btn_UpdateById" Content="Update by ID" Click="_btn_UpdateById_Click" />
+                            <Button x:Name="_btn_UpdateByEcv" Content="Update by ECV" Click="_btn_UpdateByEcv_Click" />
                         </StackPanel>
                     </Grid>
                 </GroupBox>

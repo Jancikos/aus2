@@ -47,6 +47,18 @@ namespace FRI.AUS2.SP2.GUI.Windows
             }
         }
 
+        public bool Fast
+        {
+            get
+            {
+                return _chk_Fast.IsChecked ?? false;
+            }
+            set
+            {
+                _chk_Fast.IsChecked = value;
+            }
+        }
+
         public GenerateCustomersWindow()
         {
             InitializeComponent();
