@@ -38,12 +38,22 @@ namespace FRI.AUS2.SP2.Libs.Utils
             _random = new Random(seed);
         }
 
-        public IEnumerable<Customer> GenerateCustomers(int count)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="fast">If true, the generator will not chceck for unique ids and ecvs</param>
+        /// <returns></returns>
+        public IEnumerable<Customer> GenerateCustomers(int count, bool fast=false)
         {
-            for (int i = 0; i < count; i++)
+            for (int i = 1; i < count + 1; i++)
             {
-                Debug.WriteLine($"Generating customer {i + 1}/{count}");
-                yield return GenerateCustomer();
+                Debug.WriteLine($"Generating customer {i}/{count}");
+
+                yield return 
+                    fast 
+                        ? GenerateCustomer(i, $"{i}")
+                        : GenerateCustomer();
             }
         }
 
